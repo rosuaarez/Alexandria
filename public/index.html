@@ -51,7 +51,8 @@ body.dark-mode .home-action-title{color:#E8E0FF}
 body.dark-mode .home-action-sub{color:#8B7AB8}
 body.dark-mode .home-action-arrow{background:rgba(140,89,254,.15);color:#8C59FE}
 body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height:100vh;line-height:1.6;font-size:14px;padding-bottom:32px}
-.app-shell{display:grid;grid-template-columns:1fr;grid-template-rows:var(--topbar-h) 1fr;min-height:100vh}
+.app-shell{display:grid;grid-template-columns:220px 1fr;grid-template-rows:var(--topbar-h) 1fr;min-height:100vh}
+.app-shell .topbar{grid-column:1/-1}
 .topbar{grid-column:1/-1;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:102;}
 .topbar-logo{display:flex;align-items:center;cursor:pointer}
 .topbar-logo-icon{display:none}
@@ -63,13 +64,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height
 .topbar-user-info{display:flex;flex-direction:column;line-height:1.3}
 .topbar-user-name{font-size:13px;font-weight:600;color:var(--text-1)}
 .topbar-user-email{font-size:11px;color:var(--text-3)}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;overflow-y:auto;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h))}
-.sidebar-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-4);padding:0 8px;margin-bottom:6px;margin-top:16px}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));width:220px;min-width:220px}
+.sidebar-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-4);padding:0 10px;margin-bottom:4px;margin-top:20px}
 .sidebar-label:first-child{margin-top:0}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-2);font-size:13px;transition:background .15s,color .15s}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-2);font-size:13px;font-weight:500;transition:background .15s,color .15s;position:relative}
 .nav-item:hover{background:var(--bg);color:var(--text-1)}
-.nav-item.active{background:var(--accent-lt);color:var(--accent);font-weight:500}
+.nav-item.active{background:var(--accent-lt);color:var(--accent);font-weight:600}
+.nav-item.active .nav-icon-wrap{background:var(--accent);color:#fff}
 .nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5;flex-shrink:0}
+/* ── NEW: icon wrapper for sidebar nav items ── */
+.nav-icon-wrap{width:30px;height:30px;border-radius:8px;background:var(--bg);display:grid;place-items:center;flex-shrink:0;color:var(--text-3);transition:background .15s,color .15s}
+.nav-item:hover .nav-icon-wrap{background:var(--border);color:var(--text-1)}
+.nav-icon-wrap svg{width:15px;height:15px;stroke-width:1.8}
+/* ── Sidebar section divider ── */
+.sidebar-divider{height:1px;background:var(--border);margin:12px 4px}
+/* ── Nav item badge ── */
+.nav-badge{margin-left:auto;background:var(--accent-lt);color:var(--accent);font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;flex-shrink:0}
 .main{padding:28px 48px;overflow-y:auto;max-width:1200px;margin:0 auto;width:100%}
 
 /* ══ AI COPILOT — Panel fijo derecho (solo en view-editor) ══ */
@@ -888,6 +898,7 @@ body.dark-mode .modal-overlay.from-home{background:#0F0A1E;}
 .gp-margin-comment{
   position:fixed;
   width:248px;
+  max-width:248px;
   background:var(--surface);
   border:1.5px solid var(--border-2);
   border-radius:var(--radius);
@@ -897,6 +908,7 @@ body.dark-mode .modal-overlay.from-home{background:#0F0A1E;}
   z-index:400;
   transition:box-shadow .15s;
   pointer-events:all;
+  overflow:hidden;
 }
 .gp-margin-comment:hover{box-shadow:0 6px 24px rgba(55,18,129,.22)}
 .gp-margin-comment.is-dragging{
@@ -959,6 +971,8 @@ body.dark-mode .modal-overlay.from-home{background:#0F0A1E;}
 .gp-mc-text{
   padding:8px 12px;color:var(--text-2);
   line-height:1.5;font-size:12.5px;
+  word-break:break-word;overflow-wrap:anywhere;
+  max-width:100%;overflow:hidden;
 }
 
 /* resolved state */
@@ -1504,11 +1518,11 @@ body.dark-mode .gp-footer{background:var(--surface);border-top-color:var(--borde
   padding:0 0 14px;
   margin-bottom:0;
   border-bottom:1px solid var(--border);
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
 }
 .editor-topbar-left{
   display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;
-  overflow:hidden;
+  overflow:visible;
 }
 .editor-proto-title{
   font-size:11.5px;font-weight:400;color:var(--text-4);
@@ -1526,6 +1540,7 @@ body.dark-mode .gp-footer{background:var(--surface);border-top-color:var(--borde
 /* Subtitle under protocol name */
 .editor-proto-subtitle{
   font-size:12px;color:var(--text-3);margin-top:2px;font-weight:400;
+  display:flex;flex-wrap:wrap;align-items:center;gap:4px;
 }
 /* Date + version meta row under protocol name */
 .editor-proto-meta{
@@ -1787,117 +1802,6 @@ body.dark-mode .gp-footer{background:var(--surface);border-top-color:var(--borde
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px}
 
-/* LOGIN SCREEN */
-.login-screen{
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse 90% 70% at 20% 15%, #d5cef5 0%, #ddd7f7 25%, #e5e0f9 50%, #ece8fa 70%, #f2effb 85%, #f5f3fc 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .4s
-}
-.login-screen.hidden{opacity:0;pointer-events:none}
-.login-box{
-  background:#fff;border-radius:16px;padding:36px 40px 32px;
-  width:100%;max-width:400px;
-  box-shadow:0 2px 24px rgba(109,40,199,.06),0 1px 3px rgba(109,40,199,.03);
-  border:1px solid rgba(220,215,245,.6);
-}
-.login-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:6px;justify-content:center;gap:4px}
-.login-logo-wordmark{
-  font-family:var(--font-display);font-size:56px;font-weight:700;
-  color:#371281;letter-spacing:-2px;line-height:1.05;
-}
-.login-logo-name{font-size:22px;font-weight:800;color:var(--text-1)}
-.login-title{
-  font-size:13.5px;font-weight:400;color:#8a7aaa;
-  margin-bottom:32px;text-align:center;letter-spacing:.01em;
-}
-.login-sub{font-size:13px;color:var(--text-3);margin-bottom:24px;text-align:center}
-.login-form{display:flex;flex-direction:column;gap:16px}
-.login-field-label{font-size:13px;font-weight:500;color:#371281;margin-bottom:5px;display:block}
-.login-form input[type="text"],.login-form input[type="password"]{
-  background:#FAF8FF !important;border-color:#E9E4F5 !important;
-  border-radius:9px;padding:11px 13px;font-size:14px;
-}
-.login-form input[type="text"]:focus,.login-form input[type="password"]:focus{
-  border-color:var(--accent) !important;background:#fff !important;
-}
-.login-btn{
-  width:100%;padding:14px;
-  background:#7B52F0;color:#fff;
-  border:none;border-radius:9px;
-  font-family:var(--font);font-size:15px;font-weight:600;
-  cursor:pointer;transition:background .15s;margin-top:2px;
-  letter-spacing:.01em;
-}
-.login-btn:hover{background:var(--accent-hv)}
-.login-forgot{text-align:center;font-size:13px;color:#9c8ab8;cursor:pointer;margin-top:8px;padding:4px}
-.login-forgot:hover{color:var(--accent)}
-/* Bienvenido text above logo */
-.login-welcome{font-size:13.5px;color:#9c8ab8;text-align:center;margin-bottom:6px;font-family:var(--font);letter-spacing:.02em}
-
-/* ── Login Tabs ── */
-.login-tabs{display:flex;background:#F3F0FF;border-radius:10px;padding:4px;gap:4px;margin-bottom:22px}
-.login-tab{flex:1;padding:9px;border:none;border-radius:7px;background:transparent;font-family:var(--font);font-size:13px;font-weight:500;color:#9c8ab8;cursor:pointer;transition:all .18s}
-.login-tab.active{background:#fff;color:#371281;font-weight:600;box-shadow:0 1px 4px rgba(109,40,199,.12)}
-.login-tab:hover:not(.active){color:#371281}
-
-/* ── Vistas dentro del login-box ── */
-.login-view{display:none;flex-direction:column;gap:0}
-.login-view.active{display:flex}
-
-/* ── Divider para login ── */
-.login-divider{display:flex;align-items:center;gap:10px;margin:4px 0}
-.login-divider span{flex:1;height:1px;background:#E9E4F5}
-.login-divider-text{font-size:12px;color:#c0b4dc;white-space:nowrap}
-
-/* ── Link subtle ── */
-.login-link{color:var(--accent);cursor:pointer;font-weight:500;text-decoration:none}
-.login-link:hover{text-decoration:underline}
-
-/* ── Forgot password view ── */
-.login-back{display:flex;align-items:center;gap:6px;font-size:13px;color:#9c8ab8;cursor:pointer;margin-bottom:18px;width:fit-content;padding:2px 0}
-.login-back:hover{color:var(--accent)}
-.login-back svg{width:14px;height:14px}
-.login-success-msg{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:14px 16px;font-size:13px;color:#059669;text-align:center;display:none}
-.login-success-msg.visible{display:block}
-.login-input-group{display:flex;flex-direction:column;gap:16px;margin-bottom:4px}
-.login-name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-/* ── Error inline ── */
-.login-error-msg{font-size:12px;color:#EF4444;margin-top:-8px;display:none}
-.login-error-msg.visible{display:block}
-
-/* ── Login select (rol) ── */
-.login-select{
-  width:100%;background:#FAF8FF;border:1px solid #E9E4F5;
-  border-radius:9px;padding:11px 36px 11px 13px;font-size:14px;
-  font-family:var(--font);color:var(--text-1);cursor:pointer;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%239c8ab8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;
-  outline:none;transition:border-color .15s,background-color .15s;
-}
-.login-select:focus{border-color:var(--accent)!important;background-color:#fff!important}
-.login-select option{color:var(--text-1)}
-.login-select.placeholder-selected{color:#a89cc8}
-
-/* ── Password field with eye toggle ── */
-.login-pwd-wrap{position:relative;display:flex;align-items:center}
-.login-pwd-wrap input{
-  width:100%;padding:11px 42px 11px 13px!important;
-  background:#FAF8FF!important;border:1px solid #E9E4F5!important;
-  border-radius:9px!important;font-size:14px!important;
-  font-family:var(--font)!important;outline:none!important;
-  transition:border-color .15s,background-color .15s!important;
-  box-shadow:none!important;color:var(--text-1)!important;
-}
-.login-pwd-wrap input:focus{border-color:var(--accent)!important;background:#fff!important}
-.login-pwd-eye{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;padding:0;
-  color:#b0a0cc;display:flex;align-items:center;justify-content:center;
-  transition:color .15s;
-}
-.login-pwd-eye:hover{color:var(--accent)}
 
 /* ═══════════════════════════════════════════════════════════
    ALEXANDRIA HOME SCREEN
@@ -2275,14 +2179,15 @@ body.dark-mode .global-footer-text{
 .bib-folder-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .bib-folder-icon{width:44px;height:44px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#6D28C7,#8C59FE);display:grid;place-items:center;font-size:20px;flex-shrink:0;color:#fff}
 .bib-folder-status-pill{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
-.bib-folder-status-pill.activo{background:#EDE9FE;color:#6D28D9}
+.bib-folder-status-pill.activo{background:#D1FAE5;color:#065F46}
 .bib-folder-status-pill.finalizado{background:#DBEAFE;color:#1E40AF}
 .bib-folder-status-pill.draft{background:#F3F4F6;color:#6B7280}
 .bib-folder-status-pill.on-hold{background:#FEF3C7;color:#92400E}
+.bib-folder-status-pill.onhold{background:#FEF3C7;color:#92400E}
 .bib-folder-status-pill.cerrado{background:#F3F4F6;color:#6B7280}
 .bib-folder-status-pill.in-review{background:#FEF3C7;color:#92400E}
 .bib-folder-status-pill.approved{background:#D1FAE5;color:#065F46}
-.bib-folder-status-pill.ready{background:#EDE9FE;color:#6D28D9}
+.bib-folder-status-pill.ready{background:#D1FAE5;color:#065F46}
 .bib-folder-status-pill.completed{background:#DBEAFE;color:#1E40AF}
 .bib-folder-name{font-size:16px;font-weight:700;color:var(--text-1);line-height:1.3}
 .bib-folder-desc{font-size:13px;color:var(--text-3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -2801,7 +2706,7 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
 .proto-card[data-wf="draft"] .proto-card-status-select{background:#F3F4F6;color:#6B7280;border-color:#D1D5DB}
 .proto-card[data-wf="in-review"] .proto-card-status-select,.proto-card[data-wf="onhold"] .proto-card-status-select,.proto-card[data-wf="changes_requested"] .proto-card-status-select{background:#FEF3C7;color:#92400E;border-color:#FCD34D}
 .proto-card[data-wf="approved"] .proto-card-status-select{background:#D1FAE5;color:#065F46;border-color:#6EE7B7}
-.proto-card[data-wf="ready"] .proto-card-status-select,.proto-card[data-wf="activo"] .proto-card-status-select{background:#EDE9FE;color:#6D28D9;border-color:#C4B5FD}
+.proto-card[data-wf="ready"] .proto-card-status-select,.proto-card[data-wf="activo"] .proto-card-status-select{background:#D1FAE5;color:#065F46;border-color:#6EE7B7}
 .proto-card[data-wf="completed"] .proto-card-status-select,.proto-card[data-wf="finalizado"] .proto-card-status-select,.proto-card[data-wf="cerrado"] .proto-card-status-select{background:#DBEAFE;color:#1E40AF;border-color:#93C5FD}
 
 /* Subtle card background tint per status */
@@ -2843,14 +2748,24 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
 .wf-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
 .wf-badge.draft{background:#F3F4F6;color:#6B7280}
 .wf-badge.in-review{background:#FEF3C7;color:#92400E}
-.wf-badge.approved{background:#D1FAE5;color:#065F46}
+.wf-badge.approved{background:#EDE9FE;color:#6D28D9}
 .wf-badge.ready{background:#EDE9FE;color:#6D28D9}
 .wf-badge.completed{background:#DBEAFE;color:#1E40AF}
-.wf-badge.activo{background:#EDE9FE;color:#6D28D9}
+.wf-badge.activo{background:#D1FAE5;color:#065F46}
 .wf-badge.onhold{background:#FEF3C7;color:#92400E}
 .wf-badge.cerrado{background:#F3F4F6;color:#6B7280}
 .wf-badge.finalizado{background:#DBEAFE;color:#1E40AF}
 .wf-badge.changes_requested{background:#FEF3C7;color:#92400E;animation:pulse-warn 1.5s infinite}
+/* Emoji picker overlay */
+.emoji-picker-overlay{position:fixed;inset:0;z-index:9999;display:none}
+.emoji-picker-overlay.open{display:block}
+.emoji-picker-panel{position:absolute;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:12px;width:280px;z-index:10000}
+.emoji-picker-search{display:flex;align-items:center;gap:6px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;margin-bottom:10px}
+.emoji-picker-search input{border:none;outline:none;font-family:var(--font);font-size:13px;flex:1;background:transparent;color:var(--text-1)}
+.emoji-picker-search input::placeholder{color:var(--text-4)}
+.emoji-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;max-height:180px;overflow-y:auto}
+.emoji-picker-btn{background:none;border:none;border-radius:6px;width:34px;height:34px;font-size:20px;cursor:pointer;display:grid;place-items:center;transition:background .12s}
+.emoji-picker-btn:hover{background:var(--accent-lt)}
 @keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:.75}}
 /* Barra de progreso dentro de la card */
 .proto-card-progress{display:flex;flex-direction:column;gap:5px}
@@ -4232,131 +4147,52 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
 }
 </style>
 <!-- ══ SUPABASE JS CDN ══ -->
-<!-- ══ ENVIRONMENT CONFIG ══
-     Desarrollo : crea public/config.js con tus claves (ver config.example.js)
-     Vercel     : las variables se inyectan via api/env.js (ver vercel.json)
-     NUNCA subas config.js a GitHub.
--->
-<script src="/config.js" onerror="console.warn('[Alexandria] config.js no cargado. Crea public/config.js');window.__ENV=window.__ENV||{};"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   SUPABASE — Cliente real + sesión anónima automática
+   Sin pantalla de login: cada navegador obtiene una sesión
+   anónima persistente (guardada por supabase-js) y todos los
+   protocolos creados en ese navegador quedan asociados a ella.
+   ══════════════════════════════════════════════════════════ */
+var SUPABASE_URL      = 'https://dniubktmsjhpjhppqnzx.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_3pJEPqkFG0ltQj581RBjhA_r4aEhpwf';
+
+var _supabase = (window.supabase && window.supabase.createClient)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+window._supabase = _supabase;
+
+if (!_supabase) {
+  console.error('[Alexandria DB] No se pudo cargar el SDK de Supabase (CDN bloqueado o sin red).');
+}
+
+/** Garantiza que exista una sesión (anónima) antes de leer/escribir en la BD */
+var _supabaseSessionPromise = null;
+function _ensureSupabaseSession() {
+  if (!_supabase) return Promise.resolve(null);
+  if (_supabaseSessionPromise) return _supabaseSessionPromise;
+  _supabaseSessionPromise = (async function() {
+    try {
+      var s = await _supabase.auth.getSession();
+      if (s && s.data && s.data.session) return s.data.session;
+      var res = await _supabase.auth.signInAnonymously();
+      if (res.error) {
+        console.error('[Alexandria DB] Error creando sesión anónima:', res.error);
+        return null;
+      }
+      return res.data.session;
+    } catch (e) {
+      console.error('[Alexandria DB] Error inicializando sesión de Supabase:', e);
+      return null;
+    }
+  })();
+  return _supabaseSessionPromise;
+}
+window._ensureSupabaseSession = _ensureSupabaseSession;
+</script>
 </head>
 <body>
-<div class="login-screen" id="login-screen">
-  <div style="text-align:center;margin-bottom:24px;">
-    <div style="font-size:13.5px;color:#9c8ab8;font-family:var(--font);letter-spacing:.04em;margin-bottom:12px;">Bienvenidx a</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:0"><span style="font-family:var(--font-display);font-size:52px;font-weight:700;color:#6D28C7;letter-spacing:-.5px;line-height:1.0">Alexandría</span><span style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;margin-left:10px;padding-bottom:4px"><span style="font-family:var(--font);font-size:11px;font-weight:400;color:#9c8ab8;letter-spacing:.04em;line-height:1">by</span><img style="height:26px;width:auto;object-fit:contain;display:block" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjk4IiBoZWlnaHQ9IjEyNSIgdmlld0JveD0iMCAwIDI5OCAxMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNjMuMDY4IDU2Ljk4NzlMMjkzLjMwNiAyNi44MjE0QzI5OS4yNjggMjAuODU5OSAyOTkuMjY4IDExLjIzNTMgMjkzLjMwNiA1LjI3Mzg0QzI4Ny4zNDUgLTAuNjg3NjM2IDI3Ny43MiAtMC42ODc2MzYgMjcxLjc1OSA1LjI3Mzg0TDI0NC44OTYgMzIuMDY0NkwyNTUuNjcgNDIuODM4NEMyNTkuNjkyIDQ2Ljc4ODcgMjYyLjEzNCA1MS43NDQ3IDI2My4wNjggNTYuOTg3OVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMTE4LjY5NyA3Ni44ODIxVjIyLjUxMDVWMTUuOTc0NUMxMTguNjk3IDcuNTcwOTQgMTExLjg3NCAwLjc0NzU1OSAxMDMuNDcgMC43NDc1NTlDOTUuMDY2NyAwLjc0NzU1OSA4OC4yNDMzIDcuNTcwOTQgODguMjQzMyAxNS45NzQ1VjcyLjcxNjNDODguMjQzMyA5OS43OTQzIDU5LjY1NzEgOTcuNDk1OSA1OS42NTcxIDk3LjQ5NTlDNTkuNjU3MSA5Ny40OTU5IDM0LjIzMTIgOTkuNTc4OCAzMS4zNTgyIDc3LjM4NDlDMzEuMjE0NSA3Ni4wMjAyIDMxLjA3MDkgNzQuNjU1NSAzMS4wNzA5IDczLjE0NzJWMzkuMDMwM0MzMS4wNzA5IDM5LjAzMDMgMi40MTI4MSA1OS4zNTY4IDAuNjg5MDE3IDc5LjEwODdDMC42ODkwMTcgNzkuMjUyNCAwLjY4OTAxMiA3OS4zOTYgMC42MTcxODggNzkuNTM5NkMwLjY4OTAxMiA4MS40MDcxIDAuOTA0NDg5IDgzLjI3NDYgMS4xOTE3OSA4NS4xNDJDMy45MjExMyAxMDMuODg4IDE1Ljg0NCAxMTMuNzI4IDI4LjI2OTcgMTE4LjlDMzMuNzI4NCAxMjEuMTk4IDM5Ljk3NzEgMTIyLjkyMiA0Ny4wODc4IDEyMy43ODRDNTMuNjk1NiAxMjQuNjQ2IDU4LjU3OTcgMTI0LjU3NCA1OS42NTcxIDEyNC41NzRDNTkuNjU3MSAxMjQuNTc0IDU5LjY1NzEgMTI0LjU3NCA1OS43Mjg5IDEyNC41NzRINTkuODAwOEM2MC41MTkgMTI0LjU3NCA2MS4yMzcyIDEyNC41NzQgNjEuOTU1NSAxMjQuNTc0QzYyLjgxNzQgMTI0LjU3NCA2My42NzkzIDEyNC41MDIgNjQuNTQxMiAxMjQuNTAyQzY0Ljk3MjEgMTI0LjUwMiA2NS4zMzEzIDEyNC41MDIgNjUuNjE4NiAxMjQuNDNDNjUuNzYyMiAxMjQuNDMgNjUuOTA1OSAxMjQuNDMgNjUuOTc3NyAxMjQuNDNDNjYuMTIxMyAxMjQuNDMgNjYuMTkzMSAxMjQuNDMgNjYuMTkzMSAxMjQuNDNDNjYuMTkzMSAxMjQuNDMgNjYuMTkzMSAxMjQuNDMgNjYuMTIxMyAxMjQuNDNDODAuMTk5IDEyMy41NjggOTEuMzMxOCAxMTkuOTA1IDk5LjY2MzUgMTE0LjIzMUM5OS43MzUzIDExNC4zMDMgOTkuNzM1MyAxMTQuMzAzIDk5LjgwNzEgMTE0LjM3NUMxMTAuNTgxIDEyNi45NDQgMTI1LjA4OSAxMjQuNjQ2IDEyNS4wODkgMTI0LjY0NkMxMTguNjk3IDExOC4yNTMgMTE4LjY5NyAxMTMuNTEzIDExOC42OTcgMTA1LjE4MUMxMTguNjk3IDEwMi4wOTMgMTE4LjY5NyA5MC40NTcxIDExOC42OTcgNzYuODgyMVoiIGZpbGw9InVybCgjcGFpbnQxX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMjQ3LjYyMiA1MC44ODIxTDIzNi44NDggNDAuMTA4M0wyMDEuODcgNS4yMDEzM0MxOTUuOTA4IC0wLjc2MDE0NSAxODYuMjg0IC0wLjc2MDE0NSAxODAuMzIyIDUuMjAxMzNDMTc0LjM2MSAxMS4xNjI4IDE3NC4zNjEgMjAuNzg3NCAxODAuMzIyIDI2Ljc0ODhMMjE1LjMwMSA2MS42NTU4TDE4MC4yNSA5Ni41NjI4QzE3NC4yODkgMTAyLjUyNCAxNzQuMjg5IDExMi4xNDkgMTgwLjI1IDExOC4xMUMxODYuMjEyIDEyNC4wNzIgMTk1LjgzNiAxMjQuMDcyIDIwMS43OTggMTE4LjExTDIzNi43NzYgODMuMjAzM0wyNDcuNTUgNzIuNDI5NkMyNTMuNTgzIDY2LjQ2ODEgMjUzLjU4MyA1Ni44NDM1IDI0Ny42MjIgNTAuODgyMVoiIGZpbGw9InVybCgjcGFpbnQyX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMTMzLjkyOCAzOC44MTFWMTA3LjMzMkMxMzMuOTI4IDExNS43MzYgMTQwLjc1MSAxMjIuNTU5IDE0OS4xNTUgMTIyLjU1OUMxNTcuNTU4IDEyMi41NTkgMTY0LjM4MSAxMTUuNzM2IDE2NC4zODEgMTA3LjMzMlYzOC44ODI5QzE1NS45NzggNDcuMjE0NiAxNDIuMzMxIDQ3LjIxNDYgMTMzLjkyOCAzOC44MTFaIiBmaWxsPSJ1cmwoI3BhaW50M19saW5lYXJfMzUwXzg2NykiLz4KPHBhdGggZD0iTTI2My4wNjMgNjYuMzk5N0MyNjIuMTI5IDcxLjU3MTEgMjU5LjY4NyA3Ni41MjcgMjU1LjczNyA4MC40Nzc0TDI0NC45NjMgOTEuMjUxMUwyNzEuODI1IDExOC4wNDJDMjc3Ljc4NyAxMjQuMDAzIDI4Ny40MTEgMTI0LjAwMyAyOTMuMzczIDExOC4wNDJDMjk5LjMzNCAxMTIuMDggMjk5LjMzNCAxMDIuNDU2IDI5My4zNzMgOTYuNDk0NEwyNjMuMDYzIDY2LjM5OTdaIiBmaWxsPSJ1cmwoI3BhaW50NF9saW5lYXJfMzUwXzg2NykiLz4KPHBhdGggZD0iTTIwMS45NDUgNS4yNzM4NEwyNDcuNjk3IDUwLjg4MjhDMjUzLjczIDU2LjkxNjEgMjUzLjczIDY2LjYxMjUgMjQ3LjY5NyA3Mi42NDU4TDIxOC4wMzQgMTAyLjM4MUMyMzguMjg4IDgyLjEyNjcgMjIwLjE4OCA2Ni42ODQzIDIxNS4zNzYgNjEuODAwMkMyMDkuNzc0IDU2LjE5NzggMTkyLjAzMyAzOC40NTcgMTgwLjM5NyAyNi44MjE0QzE3NC40MzYgMjAuODU5OSAxNzQuNDM2IDExLjIzNTMgMTgwLjM5NyA1LjI3Mzg0QzE4Ni4zNTkgLTAuNjg3NjM1IDE5NS45ODMgLTAuNjg3NjM1IDIwMS45NDUgNS4yNzM4NFpNMTQ5LjE1NCAwLjgyMDY5M0MxNDAuNzUgMC44MjA2OTMgMTMzLjkyNyA3LjY0NDA3IDEzMy45MjcgMTYuMDQ3NkMxMzMuOTI3IDI0LjQ1MTEgMTQwLjc1IDMxLjI3NDUgMTQ5LjE1NCAzMS4yNzQ1QzE1Ny41NTcgMzEuMjc0NSAxNjQuMzgxIDI0LjQ1MTEgMTY0LjM4MSAxNi4wNDc2QzE2NC4zODEgNy42NDQwNyAxNTcuNTU3IDAuODIwNjkzIDE0OS4xNTQgMC44MjA2OTNaTTMxLjAwMjEgMTYuMDQ3NkMzMS4wMDIxIDcuNjQ0MDcgMjQuMTc4NyAwLjgyMDY5MyAxNS43MDM0IDAuODIwNjkzQzcuMjk5OTEgMC44MjA2OTMgMC40NzY1NjIgNy42NDQwNyAwLjQ3NjU2MiAxNi4wNDc2VjU0LjQwMjJDNC4zNTUxIDM4LjgxNjEgMzEuMDAyMSAyMy41ODkyIDMxLjAwMjEgMjMuNTg5MlYxNi4wNDc2WiIgZmlsbD0idXJsKCNwYWludDVfbGluZWFyXzM1MF84NjcpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMzUwXzg2NyIgeDE9IjI3MS4zNiIgeTE9IjU2Ljk2MTMiIHgyPSIyNzEuMzYiIHkyPSIwLjc4NjE0NCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjOEM1OUZFIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU5N0FGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MV9saW5lYXJfMzUwXzg2NyIgeDE9IjYyLjgxNzciIHkxPSIxMjQuNzQ0IiB4Mj0iNjIuODE3NyIgeTI9IjAuNjkwOTY0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4QzU5RkUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTk3QUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQyX2xpbmVhcl8zNTBfODY3IiB4MT0iMjEzLjkzOSIgeTE9IjEyMi41NDEiIHgyPSIyMTMuOTM5IiB5Mj0iMC43ODU0NTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzhDNTlGRSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1OTdBRkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDNfbGluZWFyXzM1MF84NjciIHgxPSIxNDkuMTQ1IiB5MT0iMTIyLjUxOCIgeDI9IjE0OS4xNDUiIHkyPSIzOC44MzY2IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4QzU5RkUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTk3QUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQ0X2xpbmVhcl8zNTBfODY3IiB4MT0iMjcxLjM1NCIgeTE9IjEyMi41NDQiIHgyPSIyNzEuMzU0IiB5Mj0iNjYuMzY2NSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjOEM1OUZFIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU5N0FGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50NV9saW5lYXJfMzUwXzg2NyIgeDE9IjEyNi4zNSIgeTE9IjEwMi4zNDgiIHgyPSIxMjYuMzUiIHkyPSIwLjc3NjczMiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBDNEIzIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0FDRTczOCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPg==" alt="UIX"></span></div>
-    <div style="font-size:14px;color:#8a7aaa;margin-top:10px;font-family:var(--font);letter-spacing:.01em;">El hábitat del conocimiento UX/UI</div>
-  </div>
-  <div class="login-box">
-
-    <!-- TABS -->
-    <div class="login-tabs" id="login-tabs">
-      <button class="login-tab active" id="tab-login" onclick="switchLoginTab('login')">Iniciar sesión</button>
-      <button class="login-tab" id="tab-register" onclick="switchLoginTab('register')">Crear cuenta</button>
-    </div>
-
-    <!-- ── VISTA: INICIAR SESIÓN ── -->
-    <div class="login-view active" id="view-login">
-      <div class="login-input-group">
-        <div class="form-group">
-          <label class="login-field-label" for="login-email">Correo electrónico</label>
-          <input type="text" id="login-email" placeholder="tu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <div class="form-group">
-          <label class="login-field-label" for="login-name">Contraseña</label>
-          <div class="login-pwd-wrap">
-            <input type="password" id="login-name" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-            <button type="button" class="login-pwd-eye" onclick="togglePwd('login-name',this)" tabindex="-1" aria-label="Mostrar contraseña">
-              <svg id="eye-login-name" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      <button class="login-btn" id="login-submit-btn" style="margin-top:20px" onclick="doLogin()">Iniciar sesión</button>
-      <div class="login-forgot" onclick="switchLoginTab('forgot')" style="margin-top:12px">¿Olvidaste tu contraseña?</div>
-    </div>
-
-    <!-- ── VISTA: CREAR CUENTA ── -->
-    <div class="login-view" id="view-register">
-      <div class="login-input-group">
-        <div class="login-name-row">
-          <div class="form-group">
-            <label class="login-field-label" for="reg-firstname">Nombre</label>
-            <input type="text" id="reg-firstname" placeholder="Ana" autocomplete="given-name">
-          </div>
-          <div class="form-group">
-            <label class="login-field-label" for="reg-lastname">Apellido</label>
-            <input type="text" id="reg-lastname" placeholder="Martínez" autocomplete="family-name">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="login-field-label" for="reg-email">Correo electrónico</label>
-          <input type="text" id="reg-email" placeholder="tu@email.com" autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label class="login-field-label" for="reg-role">Rol / Puesto</label>
-          <select id="reg-role" class="login-select placeholder-selected" onchange="this.classList.toggle('placeholder-selected', this.value==='')">
-            <option value="" disabled selected>Selecciona tu rol…</option>
-            <option value="UX Researcher">UX Researcher</option>
-            <option value="UX Writer">UX Writer</option>
-            <option value="UX Designer">UX Designer</option>
-            <option value="Product Designer">Product Designer</option>
-            <option value="Customer Success">Customer Success</option>
-            <option value="Product Owner">Product Owner</option>
-            <option value="Project Manager">Project Manager</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="login-field-label" for="reg-password">Contraseña</label>
-          <div class="login-pwd-wrap">
-            <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
-            <button type="button" class="login-pwd-eye" onclick="togglePwd('reg-password',this)" tabindex="-1" aria-label="Mostrar contraseña">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="login-field-label" for="reg-password2">Confirmar contraseña</label>
-          <div class="login-pwd-wrap">
-            <input type="password" id="reg-password2" placeholder="Repite tu contraseña" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
-            <button type="button" class="login-pwd-eye" onclick="togglePwd('reg-password2',this)" tabindex="-1" aria-label="Mostrar contraseña">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="login-error-msg" id="reg-error"></div>
-      </div>
-      <button class="login-btn" id="register-submit-btn" style="margin-top:20px" onclick="doRegister()">Crear cuenta</button>
-      <div style="text-align:center;font-size:13px;color:#9c8ab8;margin-top:12px">
-        ¿Ya tienes cuenta? <span class="login-link" onclick="switchLoginTab('login')">Inicia sesión</span>
-      </div>
-    </div>
-
-    <!-- ── VISTA: RECUPERAR CONTRASEÑA ── -->
-    <div class="login-view" id="view-forgot">
-      <div class="login-back" onclick="switchLoginTab('login')">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
-        Volver al inicio de sesión
-      </div>
-      <div style="margin-bottom:18px">
-        <div style="font-size:15px;font-weight:700;color:#371281;margin-bottom:5px">Recupera tu acceso</div>
-        <div style="font-size:13px;color:#9c8ab8;line-height:1.5">Escribe tu correo y te enviaremos un enlace para restablecer tu contraseña.</div>
-      </div>
-      <div class="login-input-group">
-        <div class="form-group">
-          <label class="login-field-label" for="forgot-email">Correo electrónico</label>
-          <input type="text" id="forgot-email" placeholder="tu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doForgotPassword()">
-        </div>
-      </div>
-      <div class="login-success-msg" id="forgot-success">
-        ✓ Si existe una cuenta con ese correo, recibirás las instrucciones en breve.
-      </div>
-      <button class="login-btn" style="margin-top:20px" id="forgot-btn" onclick="doForgotPassword()">Enviar enlace de recuperación</button>
-    </div>
-
-  </div>
-</div>
-
 <!-- HOME SCREEN (shown after login, before app shell) -->
 <div class="home-screen" id="home-screen">
   <div class="home-topbar">
@@ -4407,7 +4243,7 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
 
   <!-- TOPBAR -->
   <header class="topbar">
-    <div class="topbar-logo" onclick="showHome()"><span class="alex-brand"><span class="alex-brand__name">Alexandría</span><span class="alex-brand__by">by</span><img class="alex-brand__uix" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjk4IiBoZWlnaHQ9IjEyNSIgdmlld0JveD0iMCAwIDI5OCAxMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNjMuMDY4IDU2Ljk4NzlMMjkzLjMwNiAyNi44MjE0QzI5OS4yNjggMjAuODU5OSAyOTkuMjY4IDExLjIzNTMgMjkzLjMwNiA1LjI3Mzg0QzI4Ny4zNDUgLTAuNjg3NjM2IDI3Ny43MiAtMC42ODc2MzYgMjcxLjc1OSA1LjI3Mzg0TDI0NC44OTYgMzIuMDY0NkwyNTUuNjcgNDIuODM4NEMyNTkuNjkyIDQ2Ljc4ODcgMjYyLjEzNCA1MS43NDQ3IDI2My4wNjggNTYuOTg3OVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMTE4LjY5NyA3Ni44ODIxVjIyLjUxMDVWMTUuOTc0NUMxMTguNjk3IDcuNTcwOTQgMTExLjg3NCAwLjc0NzU1OSAxMDMuNDcgMC43NDc1NTlDOTUuMDY2NyAwLjc0NzU1OSA4OC4yNDMzIDcuNTcwOTQgODguMjQzMyAxNS45NzQ1VjcyLjcxNjNDODguMjQzMyA5OS43OTQzIDU5LjY1NzEgOTcuNDk1OSA1OS42NTcxIDk3LjQ5NTlDNTkuNjU3MSA5Ny40OTU5IDM0LjIzMTIgOTkuNTc4OCAzMS4zNTgyIDc3LjM4NDlDMzEuMjE0NSA3Ni4wMjAyIDMxLjA3MDkgNzQuNjU1NSAzMS4wNzA5IDczLjE0NzJWMzkuMDMwM0MzMS4wNzA5IDM5LjAzMDMgMi40MTI4MSA1OS4zNTY4IDAuNjg5MDE3IDc5LjEwODdDMC42ODkwMTcgNzkuMjUyNCAwLjY4OTAxMiA3OS4zOTYgMC42MTcxODggNzkuNTM5NkMwLjY4OTAxMiA4MS40MDcxIDAuOTA0NDg5IDgzLjI3NDYgMS4xOTE3OSA4NS4xNDJDMy45MjExMyAxMDMuODg4IDE1Ljg0NCAxMTMuNzI4IDI4LjI2OTcgMTE4LjlDMzMuNzI4NCAxMjEuMTk4IDM5Ljk3NzEgMTIyLjkyMiA0Ny4wODc4IDEyMy43ODRDNTMuNjk1NiAxMjQuNjQ2IDU4LjU3OTcgMTI0LjU3NCA1OS42NTcxIDEyNC41NzRDNTkuNjU3MSAxMjQuNTc0IDU5LjY1NzEgMTI0LjU3NCA1OS43Mjg5IDEyNC41NzRINTkuODAwOEM2MC41MTkgMTI0LjU3NCA2MS4yMzcyIDEyNC41NzQgNjEuOTU1NSAxMjQuNTc0QzYyLjgxNzQgMTI0LjU3NCA2My42NzkzIDEyNC41MDIgNjQuNTQxMiAxMjQuNTAyQzY0Ljk3MjEgMTI0LjUwMiA2NS4zMzEzIDEyNC41MDIgNjUuNjE4NiAxMjQuNDNDNjUuNzYyMiAxMjQuNDMgNjUuOTA1OSAxMjQuNDMgNjUuOTc3NyAxMjQuNDNDNjYuMTIxMyAxMjQuNDMgNjYuMTkzMSAxMjQuNDMgNjYuMTkzMSAxMjQuNDNDNjYuMTkzMSAxMjQuNDMgNjYuMTkzMSAxMjQuNDMgNjYuMTIxMyAxMjQuNDNDODAuMTk5IDEyMy41NjggOTEuMzMxOCAxMTkuOTA1IDk5LjY2MzUgMTE0LjIzMUM5OS43MzUzIDExNC4zMDMgOTkuNzM1MyAxMTQuMzAzIDk5LjgwNzEgMTE0LjM3NUMxMTAuNTgxIDEyNi45NDQgMTI1LjA4OSAxMjQuNjQ2IDEyNS4wODkgMTI0LjY0NkMxMTguNjk3IDExOC4yNTMgMTE4LjY5NyAxMTMuNTEzIDExOC42OTcgMTA1LjE4MUMxMTguNjk3IDEwMi4wOTMgMTE4LjY5NyA5MC40NTcxIDExOC42OTcgNzYuODgyMVoiIGZpbGw9InVybCgjcGFpbnQxX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMjQ3LjYyMiA1MC44ODIxTDIzNi44NDggNDAuMTA4M0wyMDEuODcgNS4yMDEzM0MxOTUuOTA4IC0wLjc2MDE0NSAxODYuMjg0IC0wLjc2MDE0NSAxODAuMzIyIDUuMjAxMzNDMTc0LjM2MSAxMS4xNjI4IDE3NC4zNjEgMjAuNzg3NCAxODAuMzIyIDI2Ljc0ODhMMjE1LjMwMSA2MS42NTU4TDE4MC4yNSA5Ni41NjI4QzE3NC4yODkgMTAyLjUyNCAxNzQuMjg5IDExMi4xNDkgMTgwLjI1IDExOC4xMUMxODYuMjEyIDEyNC4wNzIgMTk1LjgzNiAxMjQuMDcyIDIwMS43OTggMTE4LjExTDIzNi43NzYgODMuMjAzM0wyNDcuNTUgNzIuNDI5NkMyNTMuNTgzIDY2LjQ2ODEgMjUzLjU4MyA1Ni44NDM1IDI0Ny42MjIgNTAuODgyMVoiIGZpbGw9InVybCgjcGFpbnQyX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMTMzLjkyOCAzOC44MTFWMTA3LjMzMkMxMzMuOTI4IDExNS43MzYgMTQwLjc1MSAxMjIuNTU5IDE0OS4xNTUgMTIyLjU1OUMxNTcuNTU4IDEyMi41NTkgMTY0LjM4MSAxMTUuNzM2IDE2NC4zODEgMTA3LjMzMlYzOC44ODI5QzE1NS45NzggNDcuMjE0NiAxNDIuMzMxIDQ3LjIxNDYgMTMzLjkyOCAzOC44MTFaIiBmaWxsPSJ1cmwoI3BhaW50M19saW5lYXJfMzUwXzg2NykiLz4KPHBhdGggZD0iTTI2My4wNjMgNjYuMzk5N0MyNjIuMTI5IDcxLjU3MTEgMjU5LjY4NyA3Ni41MjcgMjU1LjczNyA4MC40Nzc0TDI0NC45NjMgOTEuMjUxMUwyNzEuODI1IDExOC4wNDJDMjc3Ljc4NyAxMjQuMDAzIDI4Ny40MTEgMTI0LjAwMyAyOTMuMzczIDExOC4wNDJDMjk5LjMzNCAxMTIuMDggMjk5LjMzNCAxMDIuNDU2IDI5My4zNzMgOTYuNDk0NEwyNjMuMDYzIDY2LjM5OTdaIiBmaWxsPSJ1cmwoI3BhaW50NF9saW5lYXJfMzUwXzg2NykiLz4KPHBhdGggZD0iTTIwMS45NDUgNS4yNzM4NEwyNDcuNjk3IDUwLjg4MjhDMjUzLjczIDU2LjkxNjEgMjUzLjczIDY2LjYxMjUgMjQ3LjY5NyA3Mi42NDU4TDIxOC4wMzQgMTAyLjM4MUMyMzguMjg4IDgyLjEyNjcgMjIwLjE4OCA2Ni42ODQzIDIxNS4zNzYgNjEuODAwMkMyMDkuNzc0IDU2LjE5NzggMTkyLjAzMyAzOC40NTcgMTgwLjM5NyAyNi44MjE0QzE3NC40MzYgMjAuODU5OSAxNzQuNDM2IDExLjIzNTMgMTgwLjM5NyA1LjI3Mzg0QzE4Ni4zNTkgLTAuNjg3NjM1IDE5NS45ODMgLTAuNjg3NjM1IDIwMS45NDUgNS4yNzM4NFpNMTQ5LjE1NCAwLjgyMDY5M0MxNDAuNzUgMC44MjA2OTMgMTMzLjkyNyA3LjY0NDA3IDEzMy45MjcgMTYuMDQ3NkMxMzMuOTI3IDI0LjQ1MTEgMTQwLjc1IDMxLjI3NDUgMTQ5LjE1NCAzMS4yNzQ1QzE1Ny41NTcgMzEuMjc0NSAxNjQuMzgxIDI0LjQ1MTEgMTY0LjM4MSAxNi4wNDc2QzE2NC4zODEgNy42NDQwNyAxNTcuNTU3IDAuODIwNjkzIDE0OS4xNTQgMC44MjA2OTNaTTMxLjAwMjEgMTYuMDQ3NkMzMS4wMDIxIDcuNjQ0MDcgMjQuMTc4NyAwLjgyMDY5MyAxNS43MDM0IDAuODIwNjkzQzcuMjk5OTEgMC44MjA2OTMgMC40NzY1NjIgNy42NDQwNyAwLjQ3NjU2MiAxNi4wNDc2VjU0LjQwMjJDNC4zNTUxIDM4LjgxNjEgMzEuMDAyMSAyMy41ODkyIDMxLjAwMjEgMjMuNTg5MlYxNi4wNDc2WiIgZmlsbD0idXJsKCNwYWludDVfbGluZWFyXzM1MF84NjcpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMzUwXzg2NyIgeDE9IjI3MS4zNiIgeTE9IjU2Ljk2MTMiIHgyPSIyNzEuMzYiIHkyPSIwLjc4NjE0NCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjOEM1OUZFIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU5N0FGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MV9saW5lYXJfMzUwXzg2NyIgeDE9IjYyLjgxNzciIHkxPSIxMjQuNzQ0IiB4Mj0iNjIuODE3NyIgeTI9IjAuNjkwOTY0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4QzU5RkUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTk3QUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQyX2xpbmVhcl8zNTBfODY3IiB4MT0iMjEzLjkzOSIgeTE9IjEyMi41NDEiIHgyPSIyMTMuOTM5IiB5Mj0iMC43ODU0NTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzhDNTlGRSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1OTdBRkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDNfbGluZWFyXzM1MF84NjciIHgxPSIxNDkuMTQ1IiB5MT0iMTIyLjUxOCIgeDI9IjE0OS4xNDUiIHkyPSIzOC44MzY2IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4QzU5RkUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTk3QUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQ0X2xpbmVhcl8zNTBfODY3IiB4MT0iMjcxLjM1NCIgeTE9IjEyMi41NDQiIHgyPSIyNzEuMzU0IiB5Mj0iNjYuMzY2NSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjOEM1OUZFIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU5N0FGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50NV9saW5lYXJfMzUwXzg2NyIgeDE9IjEyNi4zNSIgeTE9IjEwMi4zNDgiIHgyPSIxMjYuMzUiIHkyPSIwLjc3NjczMiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBDNEIzIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0FDRTczOCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPg==" alt="UIX"></span></div>
+    <div class="topbar-logo" onclick="showView('view-dashboard')"><span class="alex-brand"><span class="alex-brand__name">Alexandría</span><span class="alex-brand__by">by</span><img class="alex-brand__uix" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjk4IiBoZWlnaHQ9IjEyNSIgdmlld0JveD0iMCAwIDI5OCAxMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNjMuMDY4IDU2Ljk4NzlMMjkzLjMwNiAyNi44MjE0QzI5OS4yNjggMjAuODU5OSAyOTkuMjY4IDExLjIzNTMgMjkzLjMwNiA1LjI3Mzg0QzI4Ny4zNDUgLTAuNjg3NjM2IDI3Ny43MiAtMC42ODc2MzYgMjcxLjc1OSA1LjI3Mzg0TDI0NC44OTYgMzIuMDY0NkwyNTUuNjcgNDIuODM4NEMyNTkuNjkyIDQ2Ljc4ODcgMjYyLjEzNCA1MS43NDQ3IDI2My4wNjggNTYuOTg3OVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMTE4LjY5NyA3Ni44ODIxVjIyLjUxMDVWMTUuOTc0NUMxMTguNjk3IDcuNTcwOTQgMTExLjg3NCAwLjc0NzU1OSAxMDMuNDcgMC43NDc1NTlDOTUuMDY2NyAwLjc0NzU1OSA4OC4yNDMzIDcuNTcwOTQgODguMjQzMyAxNS45NzQ1VjcyLjcxNjNDODguMjQzMyA5OS43OTQzIDU5LjY1NzEgOTcuNDk1OSA1OS42NTcxIDk3LjQ5NTlDNTkuNjU3MSA5Ny40OTU5IDM0LjIzMTIgOTkuNTc4OCAzMS4zNTgyIDc3LjM4NDlDMzEuMjE0NSA3Ni4wMjAyIDMxLjA3MDkgNzQuNjU1NSAzMS4wNzA5IDczLjE0NzJWMzkuMDMwM0MzMS4wNzA5IDM5LjAzMDMgMi40MTI4MSA1OS4zNTY4IDAuNjg5MDE3IDc5LjEwODdDMC42ODkwMTcgNzkuMjUyNCAwLjY4OTAxMiA3OS4zOTYgMC42MTcxODggNzkuNTM5NkMwLjY4OTAxMiA4MS40MDcxIDAuOTA0NDg5IDgzLjI3NDYgMS4xOTE3OSA4NS4xNDJDMy45MjExMyAxMDMuODg4IDE1Ljg0NCAxMTMuNzI4IDI4LjI2OTcgMTE4LjlDMzMuNzI4NCAxMjEuMTk4IDM5Ljk3NzEgMTIyLjkyMiA0Ny4wODc4IDEyMy43ODRDNTMuNjk1NiAxMjQuNjQ2IDU4LjU3OTcgMTI0LjU3NCA1OS42NTcxIDEyNC41NzRDNTkuNjU3MSAxMjQuNTc0IDU5LjY1NzEgMTI0LjU3NCA1OS43Mjg5IDEyNC41NzRINTkuODAwOEM2MC41MTkgMTI0LjU3NCA2MS4yMzcyIDEyNC41NzQgNjEuOTU1NSAxMjQuNTc0QzYyLjgxNzQgMTI0LjU3NCA2My42NzkzIDEyNC41MDIgNjQuNTQxMiAxMjQuNTAyQzY0Ljk3MjEgMTI0LjUwMiA2NS4zMzEzIDEyNC41MDIgNjUuNjE4NiAxMjQuNDNDNjUuNzYyMiAxMjQuNDMgNjUuOTA1OSAxMjQuNDMgNjUuOTc3NyAxMjQuNDNDNjYuMTIxMyAxMjQuNDMgNjYuMTkzMSAxMjQuNDMgNjYuMTkzMSAxMjQuNDNDNjYuMTkzMSAxMjQuNDMgNjYuMTkzMSAxMjQuNDMgNjYuMTIxMyAxMjQuNDNDODAuMTk5IDEyMy41NjggOTEuMzMxOCAxMTkuOTA1IDk5LjY2MzUgMTE0LjIzMUM5OS43MzUzIDExNC4zMDMgOTkuNzM1MyAxMTQuMzAzIDk5LjgwNzEgMTE0LjM3NUMxMTAuNTgxIDEyNi45NDQgMTI1LjA4OSAxMjQuNjQ2IDEyNS4wODkgMTI0LjY0NkMxMTguNjk3IDExOC4yNTMgMTE4LjY5NyAxMTMuNTEzIDExOC42OTcgMTA1LjE4MUMxMTguNjk3IDEwMi4wOTMgMTE4LjY5NyA5MC40NTcxIDExOC42OTcgNzYuODgyMVoiIGZpbGw9InVybCgjcGFpbnQxX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMjQ3LjYyMiA1MC44ODIxTDIzNi44NDggNDAuMTA4M0wyMDEuODcgNS4yMDEzM0MxOTUuOTA4IC0wLjc2MDE0NSAxODYuMjg0IC0wLjc2MDE0NSAxODAuMzIyIDUuMjAxMzNDMTc0LjM2MSAxMS4xNjI4IDE3NC4zNjEgMjAuNzg3NCAxODAuMzIyIDI2Ljc0ODhMMjE1LjMwMSA2MS42NTU4TDE4MC4yNSA5Ni41NjI4QzE3NC4yODkgMTAyLjUyNCAxNzQuMjg5IDExMi4xNDkgMTgwLjI1IDExOC4xMUMxODYuMjEyIDEyNC4wNzIgMTk1LjgzNiAxMjQuMDcyIDIwMS43OTggMTE4LjExTDIzNi43NzYgODMuMjAzM0wyNDcuNTUgNzIuNDI5NkMyNTMuNTgzIDY2LjQ2ODEgMjUzLjU4MyA1Ni44NDM1IDI0Ny42MjIgNTAuODgyMVoiIGZpbGw9InVybCgjcGFpbnQyX2xpbmVhcl8zNTBfODY3KSIvPgo8cGF0aCBkPSJNMTMzLjkyOCAzOC44MTFWMTA3LjMzMkMxMzMuOTI4IDExNS43MzYgMTQwLjc1MSAxMjIuNTU5IDE0OS4xNTUgMTIyLjU1OUMxNTcuNTU4IDEyMi41NTkgMTY0LjM4MSAxMTUuNzM2IDE2NC4zODEgMTA3LjMzMlYzOC44ODI5QzE1NS45NzggNDcuMjE0NiAxNDIuMzMxIDQ3LjIxNDYgMTMzLjkyOCAzOC44MTFaIiBmaWxsPSJ1cmwoI3BhaW50M19saW5lYXJfMzUwXzg2NykiLz4KPHBhdGggZD0iTTI2My4wNjMgNjYuMzk5N0MyNjIuMTI5IDcxLjU3MTEgMjU5LjY4NyA3Ni41MjcgMjU1LjczNyA4MC40Nzc0TDI0NC45NjMgOTEuMjUxMUwyNzEuODI1IDExOC4wNDJDMjc3Ljc4NyAxMjQuMDAzIDI4Ny40MTEgMTI0LjAwMyAyOTMuMzczIDExOC4wNDJDMjk5LjMzNCAxMTIuMDggMjk5LjMzNCAxMDIuNDU2IDI5My4zNzMgOTYuNDk0NEwyNjMuMDYzIDY2LjM5OTdaIiBmaWxsPSJ1cmwoI3BhaW50NF9saW5lYXJfMzUwXzg2NykiLz4KPHBhdGggZD0iTTIwMS45NDUgNS4yNzM4NEwyNDcuNjk3IDUwLjg4MjhDMjUzLjczIDU2LjkxNjEgMjUzLjczIDY2LjYxMjUgMjQ3LjY5NyA3Mi42NDU4TDIxOC4wMzQgMTAyLjM4MUMyMzguMjg4IDgyLjEyNjcgMjIwLjE4OCA2Ni42ODQzIDIxNS4zNzYgNjEuODAwMkMyMDkuNzc0IDU2LjE5NzggMTkyLjAzMyAzOC40NTcgMTgwLjM5NyAyNi44MjE0QzE3NC40MzYgMjAuODU5OSAxNzQuNDM2IDExLjIzNTMgMTgwLjM5NyA1LjI3Mzg0QzE4Ni4zNTkgLTAuNjg3NjM1IDE5NS45ODMgLTAuNjg3NjM1IDIwMS45NDUgNS4yNzM4NFpNMTQ5LjE1NCAwLjgyMDY5M0MxNDAuNzUgMC44MjA2OTMgMTMzLjkyNyA3LjY0NDA3IDEzMy45MjcgMTYuMDQ3NkMxMzMuOTI3IDI0LjQ1MTEgMTQwLjc1IDMxLjI3NDUgMTQ5LjE1NCAzMS4yNzQ1QzE1Ny41NTcgMzEuMjc0NSAxNjQuMzgxIDI0LjQ1MTEgMTY0LjM4MSAxNi4wNDc2QzE2NC4zODEgNy42NDQwNyAxNTcuNTU3IDAuODIwNjkzIDE0OS4xNTQgMC44MjA2OTNaTTMxLjAwMjEgMTYuMDQ3NkMzMS4wMDIxIDcuNjQ0MDcgMjQuMTc4NyAwLjgyMDY5MyAxNS43MDM0IDAuODIwNjkzQzcuMjk5OTEgMC44MjA2OTMgMC40NzY1NjIgNy42NDQwNyAwLjQ3NjU2MiAxNi4wNDc2VjU0LjQwMjJDNC4zNTUxIDM4LjgxNjEgMzEuMDAyMSAyMy41ODkyIDMxLjAwMjEgMjMuNTg5MlYxNi4wNDc2WiIgZmlsbD0idXJsKCNwYWludDVfbGluZWFyXzM1MF84NjcpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMzUwXzg2NyIgeDE9IjI3MS4zNiIgeTE9IjU2Ljk2MTMiIHgyPSIyNzEuMzYiIHkyPSIwLjc4NjE0NCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjOEM1OUZFIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU5N0FGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MV9saW5lYXJfMzUwXzg2NyIgeDE9IjYyLjgxNzciIHkxPSIxMjQuNzQ0IiB4Mj0iNjIuODE3NyIgeTI9IjAuNjkwOTY0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4QzU5RkUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTk3QUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQyX2xpbmVhcl8zNTBfODY3IiB4MT0iMjEzLjkzOSIgeTE9IjEyMi41NDEiIHgyPSIyMTMuOTM5IiB5Mj0iMC43ODU0NTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzhDNTlGRSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1OTdBRkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDNfbGluZWFyXzM1MF84NjciIHgxPSIxNDkuMTQ1IiB5MT0iMTIyLjUxOCIgeDI9IjE0OS4xNDUiIHkyPSIzOC44MzY2IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4QzU5RkUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTk3QUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQ0X2xpbmVhcl8zNTBfODY3IiB4MT0iMjcxLjM1NCIgeTE9IjEyMi41NDQiIHgyPSIyNzEuMzU0IiB5Mj0iNjYuMzY2NSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjOEM1OUZFIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU5N0FGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50NV9saW5lYXJfMzUwXzg2NyIgeDE9IjEyNi4zNSIgeTE9IjEwMi4zNDgiIHgyPSIxMjYuMzUiIHkyPSIwLjc3NjczMiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBDNEIzIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0FDRTczOCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPg==" alt="UIX"></span></div>
     <div class="topbar-user" style="margin-left:auto" onclick="if(typeof acpSetVisible==='function')acpSetVisible(false);showView('view-dashboard')">
       <div class="topbar-avatar" id="topbar-avatar-initials" style="background:linear-gradient(135deg,#6D28C7,#8C59FE)">AM</div>
       <div class="topbar-user-info">
@@ -4520,16 +4356,59 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar" style="display:none">
-    <div class="sidebar-label">Workspace</div>
-    <div class="nav-item active" id="nav-dashboard" onclick="showView('view-dashboard')"><span class="nav-dot"></span>Dashboard</div>
-    <div class="nav-item" id="nav-my-protocols" onclick="showView('view-my-protocols')"><span class="nav-dot"></span>Mis protocolos</div>
-    <div class="nav-item" id="nav-library" onclick="showView('view-library')"><span class="nav-dot"></span>Biblioteca</div>
-    <div class="nav-item" id="nav-capsulas" onclick="showView('view-capsulas')"><span class="nav-dot"></span>💡 Cápsulas</div>
-    <!-- v15: Research Library en sidebar -->
-    <div class="sidebar-label">Research System</div>
-    <div class="nav-item" id="nav-research-library" onclick="showView('view-research-library')" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="nav-dot"></span>Research Library</span><span class="lib20-count-badge" id="lib20-nav-count" style="display:none">0</span></div>
-    <div class="nav-item" id="nav-presentations" onclick="showView('view-presentations')" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="nav-dot"></span>Presentaciones</span><span class="lib20-count-badge" id="presentations-nav-count" style="display:none">0</span></div>
 
+    <!-- ── NAVEGACIÓN PRINCIPAL ── -->
+    <div class="sidebar-label">Principal</div>
+
+    <div class="nav-item active" id="nav-dashboard" onclick="showView('view-dashboard')">
+      <span class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      Inicio
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Mis herramientas</div>
+
+    <!-- Mis Protocolos -->
+    <div class="nav-item" id="nav-my-protocols" onclick="showView('view-my-protocols')">
+      <span class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </span>
+      Mis Protocolos
+    </div>
+
+    <!-- Biblioteca de Protocolos -->
+    <div class="nav-item" id="nav-library" onclick="showView('view-library')">
+      <span class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </span>
+      Biblioteca de Protocolos
+    </div>
+
+    <!-- Presentaciones -->
+    <div class="nav-item" id="nav-presentations" onclick="showView('view-presentations')" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:10px">
+        <span class="nav-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </span>
+        Presentaciones
+      </span>
+      <span class="lib20-count-badge" id="presentations-nav-count" style="display:none">0</span>
+    </div>
+
+    <!-- Cápsulas -->
+    <div class="nav-item" id="nav-capsulas" onclick="showView('view-capsulas')">
+      <span class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+      </span>
+      Cápsulas
+    </div>
+
+    <!-- Research Library (oculto, para compatibilidad) -->
+    <div class="nav-item" id="nav-research-library" onclick="showView('view-research-library')" style="display:none;justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="nav-dot"></span>Research Library</span><span class="lib20-count-badge" id="lib20-nav-count" style="display:none">0</span></div>
+
+    <!-- Sub-nav presentación (contextual) -->
     <div id="nav-presentation-wrap" style="display:none">
       <div class="sidebar-label">Presentación</div>
       <div class="nav-item" onclick="scrollTo_('s-pres-info')"><span class="nav-dot"></span>Datos</div>
@@ -4581,16 +4460,7 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
       </div><!-- end dash-hero-wrapper -->
 
       <!-- ── BARRA DE ACCIONES RÁPIDAS ── -->
-      <div class="dash-actions-bar" id="dash-actions-bar">
-        <button class="dash-quick-btn" onclick="showView('view-my-protocols')">
-          <span class="dash-quick-btn-icon">📋</span> Mis protocolos
-        </button>
-        <button class="dash-quick-btn" onclick="showView('view-presentations')">
-          <span class="dash-quick-btn-icon">🎨</span> Mis presentaciones
-        </button>
-        <button class="dash-quick-btn" onclick="showView('view-capsulas')">
-          <span class="dash-quick-btn-icon">💡</span> Cápsulas
-        </button>
+      <div class="dash-actions-bar" id="dash-actions-bar" style="display:none">
       </div>
 
       <!-- Workflow Pipeline: visualiza el flujo de estados como stepper -->
@@ -6010,11 +5880,11 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
       <div class="wf-filter-bar">
         <span style="font-size:12px;font-weight:600;color:var(--text-3);margin-right:4px">Filtrar:</span>
         <button class="wf-filter-btn active" data-status="all" onclick="setMyProtosFilter('all',this)">Todos</button>
-        <button class="wf-filter-btn" data-status="draft" onclick="setMyProtosFilter('draft',this)"><span class="wf-filter-dot" style="background:#9CA3AF"></span> Borrador</button>
-        <button class="wf-filter-btn" data-status="in-review" onclick="setMyProtosFilter('in-review',this)"><span class="wf-filter-dot" style="background:#D97706"></span> En revisión</button>
-        <button class="wf-filter-btn" data-status="approved" onclick="setMyProtosFilter('approved',this)"><span class="wf-filter-dot" style="background:#059669"></span> Aprobado</button>
-        <button class="wf-filter-btn" data-status="ready" onclick="setMyProtosFilter('ready',this)"><span class="wf-filter-dot" style="background:#7C3AED"></span> Listo para ejecutar</button>
-        <button class="wf-filter-btn" data-status="completed" onclick="setMyProtosFilter('completed',this)"><span class="wf-filter-dot" style="background:#2563EB"></span> Completado</button>
+        <button class="wf-filter-btn" data-status="draft" onclick="setMyProtosFilter('draft',this)"><span class="wf-filter-dot" style="background:#9CA3AF"></span> Draft</button>
+        <button class="wf-filter-btn" data-status="activo" onclick="setMyProtosFilter('activo',this)"><span class="wf-filter-dot" style="background:#059669"></span> Activo</button>
+        <button class="wf-filter-btn" data-status="onhold" onclick="setMyProtosFilter('onhold',this)"><span class="wf-filter-dot" style="background:#D97706"></span> On Hold</button>
+        <button class="wf-filter-btn" data-status="finalizado" onclick="setMyProtosFilter('finalizado',this)"><span class="wf-filter-dot" style="background:#2563EB"></span> Finalizado</button>
+        <button class="wf-filter-btn" data-status="cerrado" onclick="setMyProtosFilter('cerrado',this)"><span class="wf-filter-dot" style="background:#6B7280"></span> Cerrado</button>
       </div>
       <!-- Grid de cards (v13) -->
       <div id="my-protocols-cards" class="proto-cards-grid">
@@ -6041,18 +5911,18 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
             </div>
           </div>
         </div>
-        <div id="editor-action-btns" style="display:flex;gap:8px;align-items:center">
+        <div id="editor-action-btns" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0;margin-left:auto">
           <!-- Status badge moved here from form -->
           <div class="editor-status-badge draft" id="editor-status-badge" onclick="toggleEditorStatusDropdown()" title="Cambiar estado">
             <span class="editor-status-badge-dot"></span>
             <span id="editor-status-badge-label">Borrador</span>
             <span class="editor-status-badge-chevron">▾</span>
             <div class="editor-status-dropdown" id="editor-status-dropdown">
-              <div class="editor-status-opt active" data-val="draft" onclick="setEditorStatus('draft',event)"><span class="editor-status-opt-dot" style="background:#9CA3AF"></span>Borrador</div>
-              <div class="editor-status-opt" data-val="in-review" onclick="setEditorStatus('in-review',event)"><span class="editor-status-opt-dot" style="background:#3B82F6"></span>En Revisión</div>
-              <div class="editor-status-opt" data-val="approved" onclick="setEditorStatus('approved',event)"><span class="editor-status-opt-dot" style="background:#10B981"></span>Aprobado</div>
-              <div class="editor-status-opt" data-val="ready" onclick="setEditorStatus('ready',event)"><span class="editor-status-opt-dot" style="background:#8B5CF6"></span>Listo para ejecutar</div>
-              <div class="editor-status-opt" data-val="completed" onclick="setEditorStatus('completed',event)"><span class="editor-status-opt-dot" style="background:#059669"></span>Completado</div>
+              <div class="editor-status-opt active" data-val="draft" onclick="setEditorStatus('draft',event)"><span class="editor-status-opt-dot" style="background:#9CA3AF"></span>Draft</div>
+              <div class="editor-status-opt" data-val="activo" onclick="setEditorStatus('activo',event)"><span class="editor-status-opt-dot" style="background:#10B981"></span>Activo</div>
+              <div class="editor-status-opt" data-val="onhold" onclick="setEditorStatus('onhold',event)"><span class="editor-status-opt-dot" style="background:#D97706"></span>On Hold</div>
+              <div class="editor-status-opt" data-val="finalizado" onclick="setEditorStatus('finalizado',event)"><span class="editor-status-opt-dot" style="background:#2563EB"></span>Finalizado</div>
+              <div class="editor-status-opt" data-val="cerrado" onclick="setEditorStatus('cerrado',event)"><span class="editor-status-opt-dot" style="background:#6B7280"></span>Cerrado</div>
             </div>
           </div>
           <button class="btn btn-secondary" id="editor-save-btn" onclick="saveProtocolEdits()" style="font-size:12px;display:none">💾 Guardar cambios</button>
@@ -6368,7 +6238,7 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
           <div class="form-grid">
             <div class="form-group full"><label>Característica específica</label><input type="text" id="cp-caracteristica" placeholder="Ej. Usuario activo de apps de finanzas..."></div>
             <div class="form-group"><label>Digitalización de usuarios</label>
-              <select id="cp-nivel-digital"><option value="">Seleccionar...</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option><option>Experto</option></select></div>
+              <select id="cp-nivel-digital"><option value="">Seleccionar...</option><option>Indiferente</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option><option>Experto</option></select></div>
 
             <!-- EDAD -->
             <div class="form-group">
@@ -6564,7 +6434,7 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
             <!-- NSE -->
             <div class="form-group">
               <label>NSE</label>
-              <select id="cp-nse"><option value="">Seleccionar...</option><option>A/B</option><option>C+</option><option>C</option><option>C-</option><option>D+</option><option>D</option><option>E</option></select>
+              <select id="cp-nse"><option value="">Seleccionar...</option><option>Indiferente</option><option>A/B</option><option>C+</option><option>C</option><option>C-</option><option>D+</option><option>D</option><option>E</option></select>
               <label class="cuota-toggle"><input type="checkbox" onchange="toggleCuota('cuota-nse',this)"> <span>Agregar cuota</span></label>
               <div id="cuota-nse" class="cuota-panel" style="display:none">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -6581,7 +6451,18 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
             <!-- OCUPACIÓN -->
             <div class="form-group">
               <label>Ocupación</label>
-              <input type="text" id="cp-ocupacion" placeholder="Ej. Profesional independiente...">
+              <select id="cp-ocupacion">
+                <option value="">Seleccionar...</option>
+                <option>Indiferente</option>
+                <option>Estudiante</option>
+                <option>Empleado</option>
+                <option>Trabajador independiente</option>
+                <option>Empresario / Dueño de negocio</option>
+                <option>Profesional independiente</option>
+                <option>Dedicado al hogar</option>
+                <option>Pensionado / Jubilado</option>
+                <option>Desempleado</option>
+              </select>
               <label class="cuota-toggle"><input type="checkbox" onchange="toggleCuota('cuota-ocupacion',this)"> <span>Agregar cuota</span></label>
               <div id="cuota-ocupacion" class="cuota-panel" style="display:none">
                 <div class="cuota-row" data-key="Estudiante"><span>Estudiante</span><div class="cuota-ctrl"><button type="button" onclick="adjCuota(this,-1)">−</button><input type="number" value="0" min="0" class="cuota-num"><button type="button" onclick="adjCuota(this,1)">+</button></div></div>
@@ -6592,42 +6473,57 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
               </div>
             </div>
 
-            <!-- PAÍS (tag picker, México por default) -->
+            <!-- PAÍS -->
             <div class="form-group">
               <label>País</label>
-              <input type="hidden" id="cp-pais">
-              <div id="cp-pais-picker" class="tag-picker-box" onclick="document.getElementById('cp-pais-input').focus()" onfocusin="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(109,40,199,.1)';this.style.background='#fff'" onfocusout="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.background='var(--surface-2)'">
-                <div id="cp-pais-tags" style="display:contents"></div>
-                <div style="position:relative;flex:1;min-width:100px">
-                  <input type="text" id="cp-pais-input" placeholder="Agregar país..." autocomplete="off" style="border:none!important;background:transparent!important;padding:0!important;font-size:13.5px;outline:none;width:100%;box-shadow:none!important"
-                    oninput="cpPaisOnInput(this)" onkeydown="cpPaisOnKey(event)"
-                    onfocus="document.getElementById('cp-pais-sugg').style.display='block'"
-                    onblur="setTimeout(function(){document.getElementById('cp-pais-sugg').style.display='none'},180)">
-                  <div id="cp-pais-sugg" style="display:none;position:absolute;top:calc(100%+4px);left:0;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:200;min-width:200px;max-height:200px;overflow-y:auto"></div>
-                </div>
-              </div>
+              <select id="cp-pais" onchange="cpPaisOnChange(this.value)">
+                <option value="">Seleccionar...</option>
+                <option>México</option>
+                <option>Estados Unidos</option>
+                <option>Guatemala</option>
+                <option>Belice</option>
+                <option>Panamá</option>
+              </select>
             </div>
 
-            <!-- ESTADO (solo si México está en los países) -->
-            <div class="form-group full" id="cp-estado-group">
-              <div style="display:flex;align-items:center;gap:16px;margin-bottom:6px">
-                <label style="margin-bottom:0">Estado</label>
-                <label class="cuota-toggle" style="margin-bottom:0"><input type="checkbox" id="cp-estado-sin-especificar" onchange="cpEstadoSinEspecificar(this)"> <span>Sin especificar</span></label>
-              </div>
-              <div id="cp-estado-tags-area" style="max-width:50%">
-                <input type="hidden" id="cp-estado">
-                <div id="cp-estado-picker" class="tag-picker-box" onclick="document.getElementById('cp-estado-input').focus()" onfocusin="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(109,40,199,.1)';this.style.background='#fff'" onfocusout="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.background='var(--surface-2)'">
-                  <div id="cp-estado-tags" style="display:contents"></div>
-                  <div style="position:relative;flex:1;min-width:100px">
-                    <input type="text" id="cp-estado-input" placeholder="Seleccionar estado..." autocomplete="off" style="border:none!important;background:transparent!important;padding:0!important;font-size:13.5px;outline:none;width:100%;box-shadow:none!important"
-                      oninput="cpEstadoOnInput(this)" onkeydown="cpEstadoOnKey(event)"
-                      onfocus="document.getElementById('cp-estado-sugg').style.display='block'"
-                      onblur="setTimeout(function(){document.getElementById('cp-estado-sugg').style.display='none'},180)">
-                    <div id="cp-estado-sugg" style="display:none;position:absolute;top:calc(100%+4px);left:0;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:200;min-width:220px;max-height:220px;overflow-y:auto"></div>
-                  </div>
-                </div>
-              </div>
+            <!-- ESTADO — dinámico según país -->
+            <div class="form-group" id="cp-estado-group" style="display:none">
+              <label id="cp-estado-label">Estado / Provincia</label>
+              <select id="cp-estado">
+                <option value="">Seleccionar...</option>
+              </select>
             </div>
+
+            <script>
+            (function(){
+              var _estadosPorPais = {
+                'México': ['Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua','Ciudad de México','Coahuila','Colima','Durango','Estado de México','Guanajuato','Guerrero','Hidalgo','Jalisco','Michoacán','Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala','Veracruz','Yucatán','Zacatecas'],
+                'Estados Unidos': ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'],
+                'Guatemala': ['Alta Verapaz','Baja Verapaz','Chimaltenango','Chiquimula','El Progreso','Escuintla','Guatemala','Huehuetenango','Izabal','Jalapa','Jutiapa','Petén','Quetzaltenango','Quiché','Retalhuleu','Sacatepéquez','San Marcos','Santa Rosa','Sololá','Suchitepéquez','Totonicapán','Zacapa'],
+                'Belice': ['Belize','Cayo','Corozal','Orange Walk','Stann Creek','Toledo'],
+                'Panamá': ['Bocas del Toro','Chiriquí','Coclé','Colón','Darién','Herrera','Los Santos','Panamá','Panamá Oeste','Veraguas','Comarca Emberá','Comarca Guna Yala','Comarca Ngäbe-Buglé']
+              };
+
+              window.cpPaisOnChange = function(pais) {
+                var group = document.getElementById('cp-estado-group');
+                var select = document.getElementById('cp-estado');
+                var label = document.getElementById('cp-estado-label');
+                select.innerHTML = '<option value="">Seleccionar...</option>';
+                if (!pais || !_estadosPorPais[pais]) {
+                  group.style.display = 'none';
+                  return;
+                }
+                var estados = _estadosPorPais[pais];
+                estados.forEach(function(e){
+                  var opt = document.createElement('option');
+                  opt.value = e; opt.textContent = e;
+                  select.appendChild(opt);
+                });
+                label.textContent = pais === 'Estados Unidos' ? 'Estado' : pais === 'México' ? 'Estado' : 'Departamento / Distrito';
+                group.style.display = '';
+              };
+            })();
+            </script>
 
             <div class="form-group full"><label>Contexto</label><textarea id="cp-contexto-usuario" placeholder="Contexto de uso, momento del día, dispositivo..."></textarea></div>
             <div class="form-group"><label>Link Proto Persona</label><input type="text" id="cp-link-protopersona" placeholder="https://..."></div>
@@ -6849,33 +6745,11 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
         </button>
       </div>
 
-      <!-- Status filter pills -->
-      <div class="bib-filter-pills-row" id="bib-filter-pills">
-        <span class="bib-filter-pill active" data-bib-filter="all" onclick="setBibFilter('all',this)">Todos</span>
-        <span class="bib-filter-pill" data-bib-filter="draft" onclick="setBibFilter('draft',this)">Borrador</span>
-        <span class="bib-filter-pill" data-bib-filter="in-review" onclick="setBibFilter('in-review',this)">En Revisión</span>
-        <span class="bib-filter-pill" data-bib-filter="approved" onclick="setBibFilter('approved',this)">Aprobado</span>
-        <span class="bib-filter-pill" data-bib-filter="ready" onclick="setBibFilter('ready',this)">Listo para ejecutar</span>
-        <span class="bib-filter-pill" data-bib-filter="completed" onclick="setBibFilter('completed',this)">Completado</span>
-      </div>
+
 
       <!-- Advanced filter panel -->
       <div class="bib-adv-filter-panel" id="bib-adv-filter-panel">
         <div class="bib-adv-filter-grid">
-          <div class="bib-adv-filter-group">
-            <div class="bib-adv-filter-label">Estatus</div>
-            <select class="bib-adv-filter-select" id="bib-adv-estatus">
-              <option value="">Todos</option>
-              <option value="draft">Borrador</option>
-              <option value="in-review">En Revisión</option>
-              <option value="approved">Aprobado</option>
-              <option value="ready">Listo para ejecutar</option>
-              <option value="completed">Completado</option>
-              <option value="activo">Activo</option>
-              <option value="finalizado">Finalizado</option>
-              <option value="cerrado">Cerrado</option>
-            </select>
-          </div>
           <div class="bib-adv-filter-group">
             <div class="bib-adv-filter-label">Cliente</div>
             <select class="bib-adv-filter-select" id="bib-adv-cliente">
@@ -7092,60 +6966,12 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
           <label style="margin-bottom:6px;display:block">Cliente</label>
           <select id="create-cliente-select" style="width:100%" onchange="updateAutoNaming()">
             <option value="">Ninguno</option>
-            <option>Afiliación Única</option>
-            <option>ARI</option>
-            <option>Cobranza</option>
-            <option>Compensalia</option>
-            <option>Despidalia</option>
-            <option>Dinero Rápido</option>
-            <option>Ecosistema de LDC</option>
-            <option>Educalia</option>
-            <option>EDYEN</option>
-            <option>Elektra Tiempo Aire</option>
-            <option>Fideguardián</option>
-            <option>Italika APP</option>
-            <option>Landers</option>
-            <option>Misión Trader</option>
-            <option>Money Free Flex</option>
-            <option>Más salud</option>
-            <option>Nuestra Marca UiX</option>
-            <option>Origación Única</option>
-            <option>Pago Prendario</option>
-            <option>Pax</option>
-            <option>Presta Prenda App</option>
-            <option>Presta Prenda Autos</option>
-            <option>Presta Prenda Bitcoin</option>
-            <option>Presta Prenda Inmuebles</option>
-            <option>Presta Prenda Ventas (Oro, Plata y joyas)</option>
-            <option>Presta Prenda WEB</option>
-            <option>Proceso Único de Pago</option>
-            <option>Radar</option>
-            <option>Reclutalia</option>
-            <option>RPI</option>
-            <option>SAC</option>
-            <option>SAZ</option>
-            <option>Sidi</option>
-            <option>Swat Team</option>
-            <option>Tap on Phone</option>
-            <option>Torre Control</option>
-            <option>Trader Cambaceo</option>
-            <option>Zeus</option>
           </select>
         </div>
         <div>
           <label style="margin-bottom:6px;display:block">Proyecto</label>
           <select id="create-proyecto-select" style="width:100%" onchange="updateAutoNaming()">
             <option value="">Seleccionar...</option>
-            <option>UiX</option>
-            <option>RPI + Botón de Pago</option>
-            <option>Crédito Orig. - Invest.</option>
-            <option>SAC + AU</option>
-            <option>Préstamos EDP</option>
-            <option>CSC</option>
-            <option>Italika</option>
-            <option>Trader - Presta Prenda</option>
-            <option>Compensalia - Despidalia 🤩</option>
-            <option>+Salud</option>
           </select>
         </div>
       </div>
@@ -7394,19 +7220,6 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
           onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(109,40,199,.1)'"
           onblur="this.style.borderColor='var(--border)';this.style.boxShadow=''">
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
-        <label style="font-size:13px;font-weight:600;color:var(--text-2)">Estado del proyecto</label>
-        <select id="ef-estado"
-          style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;color:var(--text-1);background:var(--surface-2);outline:none;cursor:pointer;transition:border-color .15s;appearance:none"
-          onfocus="this.style.borderColor='var(--accent)'"
-          onblur="this.style.borderColor='var(--border)'">
-          <option value="activo">Activo</option>
-          <option value="draft">Draft</option>
-          <option value="on-hold">On Hold</option>
-          <option value="finalizado">Finalizado</option>
-          <option value="cerrado">Cerrado</option>
-        </select>
-      </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px">
         <label style="font-size:13px;font-weight:600;color:var(--text-2)">Descripción del proyecto</label>
         <textarea id="ef-desc" placeholder="Describe el proyecto..."
@@ -7462,20 +7275,6 @@ body.dark-mode .caps-metodo-pill.pill-design-thinking{background:#3b0764;color:#
           style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;color:var(--text-1);background:var(--surface-2);outline:none;transition:border-color .15s"
           onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(109,40,199,.1)'"
           onblur="this.style.borderColor='var(--border)';this.style.boxShadow=''">
-      </div>
-      <!-- Estado del proyecto -->
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
-        <label style="font-size:13px;font-weight:600;color:var(--text-2)">Estado del proyecto</label>
-        <select id="nf-estado"
-          style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;color:var(--text-1);background:var(--surface-2);outline:none;cursor:pointer;transition:border-color .15s;appearance:none"
-          onfocus="this.style.borderColor='var(--accent)'"
-          onblur="this.style.borderColor='var(--border)'">
-          <option value="activo">Activo</option>
-          <option value="draft">Draft</option>
-          <option value="on-hold">On Hold</option>
-          <option value="finalizado">Finalizado</option>
-          <option value="cerrado">Cerrado</option>
-        </select>
       </div>
       <!-- Descripción -->
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px">
@@ -7574,34 +7373,6 @@ var currentUser = { name: 'Ana Martínez', email: 'ana@company.com' };
    SUPABASE — Inicialización segura
    El UMD bundle expone window.supabase = { createClient, ... }
    ══════════════════════════════════════════════════════════ */
-var SUPABASE_URL = (window.__ENV && window.__ENV.SUPABASE_URL) || '';
-var SUPABASE_KEY = (window.__ENV && window.__ENV.SUPABASE_ANON_KEY) || '';
-var _supabase = null;
-
-function _initSupabaseClient() {
-  try {
-    if (typeof window.supabase === 'undefined') {
-      console.error('[Alexandria] Supabase JS no se cargó correctamente.');
-      return false;
-    }
-    if (typeof window.supabase.createClient !== 'function') {
-      console.error('[Alexandria] window.supabase.createClient no es una función.');
-      return false;
-    }
-    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    return true;
-  } catch(e) {
-    console.error('[Alexandria] Error creando cliente Supabase:', e);
-    return false;
-  }
-}
-
-function _supabaseReady() {
-  if (_supabase) return true;
-  return _initSupabaseClient();
-}
-
-/* ── Helpers de UI post-login ── */
 function _applyUserToUI(name, email, role) {
   role = role || 'UX Researcher';
   currentUser = { name: name, email: email, puesto: role };
@@ -7610,13 +7381,18 @@ function _applyUserToUI(name, email, role) {
   var homeUserName = document.getElementById('home-user-name');
   var homeUserEmail= document.getElementById('home-user-email');
   var initials = name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2) || 'U';
-  if (homeScreen)    homeScreen.classList.add('visible');
+  if (homeScreen)    homeScreen.classList.remove('visible');
   if (homeAvatar)    homeAvatar.textContent  = initials;
   if (homeUserName)  homeUserName.textContent = name;
   if (homeUserEmail) homeUserEmail.textContent = role;
-  document.getElementById('login-screen').classList.add('hidden');
+  // login removed
   updateUserUI();
   try { if (localStorage.getItem('uxpt-darkmode') === '1') { document.body.classList.add('dark-mode'); var btn=document.getElementById('darkmode-btn'); if(btn)btn.textContent='☀️'; var hbtn=document.getElementById('home-darkmode-btn'); if(hbtn)hbtn.textContent='☀️'; var hs=document.getElementById('home-screen'); if(hs){hs.style.background='#0F0A1E'; var ht=hs.querySelector('.home-topbar'); if(ht)ht.style.background='#1A1030';} } } catch(e) {}
+  // Entrar directo al dashboard sin pasar por home screen
+  document.getElementById('app-shell').style.display = 'grid';
+  var sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.style.display = 'block';
+  showView('view-dashboard');
 }
 
 function _setLoginLoading(loading, btnId) {
@@ -7627,156 +7403,10 @@ function _setLoginLoading(loading, btnId) {
 }
 
 /* ── signin(email, password) ── */
-async function doLogin() {
-  var email    = (document.getElementById('login-email').value || '').trim();
-  var password = (document.getElementById('login-name').value  || '');
-  if (!email)    { showLoginError('Escribe tu correo electrónico'); return; }
-  if (!password) { showLoginError('Escribe tu contraseña'); return; }
-  if (!_supabaseReady()) {
-    showLoginError('No se pudo conectar con el servidor. Recarga la página.');
-    return;
-  }
-  _setLoginLoading(true, 'login-submit-btn');
-  try {
-    var result = await _supabase.auth.signInWithPassword({ email: email, password: password });
-    if (result.error) throw result.error;
-    var user = result.data.user;
-    var name = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : user.email.split('@')[0];
-    name = name.charAt(0).toUpperCase() + name.slice(1);
-    var role = (user.user_metadata && user.user_metadata.role) ? user.user_metadata.role : 'UX Researcher';
-    _applyUserToUI(name, user.email, role);
-    showToast('✓ Bienvenidx, ' + name.split(' ')[0] + '!');
-  } catch(err) {
-    var msg = (err && err.message) ? err.message : 'Error al iniciar sesión';
-    if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credentials')) msg = 'Correo o contraseña incorrectos.';
-    if (msg.toLowerCase().includes('email not confirmed')) msg = 'Confirma tu correo antes de iniciar sesión.';
-    showLoginError(msg);
-  } finally {
-    _setLoginLoading(false, 'login-submit-btn');
-  }
-}
-
 /* ── Toggle password visibility ── */
-function togglePwd(inputId, btn) {
-  var inp = document.getElementById(inputId);
-  if (!inp) return;
-  var show = inp.type === 'password';
-  inp.type = show ? 'text' : 'password';
-  // Swap icon: open eye / eye-off
-  btn.innerHTML = show
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-  btn.style.color = show ? 'var(--accent)' : '';
-}
-
 /* ── Tab switcher ── */
-function switchLoginTab(tab) {
-  var views = ['login','register','forgot'];
-  views.forEach(function(v) {
-    var el = document.getElementById('view-' + v);
-    if (el) el.classList.toggle('active', v === tab);
-  });
-  // Update tab buttons (only login & register tabs are visible)
-  var tabLogin = document.getElementById('tab-login');
-  var tabReg = document.getElementById('tab-register');
-  var tabsEl = document.getElementById('login-tabs');
-  if (tab === 'forgot') {
-    if (tabsEl) tabsEl.style.display = 'none';
-  } else {
-    if (tabsEl) tabsEl.style.display = '';
-    if (tabLogin) tabLogin.classList.toggle('active', tab === 'login');
-    if (tabReg) tabReg.classList.toggle('active', tab === 'register');
-  }
-  // Reset forgot success
-  if (tab !== 'forgot') {
-    var fs = document.getElementById('forgot-success');
-    if (fs) fs.classList.remove('visible');
-    var fb = document.getElementById('forgot-btn');
-    if (fb) { fb.disabled = false; fb.textContent = 'Enviar enlace de recuperación'; }
-    var fe = document.getElementById('forgot-email');
-    if (fe) fe.value = '';
-  }
-  // Reset reg error
-  var re = document.getElementById('reg-error');
-  if (re) { re.textContent = ''; re.classList.remove('visible'); }
-}
-
 /* ── signup(email, password) ── */
-async function doRegister() {
-  var first  = (document.getElementById('reg-firstname').value || '').trim();
-  var last   = (document.getElementById('reg-lastname').value  || '').trim();
-  var email  = (document.getElementById('reg-email').value     || '').trim();
-  var role   = (document.getElementById('reg-role').value      || '').trim();
-  var pass   = (document.getElementById('reg-password').value  || '');
-  var pass2  = (document.getElementById('reg-password2').value || '');
-  var errEl  = document.getElementById('reg-error');
-
-  function showErr(msg, isSuccess) {
-    if (errEl) {
-      errEl.style.color = isSuccess ? '#059669' : '#EF4444';
-      errEl.textContent = msg;
-      errEl.classList.add('visible');
-    }
-  }
-  if (errEl) { errEl.classList.remove('visible'); errEl.style.color = '#EF4444'; }
-
-  if (!first)                          { showErr('Escribe tu nombre.'); return; }
-  if (!email || !email.includes('@'))  { showErr('Escribe un correo válido.'); return; }
-  if (pass.length < 6)                 { showErr('La contraseña debe tener al menos 6 caracteres.'); return; }
-  if (pass !== pass2)                  { showErr('Las contraseñas no coinciden.'); return; }
-
-  if (!_supabaseReady()) {
-    showErr('No se pudo conectar con el servidor. Recarga la página.');
-    return;
-  }
-
-  var name = (first + ' ' + last).trim();
-  if (!role) role = 'UX Researcher';
-
-  _setLoginLoading(true, 'register-submit-btn');
-  try {
-    var result = await _supabase.auth.signUp({
-      email: email,
-      password: pass,
-      options: { data: { full_name: name, role: role } }
-    });
-    if (result.error) throw result.error;
-    var session = result.data && result.data.session;
-    if (session) {
-      _applyUserToUI(name, email, role);
-      showToast('✓ Cuenta creada. ¡Bienvenidx, ' + first + '!');
-    } else {
-      showErr('¡Cuenta creada! Revisa tu correo para confirmarla antes de iniciar sesión.', true);
-    }
-  } catch(err) {
-    var msg = (err && err.message) ? err.message : 'Error al crear cuenta';
-    if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('user already registered')) {
-      msg = 'Este correo ya tiene una cuenta. Inicia sesión.';
-    }
-    if (msg.toLowerCase().includes('password')) msg = 'La contraseña debe tener al menos 6 caracteres.';
-    showErr(msg);
-  } finally {
-    _setLoginLoading(false, 'register-submit-btn');
-  }
-}
-
 /* ── Recuperar contraseña ── */
-function doForgotPassword() {
-  var email = (document.getElementById('forgot-email').value || '').trim();
-  if (!email || !email.includes('@')) {
-    showToast('⚠ Escribe un correo válido');
-    return;
-  }
-  var btn = document.getElementById('forgot-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
-  // Simulated async (in a real app this would call an API)
-  setTimeout(function() {
-    var fs = document.getElementById('forgot-success');
-    if (fs) fs.classList.add('visible');
-    if (btn) { btn.style.display = 'none'; }
-  }, 900);
-}
-
 function showHome() {
   // Hide app shell, show home screen
   document.getElementById('app-shell').style.display = 'none';
@@ -7792,6 +7422,8 @@ function enterApp(section) {
   var homeScreen = document.getElementById('home-screen');
   if (homeScreen) homeScreen.classList.remove('visible');
   document.getElementById('app-shell').style.display = 'grid';
+  var sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.style.display = 'block';
   if (section === 'create') {
     showView('view-dashboard');
     setTimeout(function(){ openCreateModal && openCreateModal(); }, 200);
@@ -8114,8 +7746,9 @@ function _doCreateProtocol(tplName, createType, finalName, proyectoVal, clienteV
     var homeScreen = document.getElementById('home-screen');
     if (homeScreen) homeScreen.classList.remove('visible');
     document.getElementById('app-shell').style.display = 'grid';
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.style.display = 'block';
   }
-
   var id = 'proto_' + Date.now();
   var proto = {
     id: id, name: finalName, type: createType, platform: 'maze',
@@ -8133,20 +7766,6 @@ function _doCreateProtocol(tplName, createType, finalName, proyectoVal, clienteV
 }
 
 /* ── signout() ── */
-async function doLogout() {
-  if (_supabaseReady()) {
-    try { await _supabase.auth.signOut(); } catch(e) {}
-  }
-  currentUser = { name: 'Usuario', email: '', puesto: '' };
-  var homeScreen = document.getElementById('home-screen');
-  if (homeScreen) homeScreen.classList.remove('visible');
-  document.getElementById('app-shell').style.display = 'none';
-  document.getElementById('login-screen').classList.remove('hidden');
-}
-
-function showLoginError(msg) {
-  showToast('⚠️ ' + msg);
-}
 var MOCK_USERS = [
   { name: 'Carlos López',    username: 'carlos',   email: 'carlos@empresa.com' },
   { name: 'María Torres',    username: 'maria',    email: 'maria@empresa.com' },
@@ -8175,54 +7794,29 @@ var libOpenFolderId = null;
 
 // ─── INIT ──────────────────────────────────────────────────────────────────
 (async function init(){
-  /* Inicializar cliente Supabase */
-  if (!_initSupabaseClient()) {
-    console.warn('[Alexandria] Supabase no disponible. Mostrando pantalla de login.');
-    updateUserUI();
-    initFormDefaults();
-    renderDashboard();
-    return;
-  }
+  /* Sesión anónima de Supabase (sin pantalla de login) */
+  await _ensureSupabaseSession();
 
-  /* Verificar sesión activa */
-  try {
-    var sessionResult = await _supabase.auth.getSession();
-    var session = sessionResult.data && sessionResult.data.session;
-    if (session && session.user) {
-      var user = session.user;
-      var name = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : user.email.split('@')[0];
-      name = name.charAt(0).toUpperCase() + name.slice(1);
-      var role = (user.user_metadata && user.user_metadata.role) ? user.user_metadata.role : 'UX Researcher';
-      currentUser = { name: name, email: user.email, puesto: role };
-      document.getElementById('login-screen').classList.add('hidden');
-      var homeScreen = document.getElementById('home-screen');
-      if (homeScreen) {
-        homeScreen.classList.add('visible');
-        var homeAvatar    = document.getElementById('home-avatar-initials');
-        var homeUserName  = document.getElementById('home-user-name');
-        var homeUserEmail = document.getElementById('home-user-email');
-        var initials = name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2) || 'U';
-        if (homeAvatar)    homeAvatar.textContent  = initials;
-        if (homeUserName)  homeUserName.textContent = name;
-        if (homeUserEmail) homeUserEmail.textContent = role;
-      }
-    }
-  } catch(e) {
-    console.warn('[Alexandria] Error verificando sesión:', e);
-  }
+  /* Auto-login (sin autenticación) */
+  _applyUserToUI('Usuario Demo', 'demo@demo.com', 'UX Researcher');
 
-  /* Escuchar cambios de sesión */
-  try {
-    _supabase.auth.onAuthStateChange(function(event, sess) {
-      if (event === 'SIGNED_OUT' || !sess) {
-        currentUser = { name: 'Usuario', email: '', puesto: '' };
-        var hs = document.getElementById('home-screen');
-        if (hs) hs.classList.remove('visible');
-        document.getElementById('app-shell').style.display = 'none';
-        document.getElementById('login-screen').classList.remove('hidden');
-      }
-    });
-  } catch(e) {}
+  /* Carpetas predefinidas */
+  folders.push({ id: "folder_default_01", name: "Afiliación", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_01b", name: "Botón de Pago", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_02", name: "Cobranza", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_03", name: "Compensalia", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_04", name: "Ecosistema LDC", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_05", name: "Edyen", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_06", name: "GS Motos", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_07", name: "Originación Única", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_08", name: "OPS", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_09", name: "Presta Prenda", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_10", name: "Reclutalia", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_11", name: "RPI", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_12", name: "SIDI", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_13", name: "TORRAX", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_14", name: "SWAT", fecha: "", estado: "activo", desc: "" });
+  folders.push({ id: "folder_default_15", name: "Zeus", fecha: "", estado: "activo", desc: "" });
 
   updateUserUI();
   initFormDefaults();
@@ -8316,7 +7910,8 @@ function showView(viewId) {
 
 function hideSidebarFormNav() {
   ['nav-express-wrap','nav-complete-wrap','nav-presentation-wrap'].forEach(function(id){
-    document.getElementById(id).style.display = 'none';
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
   });
 }
 
@@ -8537,10 +8132,10 @@ function buildProtoCard(p) {
   var icons = {express:'⚡',complete:'📋',presentation:'🎨',ab:'🧪'};
   var wfStatus = p.protoStatus || 'draft';
   var wfLabels = {
-    draft:'Borrador','in-review':'En revisión',approved:'Aprobado',
-    ready:'Listo para ejecutar',completed:'Completado',
-    activo:'Listo para ejecutar',onhold:'En revisión',finalizado:'Completado',cerrado:'Archivado',
-    changes_requested:'En revisión'
+    draft:'Draft','in-review':'On Hold',approved:'Activo',
+    ready:'Activo',completed:'Finalizado',
+    activo:'Activo',onhold:'On Hold',finalizado:'Finalizado',cerrado:'Cerrado',
+    changes_requested:'On Hold'
   };
   var folder = p.folderId ? folders.find(function(f){return f.id===p.folderId;}) : null;
   var genBadge  = p.generatedData ? '<span style="font-size:10px;background:linear-gradient(90deg,#2563EB,#3b82f6);color:#fff;padding:2px 7px;border-radius:999px;font-weight:600">✦ Generado</span>' : '';
@@ -8548,11 +8143,12 @@ function buildProtoCard(p) {
   // Status: solo badge visual, sin selector interactivo en la card
   var statusChangerHtml = '';
 
+  var cardIcon = p.icon || (icons[p.type]||'📋');
   return '<div class="proto-card" data-wf="' + wfStatus + '" onclick="' + openFn + '">'
     + '<div class="proto-card-stripe"></div>'
     + '<div class="proto-card-body">'
       + '<div class="proto-card-top">'
-        + '<div class="proto-card-icon ' + p.type + '">' + (icons[p.type]||'📋') + '</div>'
+        + '<div class="proto-card-icon ' + p.type + '" title="Cambiar icono" onclick="event.stopPropagation();openEmojiPicker(event,\'' + p.id + '\')" style="cursor:pointer;position:relative">' + cardIcon + '</div>'
         + '<div class="proto-card-info">'
           + '<div class="proto-card-name">' + eh(p.name) + '</div>'
           + '<div class="proto-card-type">'
@@ -8819,6 +8415,13 @@ function openCreateModal() {
   var clienteEl = document.getElementById('create-cliente-select');
   var proyectoEl = document.getElementById('create-proyecto-select');
   var temaEl = document.getElementById('create-tema-input');
+
+  // Populate cliente and proyecto from folders (same list)
+  var folderOptions = '<option value="">Ninguno</option>'
+    + folders.map(function(f){ return '<option value="' + eh(f.name) + '">' + eh(f.name) + '</option>'; }).join('');
+  if (clienteEl) clienteEl.innerHTML = folderOptions;
+  if (proyectoEl) proyectoEl.innerHTML = folderOptions.replace('Ninguno', 'Seleccionar...');
+
   if (clienteEl) clienteEl.value = '';
   if (proyectoEl) proyectoEl.value = '';
   if (temaEl) temaEl.value = '';
@@ -11002,7 +10605,6 @@ function openEditFolderModal(folderId) {
   document.getElementById('ef-id').value = folderId;
   document.getElementById('ef-nombre').value = folder.name || '';
   document.getElementById('ef-fecha').value = folder.fecha || '';
-  document.getElementById('ef-estado').value = folder.estado || 'activo';
   document.getElementById('ef-desc').value = folder.desc || '';
   document.getElementById('modal-edit-folder').classList.add('open');
   setTimeout(function(){ document.getElementById('ef-nombre').focus(); }, 80);
@@ -11023,7 +10625,6 @@ function confirmEditFolder() {
   if (!folder) return;
   folder.name = name;
   folder.fecha = document.getElementById('ef-fecha').value;
-  folder.estado = document.getElementById('ef-estado').value;
   folder.desc = document.getElementById('ef-desc').value.trim();
   document.getElementById('modal-edit-folder').classList.remove('open');
   renderBiblioteca();
@@ -11091,23 +10692,41 @@ function toggleBibAdvFilter() {
   if (!panel) return;
   var isOpen = panel.classList.toggle('open');
   if (btn) btn.classList.toggle('open', isOpen);
-  // Populate cliente select dynamically from existing folders
   if (isOpen) {
+    // CLIENTE: populated with folder names (each folder = a project/client)
     var clienteSelect = document.getElementById('bib-adv-cliente');
     if (clienteSelect) {
-      var currentVal = clienteSelect.value;
-      var clientes = [];
-      folders.forEach(function(f){ if (f.cliente && clientes.indexOf(f.cliente) === -1) clientes.push(f.cliente); });
+      var currentCliente = clienteSelect.value;
+      var folderNames = [];
+      folders.forEach(function(f){ if (f.name && folderNames.indexOf(f.name) === -1) folderNames.push(f.name); });
+      folderNames.sort();
       clienteSelect.innerHTML = '<option value="">Todos</option>'
-        + clientes.map(function(c){ return '<option value="' + eh(c) + '">' + eh(c) + '</option>'; }).join('');
-      if (currentVal) clienteSelect.value = currentVal;
+        + folderNames.map(function(n){ return '<option value="' + eh(n) + '">' + eh(n) + '</option>'; }).join('');
+      if (currentCliente) clienteSelect.value = currentCliente;
+    }
+    // PROYECTO: populated with protocol names stored in folders
+    var proyectoSelect = document.getElementById('bib-adv-proyecto');
+    if (proyectoSelect) {
+      var currentProyecto = proyectoSelect.value;
+      var protoNames = [];
+      protocols.forEach(function(p){ if (p.name && protoNames.indexOf(p.name) === -1) protoNames.push(p.name); });
+      protoNames.sort();
+      proyectoSelect.innerHTML = '<option value="">Todos</option>'
+        + protoNames.map(function(n){ return '<option value="' + eh(n) + '">' + eh(n) + '</option>'; }).join('');
+      if (currentProyecto) proyectoSelect.value = currentProyecto;
+    }
+    // CREADOR: left empty — will be populated from Supabase users
+    var creadorSelect = document.getElementById('bib-adv-creador');
+    if (creadorSelect) {
+      var currentCreador = creadorSelect.value;
+      creadorSelect.innerHTML = '<option value="">Todos</option>';
+      if (currentCreador) creadorSelect.value = currentCreador;
     }
   }
 }
 
 function applyBibAdvFilters() {
   bibAdvFilters = {
-    estatus: (document.getElementById('bib-adv-estatus')||{}).value || '',
     cliente: (document.getElementById('bib-adv-cliente')||{}).value || '',
     proyecto: (document.getElementById('bib-adv-proyecto')||{}).value || '',
     creador: (document.getElementById('bib-adv-creador')||{}).value || '',
@@ -11120,7 +10739,7 @@ function applyBibAdvFilters() {
 
 function resetBibAdvFilters() {
   bibAdvFilters = {};
-  ['bib-adv-estatus','bib-adv-cliente','bib-adv-proyecto','bib-adv-creador','bib-adv-fecha','bib-adv-metodologia'].forEach(function(id){
+  ['bib-adv-cliente','bib-adv-proyecto','bib-adv-creador','bib-adv-fecha','bib-adv-metodologia'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -11136,19 +10755,20 @@ function renderBiblioteca() {
   if (detail) detail.classList.remove('open');
   grid.style.display = '';
   var search = ((document.getElementById('bib-search')||{}).value || '').toLowerCase();
-  var statusLabels = {draft:'Borrador','in-review':'En revisión',approved:'Aprobado',ready:'Listo para ejecutar',completed:'Completado',activo:'Listo para ejecutar',cerrado:'Archivado',finalizado:'Completado','on-hold':'En revisión',onhold:'En revisión',changes_requested:'En revisión'};
+  var statusLabels = {draft:'Draft','in-review':'On Hold',approved:'Activo',ready:'Activo',completed:'Finalizado',activo:'Activo',cerrado:'Cerrado',finalizado:'Finalizado','on-hold':'On Hold',onhold:'On Hold',changes_requested:'On Hold'};
   var html = '';
   var visibleFolders = [];
 
   folders.forEach(function(f) {
     var protos = protocols.filter(function(p){ return p.folderId === f.id; });
     var folderStatus = f.estado || 'activo';
-    // Status filter (pill)
-    if (bibFilter !== 'all' && folderStatus !== bibFilter) return;
-    // Advanced filter by estatus
-    if (bibAdvFilters.estatus && folderStatus.toLowerCase() !== bibAdvFilters.estatus.toLowerCase()) return;
-    // Advanced filter by cliente
-    if (bibAdvFilters.cliente && (f.cliente || '') !== bibAdvFilters.cliente) return;
+    // Advanced filter by cliente (folder name)
+    if (bibAdvFilters.cliente && f.name !== bibAdvFilters.cliente) return;
+    // Advanced filter by proyecto (protocol names inside folder)
+    if (bibAdvFilters.proyecto) {
+      var hasProto = protos.some(function(p){ return p.name === bibAdvFilters.proyecto; });
+      if (!hasProto) return;
+    }
     // Advanced filter by creador
     if (bibAdvFilters.creador && (f.creador || '') !== bibAdvFilters.creador) return;
     // Advanced filter by metodologia
@@ -11176,8 +10796,7 @@ function renderBiblioteca() {
         + '<button class="bib-folder-dropdown-item danger" onclick="event.stopPropagation();openDeleteFolderModal(\'' + f.id + '\')">🗑 Eliminar carpeta</button>'
       + '</div>'
       + '<div class="bib-folder-card-top">'
-        + '<div class="bib-folder-icon">📁</div>'
-        + '<span class="bib-folder-status-pill ' + folderStatus + '">' + (statusLabels[folderStatus] || folderStatus) + '</span>'
+        + '<div class="bib-folder-icon" title="Cambiar icono" onclick="event.stopPropagation();openEmojiPicker(event,\'' + f.id + '\',\'folder\')" style="cursor:pointer">' + (f.icon || '📁') + '</div>'
       + '</div>'
       + '<div class="bib-folder-name">' + eh(f.name) + '</div>'
       + (f.desc ? '<div class="bib-folder-desc">' + eh(f.desc) + '</div>' : '')
@@ -11264,7 +10883,7 @@ function openLibFolder(folderId) {
 }
 
 function openBibFolder(folderId) {
-  var statusLabels = {draft:'Borrador','in-review':'En revisión',approved:'Aprobado',ready:'Listo para ejecutar',completed:'Completado',activo:'Listo para ejecutar',cerrado:'Archivado',finalizado:'Completado','on-hold':'En revisión',onhold:'En revisión',changes_requested:'En revisión'};
+  var statusLabels = {draft:'Draft','in-review':'On Hold',approved:'Activo',ready:'Activo',completed:'Finalizado',activo:'Activo',cerrado:'Cerrado',finalizado:'Finalizado','on-hold':'On Hold',onhold:'On Hold',changes_requested:'On Hold'};
   var folder = folderId === '__unfiled__' ? null : folders.find(function(f){ return f.id === folderId; });
   var protos = folderId === '__unfiled__'
     ? protocols.filter(function(p){ return !p.folderId; })
@@ -12359,19 +11978,19 @@ function renderGeneratedProtocol() {
   // ── MAIN TITLE ──
   html += '<div class="gp-main-title">Protocolo: ' + eh(protoName) + '</div>';
 
-  // ── TOP TABS (Editar / Resultados) + inline status selector ──
+  // ── ROW 1: Nav tabs (Editar / Resultados) + status dropdown ──
   var curOpt = STATUS_OPTIONS.find(function(o){ return o.value === protoState; }) || STATUS_OPTIONS[0];
-  html += '<div class="gp-tabs-bar" id="gp-tabs-bar">';
+  html += '<div class="gp-tabs-bar" id="gp-tabs-bar" style="flex-wrap:wrap;gap:0;align-items:stretch;padding-bottom:0">';
   html += '<button class="gp-tab' + (protoState !== 'completed' ? ' active' : '') + '" data-gptab="protocol" onclick="if(editingProtocolId){openProtocol(editingProtocolId);}else{backToEditor();}">✏️ Editar protocolo</button>';
   html += '<button class="gp-tab' + (protoState === 'completed' ? ' active' : '') + '" data-gptab="results" onclick="switchGpTab(\'results\',this)">📈 Resultados</button>';
-  // ── Inline status selector (lives in the tabs bar, right side) ──
-  html += '<div class="gp-tab-status-wrap" id="status-btn-wrap-' + currentProtoId + '">';
+
+  // Status dropdown — right side of row 1
+  html += '<div class="gp-tab-status-wrap" id="status-btn-wrap-' + currentProtoId + '" style="margin-left:auto;align-self:center">';
   html += '<button class="gp-tab-status-btn" onclick="toggleStatusDropdown(\'' + currentProtoId + '\')" id="status-btn-' + currentProtoId + '">';
   html += '<span class="status-btn-dot ' + curOpt.dot + '"></span>';
   html += '<span class="gp-tab-status-label">' + curOpt.emoji + ' ' + curOpt.label + '</span>';
   html += '<svg class="status-btn-chevron" width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   html += '</button>';
-  // dropdown (opens downward)
   html += '<div class="status-dropdown gp-tab-status-dropdown" id="status-dropdown-' + currentProtoId + '">';
   html += '<div class="status-dropdown-title">Cambiar estado</div>';
   STATUS_OPTIONS.forEach(function(o) {
@@ -12384,7 +12003,54 @@ function renderGeneratedProtocol() {
   });
   html += '</div>';
   html += '</div>';
-  html += '</div>';
+
+  // ── ROW 2: Action pipeline — full width, all buttons always visible ──
+  var stateOrder = ['draft','in-review','approved','ready','completed'];
+  var stateIdx   = stateOrder.indexOf(protoState);
+  if (stateIdx < 0) stateIdx = 0;
+
+  var reviewActive  = true;
+  var approveActive = stateIdx >= 1;
+  var readyActive   = true;
+  var mazeActive    = stateIdx >= 3;
+
+  var dimStyle  = 'opacity:.28;filter:grayscale(.6);cursor:default;pointer-events:none;';
+  var fullStyle = '';
+
+  html += '<div style="width:100%;border-top:1px solid var(--border);padding:8px 0 10px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto">';
+
+  // 1 — Enviar a revisión
+  html += '<button class="gp-footer-btn proto-send-review-btn" style="flex-shrink:0;' + (reviewActive ? fullStyle : dimStyle) + '" onclick="openSendReviewDialog(\'' + currentProtoId + '\')">'
+    + '📤 ' + (protoState === 'changes_requested' ? 'Reenviar' : 'Enviar a revisión') + '</button>';
+
+  html += '<span style="color:var(--border-2);font-size:16px;flex-shrink:0">›</span>';
+
+  // 2 — Aprobar
+  html += '<button class="gp-footer-btn gp-btn-approve" style="flex-shrink:0;' + (approveActive ? fullStyle : dimStyle) + '" onclick="gpApprove(\'' + currentProtoId + '\')">✅ Aprobar</button>';
+
+  html += '<span style="color:var(--border-2);font-size:16px;flex-shrink:0">›</span>';
+
+  // 3 — Listo para ejecutar
+  html += '<button class="gp-footer-btn gp-btn-ready" style="flex-shrink:0;' + (readyActive ? fullStyle : dimStyle) + '" onclick="changeProtoStatus(\'' + currentProtoId + '\',\'ready\')">🚀 Listo para ejecutar</button>';
+
+  html += '<span style="color:var(--border-2);font-size:16px;flex-shrink:0">›</span>';
+
+  // 4 — Maze
+  html += '<button class="gp-footer-btn maze" style="flex-shrink:0;' + (mazeActive ? fullStyle : dimStyle) + '" onclick="openMazeExportModal()">'
+    + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z" fill="rgba(255,255,255,0.9)"/><path d="M12 2v20M2 7l10 5 10-5" stroke="rgba(255,79,0,0.6)" stroke-width="1.5" stroke-linecap="round"/></svg>'
+    + ' Maze</button>';
+
+  // Separator
+  html += '<div style="width:1px;height:22px;background:var(--border);flex-shrink:0;margin:0 4px"></div>';
+
+  // 5 — PDF (siempre activo)
+  html += '<button class="gp-footer-btn pdf" style="flex-shrink:0" onclick="genDownloadPDF()">⎙ PDF</button>';
+
+  // 6 — Presentación (siempre activo)
+  html += '<button class="gp-footer-btn presentation" style="flex-shrink:0" onclick="generateFigmaPresentation()">🎨 Presentación</button>';
+
+  html += '</div>'; // /row 2
+  html += '</div>'; // /gp-tabs-bar
 
   // ── RESULTS PANEL (hidden by default, visible if completed) ──
   var resultsVisible = protoState === 'completed';
@@ -12627,48 +12293,6 @@ function renderGeneratedProtocol() {
     html += '</div>'; // /gp-section
   });
 
-  // ── CARD FOOTER — buttons depend on status ──
-  var currentStatus = (proto && proto.protoStatus) || 'draft';
-
-  html += '<div class="gp-footer" id="gp-sticky-footer">';
-  html += '<div class="gp-footer-actions">';
-
-  if (currentStatus === 'draft' || currentStatus === 'changes_requested') {
-    // BORRADOR / CAMBIOS SOLICITADOS
-    if (currentStatus === 'changes_requested') {
-      html += '<span style="font-size:12px;color:#D97706;font-style:italic;display:flex;align-items:center;gap:6px"><span>⚠️</span> Se solicitaron cambios — revisa los comentarios, corrige y cambia el estado a <strong>En revisión</strong> para reenviar.</span>';
-      html += '<button class="proto-send-review-btn" onclick="openSendReviewDialog(\'' + currentProtoId + '\')">📤 Reenviar a revisión</button>';
-    } else {
-      html += '<span style="font-size:12px;color:var(--text-4);font-style:italic">Completa el borrador y envíalo a revisión para continuar.</span>';
-      html += '<button class="proto-send-review-btn" onclick="openSendReviewDialog(\'' + currentProtoId + '\')">📤 Enviar a revisión</button>';
-    }
-
-  } else if (currentStatus === 'in-review') {
-    // EN REVISIÓN: solo aprobar o solicitar cambios
-    html += '<button class="gp-footer-btn gp-btn-changes" onclick="gpRequestChanges(\'' + currentProtoId + '\')">⚠️ Solicitar cambios</button>';
-    html += '<button class="gp-footer-btn gp-btn-approve" onclick="gpApprove(\'' + currentProtoId + '\')">✅ Aprobar</button>';
-
-  } else if (currentStatus === 'approved') {
-    // APROBADO: presentación, PDF, listo para ejecutar
-    html += '<button class="gp-footer-btn presentation" onclick="generateFigmaPresentation()">🎨 Convertir en presentación</button>';
-    html += '<button class="gp-footer-btn pdf" onclick="genDownloadPDF()">⎙ Descargar PDF</button>';
-    html += '<button class="gp-footer-btn gp-btn-ready" onclick="changeProtoStatus(\'' + currentProtoId + '\',\'ready\')">🚀 Listo para ejecutar</button>';
-
-  } else if (currentStatus === 'ready') {
-    // LISTO PARA EJECUTAR: presentación, PDF, exportar a Maze
-    html += '<button class="gp-footer-btn presentation" onclick="generateFigmaPresentation()">🎨 Convertir en presentación</button>';
-    html += '<button class="gp-footer-btn pdf" onclick="genDownloadPDF()">⎙ Descargar PDF</button>';
-    html += '<button class="gp-footer-btn maze" onclick="openMazeExportModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z" fill="rgba(255,255,255,0.9)"/><path d="M12 2v20M2 7l10 5 10-5" stroke="rgba(255,79,0,0.6)" stroke-width="1.5" stroke-linecap="round"/></svg> Exportar a Maze</button>';
-
-  } else if (currentStatus === 'completed') {
-    // COMPLETADO: presentación con IA, descargar PDF
-    html += '<button class="gp-footer-btn presentation" onclick="generateFigmaPresentation()">🎨 Presentación con IA</button>';
-    html += '<button class="gp-footer-btn pdf" onclick="genDownloadPDF()">⎙ Descargar PDF</button>';
-  }
-
-  html += '</div>';
-  html += '</div>';
-
   html += '</div>'; // /gp-card
   html += '</div>'; // /gp-panel-protocol
 
@@ -12676,6 +12300,11 @@ function renderGeneratedProtocol() {
 
   // ── Re-render margin bubbles for persisted inline_ comments after DOM rebuild ──
   setTimeout(function() {
+    // Clean up stale bubbles
+    _gpAnchoredComments.forEach(function(c) {
+      var b = document.getElementById('gp-mcbubble-' + c.id);
+      if (b) { if (b._cleanupScroll) b._cleanupScroll(); b.remove(); }
+    });
     _gpAnchoredComments = [];
     Object.keys(genInlineComments).forEach(function(key) {
       if (key.indexOf('inline_') !== 0) return;
@@ -12736,8 +12365,7 @@ window.deleteGenComment = function(key, ci) {
   if (genInlineComments[key]) {
     genInlineComments[key].splice(ci, 1);
     if (!genInlineComments[key].length) delete genInlineComments[key];
-    var proto = editingProtocolId ? protocols.find(function(p){ return p.id === editingProtocolId; }) : null;
-    if (proto) proto.comments = genInlineComments;
+    syncGenCommentsToProtocol();
     renderGeneratedProtocol();
     renderDashboardComments && renderDashboardComments();
     showToast('🗑 Comentario eliminado');
@@ -12897,10 +12525,8 @@ function syncGenCommentsToProtocol() {
   if (!editingProtocolId) return;
   var proto = protocols.find(function(p){ return p.id === editingProtocolId; });
   if (!proto) return;
-  if (!proto.comments) proto.comments = {};
-  Object.keys(genInlineComments).forEach(function(k){
-    proto.comments[k] = genInlineComments[k];
-  });
+  // Replace entirely so deleted keys are also removed from proto
+  proto.comments = JSON.parse(JSON.stringify(genInlineComments));
   renderDashboardComments();
 }
 
@@ -12987,11 +12613,11 @@ function downloadGenJSON() {
 // ─── FINALIZAR PROTOCOLO ─────────────────────────────────────────────────────
 // ── STATUS BUTTON SYSTEM ──────────────────────────────────────────
 var STATUS_OPTIONS = [
-  { value: 'draft',     label: 'Borrador',            dot: 'sdot-draft',     emoji: '📝' },
-  { value: 'in-review', label: 'En revisión',         dot: 'sdot-review',    emoji: '📤' },
-  { value: 'approved',  label: 'Aprobado',             dot: 'sdot-approved',  emoji: '✓'  },
-  { value: 'ready',     label: 'Listo para ejecutar', dot: 'sdot-ready',     emoji: '🚀' },
-  { value: 'completed', label: 'Completado',           dot: 'sdot-completed', emoji: '✅' },
+  { value: 'draft',      label: 'Borrador',            dot: 'sdot-draft',     emoji: '📝' },
+  { value: 'in-review',  label: 'En Revisión',         dot: 'sdot-review',    emoji: '👀' },
+  { value: 'approved',   label: 'Aprobado',            dot: 'sdot-approved',  emoji: '✅' },
+  { value: 'ready',      label: 'Listo para ejecutar', dot: 'sdot-ready',     emoji: '🚀' },
+  { value: 'completed',  label: 'Completado',          dot: 'sdot-completed', emoji: '🏁' },
 ];
 
 function buildStatusButton(currentStatus, protoId) {
@@ -13152,11 +12778,39 @@ function shareAddChip(type) {
 }
 
 function shareGenLink() {
-  _shareLink = 'https://uxprotools.app/review/' + Math.random().toString(36).slice(2,10);
+  // Genera un link que funciona dentro de la misma app:
+  // abre el protocolo en modo revisión al cargarlo con el parámetro ?review=<id>
+  var protoId = _shareProtoId || pendingShareId;
+  if (!protoId) { showToast('⚠️ Selecciona un protocolo primero'); return; }
+  var token = Math.random().toString(36).slice(2,10);
+  // Guardar token → protoId para que el handler lo resuelva
+  try {
+    var reviewMap = JSON.parse(localStorage.getItem('_ux_review_tokens') || '{}');
+    reviewMap[token] = protoId;
+    localStorage.setItem('_ux_review_tokens', JSON.stringify(reviewMap));
+  } catch(e) {}
+  // URL: misma página + parámetros
+  var base = window.location.href.split('?')[0].split('#')[0];
+  _shareLink = base + '?review=' + protoId + '&token=' + token;
   var el = document.getElementById('share-link-text');
   var copyBtn = document.getElementById('share-copy-btn');
   if (el) el.textContent = _shareLink;
   if (copyBtn) copyBtn.style.display = 'inline-flex';
+}
+
+/** Alias usado en el segundo modal de envío a revisión */
+function genReviewLink() {
+  var protoId = pendingShareId || _shareProtoId;
+  if (!protoId) { showToast('⚠️ No hay protocolo activo para generar el link'); return; }
+  // Reusar shareGenLink con el id correcto
+  _shareProtoId = protoId;
+  _shareSetTab && _shareSetTab('link');
+  shareGenLink();
+  // Mostrar el link generado en el input del segundo modal si existe
+  setTimeout(function() {
+    var inp = document.getElementById('review-send-email-input');
+    if (inp && _shareLink) inp.value = _shareLink;
+  }, 50);
 }
 
 function shareCopyLink() {
@@ -14116,6 +13770,28 @@ function openProtocolByRole(id) {
       openProtocol(id);
     }
   }
+}
+
+/**
+ * openSendReviewDialog — alias del flujo "Enviar a revisión".
+ * Llamado por el botón del footer del protocolo generado.
+ * Si el protocolo ya tiene datos generados lo manda directamente a in-review
+ * (abre el share-modal igual que changeProtoStatus lo haría); si no, muestra
+ * un toast de advertencia para que el researcher genere primero el protocolo.
+ */
+function openSendReviewDialog(protoId) {
+  var proto = protocols.find(function(p){ return p.id === protoId; });
+  if (!proto) return;
+
+  // Si no se ha generado el protocolo todavía, avisar y salir
+  if (!proto.generatedData) {
+    showToast('⚠️ Genera el protocolo primero antes de enviarlo a revisión');
+    return;
+  }
+
+  // Delegar en changeProtoStatus que maneja todo el flujo in-review
+  // (abre share modal, actualiza estado, persiste en Supabase, etc.)
+  changeProtoStatus(protoId, 'in-review');
 }
 
 /** RESEARCHER: Reenviar a revisión desde estado changes_requested */
@@ -16844,7 +16520,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- GLOBAL FOOTER -->
 <div class="global-footer">
-  <span class="global-footer-text">Una iniciativa de (nombre comunidad UX/UXR)&nbsp;&nbsp;|&nbsp;&nbsp;Hecho por Rolando Suarez</span>
+  <span class="global-footer-text">Una iniciativa de UiX</span>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -17543,6 +17219,8 @@ function downloadPresAsGSlides() {
       var homeScreen = document.getElementById('home-screen');
       if (homeScreen) homeScreen.classList.remove('visible');
       document.getElementById('app-shell').style.display = 'grid';
+      var sidebar = document.getElementById('sidebar');
+      if (sidebar) sidebar.style.display = 'block';
       showView('view-presentations');
       return;
     }
@@ -18274,6 +17952,7 @@ function renderMarginComment(comment) {
     existing.remove();
   }
   if (comment._hidden) return;
+  if (comment._deleted) return;
 
   var anchor = comment.anchorEl || document.querySelector('[data-comment-id="' + comment.id + '"]');
   // If anchor is not in the DOM (e.g. after re-render), use the gp-card as fallback anchor
@@ -18452,8 +18131,8 @@ window.resolveMarginComment = function(cid) {
   com.resolved = true;
   if (typeof genInlineComments !== 'undefined' && genInlineComments[com.key] && genInlineComments[com.key][0]) {
     genInlineComments[com.key][0].resolved = true;
-    if (typeof syncGenCommentsToProtocol === 'function') syncGenCommentsToProtocol();
   }
+  if (typeof syncGenCommentsToProtocol === 'function') syncGenCommentsToProtocol();
   renderMarginComment(com);
   if (typeof renderDashboardComments === 'function') renderDashboardComments();
   if (typeof showToast === 'function') showToast('✓ Comentario resuelto');
@@ -18463,18 +18142,30 @@ window.deleteMarginComment = function(cid) {
   var idx = _gpAnchoredComments.findIndex(function(c){ return c.id === cid; });
   if (idx === -1) return;
   var com = _gpAnchoredComments[idx];
+
+  // Mark as deleted so any pending re-render is a no-op
+  com._deleted = true;
+  com._hidden  = true;
+
+  // Remove DOM anchor (highlighted text wrapper)
   var anchor = com.anchorEl || document.querySelector('[data-comment-id="' + cid + '"]');
   if (anchor && anchor.parentNode) {
     var parent = anchor.parentNode;
     while (anchor.firstChild) parent.insertBefore(anchor.firstChild, anchor);
     parent.removeChild(anchor);
   }
+
+  // Remove the floating bubble
   var bubble = document.getElementById('gp-mcbubble-' + cid);
   if (bubble) {
     if (bubble._cleanupScroll) bubble._cleanupScroll();
     bubble.remove();
   }
+
+  // Remove from array
   _gpAnchoredComments.splice(idx, 1);
+
+  // Clean up genInlineComments if present
   if (typeof genInlineComments !== 'undefined') {
     delete genInlineComments[com.key];
     if (typeof syncGenCommentsToProtocol === 'function') syncGenCommentsToProtocol();
@@ -20743,7 +20434,7 @@ function acpHideTyping() {
    GEMINI 2.5 FLASH — Función de llamada a API
    ══════════════════════════════════════════════════════════ */
 
-var GEMINI_API_KEY = (window.__ENV && window.__ENV.GEMINI_API_KEY) || '';
+var GEMINI_API_KEY = 'AQ.Ab8RN6L65FKXjBbYfJd2f8EPOUguu45nWwmPXLYrj2WZ6LkEhg';
 var GEMINI_MODEL   = 'gemini-2.5-flash';
 
 async function callGemini(userMessage, systemPrompt) {
@@ -20946,14 +20637,19 @@ window.acpSetVisible = acpSetVisible;
 
 /* ── Helpers internos ─────────────────────────────────────────────────── */
 
-/** Obtiene el user_id del usuario autenticado en Supabase */
+/** Obtiene el user_id del usuario autenticado en Supabase (sesión anónima) */
 async function _getUid() {
   if (!_supabase) return null;
   try {
     var s = await _supabase.auth.getSession();
-    return s && s.data && s.data.session && s.data.session.user
+    var uid = s && s.data && s.data.session && s.data.session.user
       ? s.data.session.user.id
       : null;
+    if (!uid && window._ensureSupabaseSession) {
+      var session = await window._ensureSupabaseSession();
+      uid = session && session.user ? session.user.id : null;
+    }
+    return uid;
   } catch(e) { return null; }
 }
 
@@ -21077,7 +20773,12 @@ async function _dbCreateProtocol(proto) {
    ACTUALIZAR PROTOCOLO en Supabase
    ══════════════════════════════════════════════════════════ */
 async function _dbUpdateProtocol(proto) {
-  if (!_supabase || !proto._supabaseId) return;
+  if (!_supabase) return;
+  // Si el protocolo nunca fue creado en BD, crearlo ahora
+  if (!proto._supabaseId) {
+    await _dbCreateProtocol(proto);
+    return;
+  }
   var uid = await _getUid();
   if (!uid) return;
 
@@ -21132,6 +20833,20 @@ window.confirmCreateProtocol = function() {
   if (proto) {
     _dbCreateProtocol(proto).then(function(updated) {
       // proto ya fue modificado in-place (_supabaseId asignado)
+      if (typeof renderDashboard === 'function') renderDashboard();
+    });
+  }
+};
+
+/* ══════════════════════════════════════════════════════════
+   PATCH: _doCreateProtocol → guardar en Supabase (flujo con template)
+   ══════════════════════════════════════════════════════════ */
+var _origDoCreateProtocol = window._doCreateProtocol;
+window._doCreateProtocol = function(tplName, createType, finalName, proyectoVal, clienteVal, temaVal2, folderVal2) {
+  _origDoCreateProtocol && _origDoCreateProtocol.apply(this, arguments);
+  var proto = protocols[protocols.length - 1];
+  if (proto && typeof _dbCreateProtocol === 'function') {
+    _dbCreateProtocol(proto).then(function() {
       if (typeof renderDashboard === 'function') renderDashboard();
     });
   }
@@ -21362,6 +21077,50 @@ document.addEventListener('DOMContentLoaded', function() {
       loadUserProtocols();
     }
   }, 800);
+
+  // ── HANDLER: link de revisión (?review=protoId) ─────────────────────────
+  // Si la URL tiene ?review=<id> abrimos directamente el protocolo en revisión
+  setTimeout(function() {
+    var params = new URLSearchParams(window.location.search);
+    var reviewId = params.get('review');
+    var token    = params.get('token');
+    if (!reviewId) return;
+
+    // Validar token si existe
+    var validToken = true;
+    if (token) {
+      try {
+        var reviewMap = JSON.parse(localStorage.getItem('_ux_review_tokens') || '{}');
+        validToken = (reviewMap[token] === reviewId);
+      } catch(e) { validToken = false; }
+    }
+    if (!validToken) {
+      showToast && showToast('⚠️ Link de revisión inválido o expirado');
+      return;
+    }
+
+    // Esperar a que los protocolos carguen y luego abrir
+    var tries = 0;
+    var interval = setInterval(function() {
+      tries++;
+      var proto = protocols.find(function(p) { return p.id === reviewId; });
+      if (proto) {
+        clearInterval(interval);
+        // Limpiar la URL sin recargar
+        try { window.history.replaceState({}, document.title, window.location.pathname); } catch(e) {}
+        // Abrir como líder (vista de revisión) o como researcher según el rol
+        if (typeof openProtocolByRole === 'function') {
+          openProtocolByRole(reviewId);
+        } else if (proto.generatedData && typeof openGeneratedProtocol === 'function') {
+          openGeneratedProtocol(reviewId);
+        } else if (typeof openProtocol === 'function') {
+          openProtocol(reviewId);
+        }
+        showToast && showToast('📋 Protocolo abierto desde link de revisión');
+      }
+      if (tries > 20) clearInterval(interval); // 4 seg máx
+    }, 200);
+  }, 1200);
 });
 
 /* confirmShare ya incluye persistencia directamente en su definición */
@@ -21402,4 +21161,87 @@ window._dbDeleteProtocol  = _dbDeleteProtocol;
 console.log('[Alexandria DB] Módulo de persistencia Supabase cargado ✓');
 
 })();
+</script>
+
+<!-- ══ EMOJI PICKER ══ -->
+<div class="emoji-picker-overlay" id="emoji-picker-overlay" onclick="closeEmojiPicker()">
+  <div class="emoji-picker-panel" id="emoji-picker-panel" onclick="event.stopPropagation()">
+    <div class="emoji-picker-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="emoji-search-input" placeholder="Buscar emoji…" oninput="filterEmojis(this.value)" autocomplete="off">
+    </div>
+    <div class="emoji-picker-grid" id="emoji-picker-grid"></div>
+  </div>
+</div>
+
+<script>
+var _emojiProtoId = null;
+var _emojiEntityType = 'protocol';
+var _allEmojis = ['📋','⚡','🎨','🧪','🔬','📊','📌','🚀','✅','🔒','🧩','💡','🎯','🔍','📝','💬','🔗','📣','🏆','💼','🔧','⚙️','🌟','🎤','📱','💻','🖥️','📡','🛡️','🧠','🎭','🗺️','📐','🔑','🌀','🦾','📈','📉','📂','🧾','🔔','📢','🎬','🔭','🔎','🌈','🏁','🎲','✏️','📏','🗝️','💎','🏅','🥇','🏆','🧲','🔋','🌱','🌿','🍀','🌊','🔥','🌙','☀️','⭐','🎉','🎊','🎁','🎈','🎀','🐱','🐶','🦊','🐼','🦁','🐸','🦋','🌸','🌺','🍎','🍕','🎸','🎹','🎺','🎻'];
+
+window.openEmojiPicker = function(evt, entityId, entityType) {
+  _emojiProtoId = entityId;
+  _emojiEntityType = entityType || 'protocol';
+  var overlay = document.getElementById('emoji-picker-overlay');
+  var panel   = document.getElementById('emoji-picker-panel');
+  if (!overlay || !panel) return;
+  var x = evt.clientX, y = evt.clientY;
+  var pw = 280, ph = 260;
+  var left = Math.min(x, window.innerWidth - pw - 12);
+  var top  = Math.min(y + 8, window.innerHeight - ph - 12);
+  panel.style.left = left + 'px';
+  panel.style.top  = top  + 'px';
+  var inp = document.getElementById('emoji-search-input');
+  if (inp) inp.value = '';
+  window._renderEmojiGrid(_allEmojis);
+  overlay.classList.add('open');
+  setTimeout(function(){ if (inp) inp.focus(); }, 50);
+};
+
+window.closeEmojiPicker = function() {
+  var overlay = document.getElementById('emoji-picker-overlay');
+  if (overlay) overlay.classList.remove('open');
+  _emojiProtoId = null;
+};
+
+window.filterEmojis = function(q) {
+  if (!q) { window._renderEmojiGrid(_allEmojis); return; }
+  var filtered = _allEmojis.filter(function(e){ return e.includes(q); });
+  window._renderEmojiGrid(filtered.length ? filtered : _allEmojis);
+};
+
+window._renderEmojiGrid = function(list) {
+  var grid = document.getElementById('emoji-picker-grid');
+  if (!grid) return;
+  grid.innerHTML = list.map(function(e){
+    // Use data-emoji attribute + click handler to avoid encoding issues
+    return '<button class="emoji-picker-btn" data-emoji="' + e + '" title="' + e + '">' + e + '</button>';
+  }).join('');
+  // Attach listeners fresh each time
+  grid.querySelectorAll('.emoji-picker-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ window.pickEmoji(this.getAttribute('data-emoji')); });
+  });
+};
+
+window.pickEmoji = function(emoji) {
+  if (!_emojiProtoId) return;
+  if (_emojiEntityType === 'folder') {
+    var folder = (typeof folders !== 'undefined') && folders.find(function(f){ return f.id === _emojiProtoId; });
+    if (!folder) return;
+    folder.icon = emoji;
+    if (typeof saveData === 'function') saveData();
+    if (typeof renderBiblioteca === 'function') renderBiblioteca();
+    if (typeof renderLibrary === 'function') renderLibrary();
+  } else {
+    var proto = (typeof protocols !== 'undefined') && protocols.find(function(p){ return p.id === _emojiProtoId; });
+    if (!proto) return;
+    proto.icon = emoji;
+    if (typeof saveData === 'function') saveData();
+    if (window._dbUpdateProtocol) window._dbUpdateProtocol(proto);
+    if (typeof renderDashboard === 'function') renderDashboard();
+    if (typeof renderProtocolList === 'function') renderProtocolList();
+  }
+  window.closeEmojiPicker();
+  if (typeof showToast === 'function') showToast(emoji + ' Icono actualizado');
+};
 </script>
