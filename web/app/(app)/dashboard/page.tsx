@@ -7,21 +7,15 @@ import { useAuthStore } from '@/lib/stores/useAuthStore'
 import { StatusPill } from '@/components/ui/StatusPill'
 import { CreateProtocolModal } from '@/components/protocols/CreateProtocolModal'
 import { ServiceStatus } from '@/components/dashboard/ServiceStatus'
-import type { ProtocolType } from '@/lib/types'
 import { timeAgo } from '@/lib/utils/date'
 
-const TYPE_ICON: Record<ProtocolType, string> = {
-  express: '⚡',
-  complete: '📋',
-  presentation: '🎯',
-  ab: '🔀',
-}
-
-const TYPE_LABEL: Record<ProtocolType, string> = {
-  express: 'Express',
-  complete: 'Completo',
-  presentation: 'Presentación',
-  ab: 'A/B',
+// Slug del nombre del protocolo para la meta de cada fila (minúsculas, guiones).
+function slugify(value: string): string {
+  return value
+    .trim()
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
 }
 
 // Pasos del workflow — fiel a la pipeline del HTML original.
@@ -37,10 +31,13 @@ export default function DashboardPage() {
   const router = useRouter()
   const protocols = useProtocolStore((s) => s.protocols)
   const loading = useProtocolStore((s) => s.loading)
+  const deleteProtocol = useProtocolStore((s) => s.deleteProtocol)
   const currentUser = useAuthStore((s) => s.currentUser)
   const [createOpen, setCreateOpen] = useState(false)
 
   const firstName = (currentUser?.name ?? 'Ana').split(' ')[0]
+  const userInitials = currentUser?.initials ?? (currentUser?.name ?? 'A')[0]
+  const userName = currentUser?.name ?? 'Ana Martínez'
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {}
@@ -90,61 +87,104 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Workflow pipeline — stepper de estados ── */}
+      {/* El estado con count > 0 se resalta (has-items → púrpura/bold, fiel al original). */}
       <div className="wf-pipeline">
-        {WF_STEPS.map((step) => (
-          <div
-            key={step.key}
-            className="wf-step"
-            data-wf={step.key}
-            title={step.label}
-          >
-            <div className="wf-step-icon">{step.icon}</div>
-            <div className="wf-step-count">{counts[step.key] ?? 0}</div>
-            <div className="wf-step-label">{step.label}</div>
-          </div>
-        ))}
+        {WF_STEPS.map((step) => {
+          const count = counts[step.key] ?? 0
+          return (
+            <div
+              key={step.key}
+              className={`wf-step${count > 0 ? ' has-items' : ''}`}
+              data-wf={step.key}
+              title={step.label}
+            >
+              <div className="wf-step-icon">{step.icon}</div>
+              <div className="wf-step-count">{count}</div>
+              <div className="wf-step-label">{step.label}</div>
+            </div>
+          )
+        })}
       </div>
 
       <ServiceStatus />
 
-      {/* ── Protocolos recientes ── */}
+      {/* ── Comentarios recientes de tus protocolos (feed fiel al original) ── */}
       <h2 className="section-heading" style={{ marginTop: 28 }}>
-        Protocolos recientes <span>de tu espacio</span>
+        Comentarios recientes <span>de tus protocolos</span>
       </h2>
-      {loading ? (
-        <div className="proto-list">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="proto-item" style={{ opacity: 0.5 }} />
-          ))}
-        </div>
-      ) : recent.length === 0 ? (
-        <p style={{ color: 'var(--text-3)', fontSize: 14 }}>
-          Aún no tienes protocolos. Crea el primero para empezar.
-        </p>
-      ) : (
-        <div className="proto-list">
-          {recent.map((p) => (
-            <div
-              key={p.id}
-              className="proto-item"
-              onClick={() => router.push(`/protocols/${p.id}/edit`)}
-            >
-              <div className={`proto-item-icon ${p.type}`}>
-                {p.icon || TYPE_ICON[p.type] || '📄'}
-              </div>
-              <div className="proto-item-body">
-                <div className="proto-item-name">{p.name}</div>
-                <div className="proto-item-meta">
-                  {TYPE_LABEL[p.type] ?? p.type}
-                  {' · '}
-                  {timeAgo(p.updatedAt)}
-                  <StatusPill status={p.protoStatus} size="sm" />
+      <div className="dash-comments-feed">
+        {loading ? (
+          <div className="dash-comments-empty">Cargando…</div>
+        ) : recent.length === 0 ? (
+          <div className="dash-comments-empty">Sin comentarios aún</div>
+        ) : (
+          recent.map((p) => (
+            <div key={p.id} className="dash-comment-item" style={{ position: 'relative' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 10,
+                  flex: 1,
+                  cursor: 'pointer',
+                }}
+                onClick={() => router.push(`/protocols/${p.id}/edit`)}
+              >
+                <div
+                  className="comment-avatar-sm"
+                  style={{ width: 28, height: 28, fontSize: 11, flexShrink: 0, marginTop: 2 }}
+                  aria-hidden="true"
+                >
+                  {userInitials}
+                </div>
+                <div className="dash-comment-body">
+                  <div
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}
+                  >
+                    <span style={{ fontSize: 12.5, fontWeight: 600 }}>{userName}</span>
+                    <span className="comment-loc-tag">
+                      📍 {p.proyecto || 'Sin proyecto'}
+                    </span>
+                  </div>
+                  <div className="dash-comment-text">{p.name}</div>
+                  <div
+                    className="dash-comment-meta"
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}
+                  >
+                    <StatusPill status={p.protoStatus} size="sm" />
+                    <span>· {slugify(p.name)}</span>
+                    <span>· {timeAgo(p.updatedAt)}</span>
+                  </div>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  void deleteProtocol(p)
+                }}
+                title="Eliminar protocolo"
+                style={{
+                  flexShrink: 0,
+                  width: 24,
+                  height: 24,
+                  borderRadius: 5,
+                  border: '1px solid var(--border)',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  color: 'var(--text-4)',
+                  fontSize: 12,
+                  display: 'grid',
+                  placeItems: 'center',
+                  marginTop: 2,
+                }}
+              >
+                🗑
+              </button>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
 
       <CreateProtocolModal isOpen={createOpen} onClose={() => setCreateOpen(false)} />
     </div>

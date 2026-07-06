@@ -2,7 +2,6 @@
 
 import { useAuthStore } from '@/lib/stores/useAuthStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
-import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 
 function SunIcon() {
   return (
@@ -38,24 +37,12 @@ function MenuIcon() {
   )
 }
 
-// Ícono del bloque AI Copilot del topbar (fiel al original: globo con órbitas).
-function CopilotGlobeIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
-    </svg>
-  )
-}
-
 export function Topbar() {
   const currentUser = useAuthStore((s) => s.currentUser)
   const signOut = useAuthStore((s) => s.signOut)
   const darkMode = useUIStore((s) => s.darkMode)
   const toggleDarkMode = useUIStore((s) => s.toggleDarkMode)
   const toggleMobileSidebar = useUIStore((s) => s.toggleMobileSidebar)
-  const copilotOpen = useCopilotStore((s) => s.isOpen)
-  const toggleCopilot = useCopilotStore((s) => s.toggleCopilot)
 
   return (
     <header className="topbar">
@@ -69,31 +56,34 @@ export function Topbar() {
         <MenuIcon />
       </button>
 
+      {/* Logo único fiel al original: "Alexandría by [UIX]". */}
       <div className="topbar-logo">
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontWeight: 700,
-            fontSize: 20,
-            color: 'var(--accent)',
-          }}
-        >
-          Alexandría
+        <span className="alex-brand">
+          <span className="alex-brand__name">Alexandría</span>
+          <span className="alex-brand__by">by</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="alex-brand__uix" src="/uix-logo.svg" alt="UIX" />
         </span>
-        <span className="topbar-badge">UIX</span>
       </div>
 
-      <div className="topbar-divider" />
-
-      <button
-        type="button"
-        className="darkmode-btn"
-        onClick={toggleCopilot}
-        aria-pressed={copilotOpen}
-        title="Copiloto Alexandria"
+      {/* Bloque de usuario fiel al original: avatar + nombre y email, alineado a la derecha. */}
+      <div
+        className="topbar-user"
+        style={{ marginLeft: 'auto' }}
+        title={currentUser?.name ?? 'Usuario'}
       >
-        ✨ Copiloto
-      </button>
+        <div className="topbar-avatar" aria-hidden="true">
+          {currentUser?.initials ?? '—'}
+        </div>
+        <div className="topbar-user-info">
+          <span className="topbar-user-name">
+            {currentUser?.name ?? 'Usuario'}
+          </span>
+          <span className="topbar-user-email">
+            {currentUser?.email ?? ''}
+          </span>
+        </div>
+      </div>
 
       <button
         type="button"
@@ -109,39 +99,11 @@ export function Topbar() {
         type="button"
         className="logout-btn"
         onClick={signOut}
-        aria-label="Cerrar sesión"
         title="Cerrar sesión"
       >
         <LogoutIcon />
+        Salir
       </button>
-
-      {/* Bloque de usuario fiel al original: avatar con gradiente + nombre y email. */}
-      <div className="topbar-user" title={currentUser?.name ?? 'Usuario'}>
-        <div className="topbar-avatar" aria-hidden="true">
-          {currentUser?.initials ?? '—'}
-        </div>
-        <div className="topbar-user-info">
-          <span className="topbar-user-name">
-            {currentUser?.name ?? 'Usuario'}
-          </span>
-          <span className="topbar-user-email">
-            {currentUser?.email ?? ''}
-          </span>
-        </div>
-      </div>
-
-      {/* Bloque AI Copilot en el topbar — visible solo cuando el copiloto está abierto. */}
-      {copilotOpen && (
-        <div className="acp-topbar-block">
-          <div className="acp-topbar-icon">
-            <CopilotGlobeIcon />
-          </div>
-          <div className="acp-topbar-info">
-            <div className="acp-topbar-title">AI Copilot</div>
-            <div className="acp-topbar-sub">Asistente de investigación UX</div>
-          </div>
-        </div>
-      )}
     </header>
   )
 }

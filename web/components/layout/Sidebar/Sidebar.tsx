@@ -17,8 +17,8 @@ interface NavItem {
   label: string
   href: string
   icon: ReactNode
-  // Clave del contador a mostrar como badge (por ahora solo 'protocols').
-  badge?: 'protocols'
+  // Clave del contador a mostrar como badge.
+  badge?: 'protocols' | 'presentations'
 }
 
 interface NavSection {
@@ -35,24 +35,30 @@ const ICON_PROPS = {
   'aria-hidden': true,
 }
 
-// Estructura fiel al original: secciones con label, dividers entre ellas y
-// "Mi Equipo" sin label al final.
+// Estructura fiel al original (public/index.html): "Principal" con Inicio y
+// "Mis herramientas" con Mis Protocolos, Biblioteca de Protocolos,
+// Presentaciones y Cápsulas. El equipo NO aparece en el sidebar original.
 const NAV_SECTIONS: NavSection[] = [
   {
     label: 'Principal',
     items: [
       {
-        label: 'Dashboard',
+        label: 'Inicio',
         href: '/dashboard',
         icon: (
           <svg {...ICON_PROPS}>
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
             <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
         ),
       },
+    ],
+  },
+  {
+    label: 'Mis herramientas',
+    items: [
       {
         label: 'Mis Protocolos',
         href: '/protocols',
@@ -67,13 +73,8 @@ const NAV_SECTIONS: NavSection[] = [
           </svg>
         ),
       },
-    ],
-  },
-  {
-    label: 'Recursos',
-    items: [
       {
-        label: 'Biblioteca',
+        label: 'Biblioteca de Protocolos',
         href: '/library',
         icon: (
           <svg {...ICON_PROPS}>
@@ -83,27 +84,25 @@ const NAV_SECTIONS: NavSection[] = [
         ),
       },
       {
+        label: 'Presentaciones',
+        href: '/presentations',
+        badge: 'presentations',
+        icon: (
+          <svg {...ICON_PROPS}>
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+        ),
+      },
+      {
         label: 'Cápsulas',
         href: '/capsulas',
         icon: (
           <svg {...ICON_PROPS}>
-            <path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z" />
-            <path d="M8.5 8.5l7 7" />
-          </svg>
-        ),
-      },
-    ],
-  },
-  {
-    items: [
-      {
-        label: 'Mi Equipo',
-        href: '/team',
-        icon: (
-          <svg {...ICON_PROPS}>
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            <path d="M9 18h6" />
+            <path d="M10 22h4" />
+            <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
           </svg>
         ),
       },
@@ -115,10 +114,13 @@ export function Sidebar() {
   const pathname = usePathname()
   const mobileSidebarOpen = useUIStore((s) => s.mobileSidebarOpen)
   const closeMobileSidebar = useUIStore((s) => s.closeMobileSidebar)
-  const protocolCount = useProtocolStore((s) => s.protocols.length)
+  const protocols = useProtocolStore((s) => s.protocols)
+  const protocolCount = protocols.length
+  const presentationCount = protocols.filter((p) => p.type === 'presentation').length
 
   const badgeValue = (key: NavItem['badge']): number | null => {
     if (key === 'protocols') return protocolCount > 0 ? protocolCount : null
+    if (key === 'presentations') return presentationCount > 0 ? presentationCount : null
     return null
   }
 
