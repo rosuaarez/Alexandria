@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ProjectFolder } from '@/lib/types'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { EmojiPicker } from '@/components/ui/EmojiPicker'
@@ -40,6 +40,7 @@ export function FolderModal({
   const [description, setDescription] = useState('')
   const [date, setDate] = useState('')
   const [emojiOpen, setEmojiOpen] = useState(false)
+  const iconRef = useRef<HTMLButtonElement>(null)
   const trapRef = useFocusTrap<HTMLDivElement>(isOpen)
 
   // Sincroniza los campos al abrir (pre-rellenado en edición, defaults en creación).
@@ -91,25 +92,25 @@ export function FolderModal({
         <div className="modal-header">
           <div className="modal-title">
             {/* Ícono clickeable → EmojiPicker. */}
-            <div style={{ position: 'relative' }}>
-              <button
-                type="button"
-                className="modal-title-icon"
-                title="Cambiar icono"
-                aria-label="Cambiar icono"
-                onClick={() => setEmojiOpen((v) => !v)}
-                style={{ cursor: 'pointer', border: 'none' }}
-              >
-                {emoji}
-              </button>
-              {emojiOpen && (
-                <EmojiPicker
-                  selected={emoji}
-                  onSelect={setEmoji}
-                  onClose={() => setEmojiOpen(false)}
-                />
-              )}
-            </div>
+            <button
+              ref={iconRef}
+              type="button"
+              className="modal-title-icon"
+              title="Cambiar icono"
+              aria-label="Cambiar icono"
+              onClick={() => setEmojiOpen((v) => !v)}
+              style={{ cursor: 'pointer', border: 'none' }}
+            >
+              {emoji}
+            </button>
+            {emojiOpen && (
+              <EmojiPicker
+                selected={emoji}
+                anchor={iconRef.current}
+                onSelect={setEmoji}
+                onClose={() => setEmojiOpen(false)}
+              />
+            )}
             {isEdit ? 'Editar carpeta' : 'Nueva carpeta'}
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Cerrar">

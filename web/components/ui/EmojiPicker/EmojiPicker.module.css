@@ -1,11 +1,13 @@
+/* Se renderiza en un portal a document.body; la posición (fixed, top/left)
+   se calcula en el componente con getBoundingClientRect del disparador. */
 .picker {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 60;
-  width: 260px;
+  position: fixed;
+  z-index: 9999;
+  width: 280px;
+  max-height: 280px;
+  overflow-y: auto;
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
   padding: 10px;
@@ -13,6 +15,9 @@
 }
 
 .search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   width: 100%;
   padding: 8px 11px;
   border: 1.5px solid var(--border);
@@ -34,8 +39,6 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
-  max-height: 200px;
-  overflow-y: auto;
 }
 
 .cell {

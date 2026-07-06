@@ -38,6 +38,7 @@ export function FolderCard({
   const [menuOpen, setMenuOpen] = useState(false)
   const [emojiOpen, setEmojiOpen] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
+  const iconRef = useRef<HTMLDivElement>(null)
 
   // Cierra el menú ⋯ al hacer click fuera de la tarjeta.
   useEffect(() => {
@@ -108,27 +109,27 @@ export function FolderCard({
       )}
 
       <div className="bib-folder-card-top">
-        <div style={{ position: 'relative' }}>
-          <div
-            className="bib-folder-icon"
-            title={isUncategorized ? undefined : 'Cambiar icono'}
-            style={{ cursor: isUncategorized ? 'default' : 'pointer' }}
-            onClick={(e) => {
-              if (isUncategorized) return
-              e.stopPropagation()
-              setEmojiOpen((v) => !v)
-            }}
-          >
-            {folder.emoji || '📁'}
-          </div>
-          {emojiOpen && !isUncategorized && (
-            <EmojiPicker
-              selected={folder.emoji}
-              onSelect={(emoji) => onChangeEmoji(folder.id, emoji)}
-              onClose={() => setEmojiOpen(false)}
-            />
-          )}
+        <div
+          ref={iconRef}
+          className="bib-folder-icon"
+          title={isUncategorized ? undefined : 'Cambiar icono'}
+          style={{ cursor: isUncategorized ? 'default' : 'pointer' }}
+          onClick={(e) => {
+            if (isUncategorized) return
+            e.stopPropagation()
+            setEmojiOpen((v) => !v)
+          }}
+        >
+          {folder.emoji || '📁'}
         </div>
+        {emojiOpen && !isUncategorized && (
+          <EmojiPicker
+            selected={folder.emoji}
+            anchor={iconRef.current}
+            onSelect={(emoji) => onChangeEmoji(folder.id, emoji)}
+            onClose={() => setEmojiOpen(false)}
+          />
+        )}
         {isUncategorized && (
           <span className="bib-folder-status-pill activo">Sin carpeta</span>
         )}
