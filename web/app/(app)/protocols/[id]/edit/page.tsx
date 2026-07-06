@@ -52,6 +52,21 @@ function formatAgo(ms: number): string {
 
 const AUTOSAVE_MS = 30000
 
+// Fecha corta dd-mm-aaaa para la meta del editor.
+function formatDMY(d: Date): string {
+  const dd = String(d.getDate()).padStart(2, '0')
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  return `${dd}-${mm}-${d.getFullYear()}`
+}
+
+// Tag de plantilla/tipo mostrado en la meta del editor (fallback por tipo).
+const TYPE_TAG: Record<ProtocolType, { icon: string; label: string }> = {
+  express: { icon: '⚡', label: 'Express' },
+  complete: { icon: '📋', label: 'Completo' },
+  presentation: { icon: '🎯', label: 'Presentación' },
+  ab: { icon: '🔀', label: 'A/B Testing' },
+}
+
 // Opciones del badge de estado del editor (dropdown "Borrador ▾" del original).
 const EDITOR_STATUS_OPTIONS: { value: ProtocolStatus; label: string; dot: string }[] = [
   { value: 'draft', label: 'Borrador', dot: '#9CA3AF' },
@@ -176,9 +191,11 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const isSaving = useEditorStore((s) => s.isSaving)
   const setSaving = useEditorStore((s) => s.setSaving)
 
-  const [name, setName] = useState(initial.name)
+  const [name] = useState(initial.name)
   const [status, setStatus] = useState<ProtocolStatus>(initial.status)
   const [statusMenuOpen, setStatusMenuOpen] = useState(false)
+  // Fecha de la meta: se captura tras el montaje para no llamar new Date() en render.
+  const [metaDate, setMetaDate] = useState('')
   const [tab, setTab] = useState<Tab>(
     searchParams.get('tab') === 'output' ? 'output' : 'edit'
   )
@@ -244,6 +261,12 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     }
   }, [id, isNew, isInReview, loadComments, clearComments, closeComments])
 
+  // Fecha de la meta: createdAt del protocolo, o hoy para uno nuevo.
+  useEffect(() => {
+    const base = protocol?.createdAt ? new Date(protocol.createdAt) : new Date()
+    setMetaDate(formatDMY(base))
+  }, [protocol?.createdAt])
+
   const markDirty = useCallback(() => {
     if (!useEditorStore.getState().isDirty) setDirty(true)
   }, [setDirty])
@@ -267,14 +290,6 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     },
     [markDirty, recomputeCompletion, scheduleAutosave]
   )
-
-  const handleNameChange = (value: string) => {
-    setName(value)
-    nameRef.current = value
-    markDirty()
-    recomputeCompletion()
-    scheduleAutosave()
-  }
 
   const persist = useCallback(async (): Promise<string | null> => {
     if (!currentUser) return null
@@ -402,6 +417,9 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const currentStatus =
     EDITOR_STATUS_OPTIONS.find((o) => o.value === status) ?? EDITOR_STATUS_OPTIONS[0]
 
+  const versionLabel = `V${protocol?.version ?? 1}`
+  const templateTag = TYPE_TAG[initial.type] ?? TYPE_TAG.express
+
   return (
     <div className={styles.page}>
       {/* Topbar del editor fiel al original: [← Volver] [nombre] [estado ▾]. */}
@@ -416,22 +434,30 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
               ← Volver
             </button>
             <div>
-              <input
-                className="editor-proto-name"
-                value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Nombre del protocolo"
-                aria-label="Nombre del protocolo"
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  padding: 0,
-                  width: '100%',
-                  outline: 'none',
-                }}
-              />
-              <div className="editor-proto-subtitle">
-                Completa la siguiente información de tu protocolo
+              <h2 className="editor-proto-name">{name || 'Nuevo protocolo'}</h2>
+              <div className="editor-proto-meta">
+                <span>
+                  <strong>Fecha:</strong> {metaDate || '—'}
+                </span>
+                <span className="editor-proto-meta-sep">·</span>
+                <span>
+                  <strong>Versión:</strong> {versionLabel}
+                </span>
+                <span className="editor-proto-meta-sep">·</span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    background: 'var(--accent-lt)',
+                    color: 'var(--accent)',
+                    borderRadius: 999,
+                    padding: '2px 10px',
+                    fontWeight: 600,
+                  }}
+                >
+                  {templateTag.icon} {templateTag.label}
+                </span>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/stores/useAuthStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useCopilotStore } from '@/lib/stores/useCopilotStore'
@@ -55,6 +56,9 @@ export function Topbar() {
   const toggleDarkMode = useUIStore((s) => s.toggleDarkMode)
   const toggleMobileSidebar = useUIStore((s) => s.toggleMobileSidebar)
   const toggleCopilot = useCopilotStore((s) => s.toggleCopilot)
+  const pathname = usePathname()
+  // El bloque AI Copilot solo aparece en el editor (/protocols/[id]/edit).
+  const inEditor = /^\/protocols\/[^/]+\/edit/.test(pathname)
 
   return (
     <header className="topbar">
@@ -117,29 +121,32 @@ export function Topbar() {
         Salir
       </button>
 
-      {/* Bloque AI Copilot en el topbar global. Visible solo con body.acp-open
-          (se activa en el editor). Click togglea el panel del copiloto. */}
-      <div
-        className="acp-topbar-block"
-        role="button"
-        tabIndex={0}
-        onClick={toggleCopilot}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            toggleCopilot()
-          }
-        }}
-        title="AI Copilot"
-      >
-        <div className="acp-topbar-icon">
-          <CopilotGlobeIcon />
+      {/* Bloque AI Copilot en el topbar global. Solo en el editor; siempre
+          visible allí (display forzado) y su click togglea el panel. */}
+      {inEditor && (
+        <div
+          className="acp-topbar-block"
+          style={{ display: 'flex' }}
+          role="button"
+          tabIndex={0}
+          onClick={toggleCopilot}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              toggleCopilot()
+            }
+          }}
+          title="AI Copilot"
+        >
+          <div className="acp-topbar-icon">
+            <CopilotGlobeIcon />
+          </div>
+          <div className="acp-topbar-info">
+            <div className="acp-topbar-title">AI Copilot</div>
+            <div className="acp-topbar-sub">Asistente de investigación UX</div>
+          </div>
         </div>
-        <div className="acp-topbar-info">
-          <div className="acp-topbar-title">AI Copilot</div>
-          <div className="acp-topbar-sub">Asistente de investigación UX</div>
-        </div>
-      </div>
+      )}
     </header>
   )
 }
