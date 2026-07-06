@@ -170,7 +170,10 @@ export function Sidebar() {
             title="Exportar"
             onClick={closeMobileSidebar}
           >
-            <span className="nav-dot" />← Exportar
+            <span className="nav-icon-wrap" aria-hidden="true">
+              ←
+            </span>
+            Exportar
           </Link>
         </div>
       )}
