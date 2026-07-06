@@ -12,7 +12,6 @@ import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useTeamStore } from '@/lib/stores/useTeamStore'
 import { PROTOCOL_TEMPLATES } from '@/lib/data/templates'
-import { Button } from '@/components/ui/Button'
 import { WorkflowBanner } from '@/components/protocols/WorkflowBanner'
 import { ReviewBanner } from '@/components/protocols/ReviewBanner'
 import { RelatedResources } from '@/components/protocols/RelatedResources'
@@ -544,7 +543,8 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
           <>
             {renderForm()}
             <RelatedResources type={initial.type} />
-            {/* Botón principal al final del formulario (fiel al original). */}
+            {/* Botón principal al final del formulario (fiel al original:
+                acento, texto "✦ Generar protocolo"). */}
             <div
               style={{
                 display: 'flex',
@@ -552,15 +552,15 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
                 marginTop: 20,
               }}
             >
-              <Button
-                variant="primary"
+              <button
+                type="button"
+                className="generate-protocol-btn"
                 onClick={handleGenerate}
-                loading={isGenerating}
-                disabled={isSaving}
-                leftIcon={isGenerating ? undefined : '✦'}
+                disabled={isSaving || isGenerating}
+                style={{ background: 'var(--accent)', color: '#fff' }}
               >
-                {isGenerating ? 'Generando…' : 'Generar protocolo'}
-              </Button>
+                {isGenerating ? 'Generando…' : '✦ Generar protocolo'}
+              </button>
             </div>
           </>
         ) : outputProtocol ? (
