@@ -124,6 +124,12 @@ export function Sidebar() {
     return null
   }
 
+  // En el editor/detalle de un protocolo (/protocols/{id}...), extrae el id para
+  // mostrar la sección OUTPUT con el link "← Exportar" (fiel al original).
+  const editorMatch = pathname.match(/^\/protocols\/([^/]+)/)
+  const editorProtocolId =
+    editorMatch && editorMatch[1] !== 'new' ? editorMatch[1] : null
+
   // Clases globales del HTML original (Sprint 12). `sidebar-mobile-open` es una
   // ayuda propia de Next para el overlay en móvil.
   return (
@@ -152,6 +158,22 @@ export function Sidebar() {
           })}
         </div>
       ))}
+
+      {/* Sección OUTPUT — solo visible en el editor/detalle de un protocolo. */}
+      {editorProtocolId && (
+        <div>
+          <div className="sidebar-divider" aria-hidden="true" />
+          <div className="sidebar-label">Output</div>
+          <Link
+            href={`/protocols/${editorProtocolId}`}
+            className={`nav-item${pathname === `/protocols/${editorProtocolId}` ? ' active' : ''}`}
+            title="Exportar"
+            onClick={closeMobileSidebar}
+          >
+            <span className="nav-dot" />← Exportar
+          </Link>
+        </div>
+      )}
     </aside>
   )
 }
