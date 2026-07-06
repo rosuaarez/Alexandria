@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/lib/stores/useAuthStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
+import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 
 function SunIcon() {
   return (
@@ -37,12 +38,23 @@ function MenuIcon() {
   )
 }
 
+// Ícono del bloque AI Copilot del topbar (globo con órbitas, fiel al original).
+function CopilotGlobeIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+    </svg>
+  )
+}
+
 export function Topbar() {
   const currentUser = useAuthStore((s) => s.currentUser)
   const signOut = useAuthStore((s) => s.signOut)
   const darkMode = useUIStore((s) => s.darkMode)
   const toggleDarkMode = useUIStore((s) => s.toggleDarkMode)
   const toggleMobileSidebar = useUIStore((s) => s.toggleMobileSidebar)
+  const toggleCopilot = useCopilotStore((s) => s.toggleCopilot)
 
   return (
     <header className="topbar">
@@ -104,6 +116,30 @@ export function Topbar() {
         <LogoutIcon />
         Salir
       </button>
+
+      {/* Bloque AI Copilot en el topbar global. Visible solo con body.acp-open
+          (se activa en el editor). Click togglea el panel del copiloto. */}
+      <div
+        className="acp-topbar-block"
+        role="button"
+        tabIndex={0}
+        onClick={toggleCopilot}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            toggleCopilot()
+          }
+        }}
+        title="AI Copilot"
+      >
+        <div className="acp-topbar-icon">
+          <CopilotGlobeIcon />
+        </div>
+        <div className="acp-topbar-info">
+          <div className="acp-topbar-title">AI Copilot</div>
+          <div className="acp-topbar-sub">Asistente de investigación UX</div>
+        </div>
+      </div>
     </header>
   )
 }

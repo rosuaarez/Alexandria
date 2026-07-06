@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import type { Protocol, ProtocolType } from '@/lib/types'
+import type { Protocol, ProtocolType, ProtocolStatus } from '@/lib/types'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import { useEditorStore } from '@/lib/stores/useEditorStore'
 import { useAuthStore } from '@/lib/stores/useAuthStore'
@@ -12,9 +12,7 @@ import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useTeamStore } from '@/lib/stores/useTeamStore'
 import { PROTOCOL_TEMPLATES } from '@/lib/data/templates'
-import { StatusPill } from '@/components/ui/StatusPill'
 import { Button } from '@/components/ui/Button'
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { WorkflowBanner } from '@/components/protocols/WorkflowBanner'
 import { ReviewBanner } from '@/components/protocols/ReviewBanner'
 import { RelatedResources } from '@/components/protocols/RelatedResources'
@@ -54,6 +52,15 @@ function formatAgo(ms: number): string {
 }
 
 const AUTOSAVE_MS = 30000
+
+// Opciones del badge de estado del editor (dropdown "Borrador ▾" del original).
+const EDITOR_STATUS_OPTIONS: { value: ProtocolStatus; label: string; dot: string }[] = [
+  { value: 'draft', label: 'Borrador', dot: '#9CA3AF' },
+  { value: 'in-review', label: 'En revisión', dot: '#D97706' },
+  { value: 'approved', label: 'Aprobado', dot: '#10B981' },
+  { value: 'ready', label: 'Listo para ejecutar', dot: '#5B21B6' },
+  { value: 'completed', label: 'Completado', dot: '#2563EB' },
+]
 
 interface EditorInitial {
   type: ProtocolType
@@ -150,6 +157,7 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const generateProtocol = useCopilotStore((s) => s.generateProtocol)
   const isGenerating = useCopilotStore((s) => s.isGenerating)
   const setCurrentProtocol = useCopilotStore((s) => s.setCurrentProtocol)
+  const setCopilotOpen = useCopilotStore((s) => s.setOpen)
 
   // Colaboración: comentarios por campo cuando el protocolo está en revisión.
   const loadComments = useTeamStore((s) => s.loadComments)
@@ -170,6 +178,8 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const setSaving = useEditorStore((s) => s.setSaving)
 
   const [name, setName] = useState(initial.name)
+  const [status, setStatus] = useState<ProtocolStatus>(initial.status)
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false)
   const [tab, setTab] = useState<Tab>(
     searchParams.get('tab') === 'output' ? 'output' : 'edit'
   )
@@ -200,9 +210,13 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     setEditorPlatform(initial.platform ?? null)
     setEditingProtocol(isNew ? null : id)
     setCurrentProtocol(isNew ? null : id)
+    // El AI Copilot está siempre visible en el editor (fiel al original):
+    // se abre al entrar y se cierra al salir.
+    setCopilotOpen(true)
     return () => {
       resetEditor()
       setCurrentProtocol(null)
+      setCopilotOpen(false)
     }
   }, [
     id,
@@ -213,6 +227,7 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     setEditorPlatform,
     setEditingProtocol,
     setCurrentProtocol,
+    setCopilotOpen,
     resetEditor,
   ])
 
@@ -335,11 +350,6 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     }
   }, [])
 
-  const handleSave = async () => {
-    const savedId = await persist()
-    if (isNew && savedId) router.replace(`/protocols/${savedId}/edit`)
-  }
-
   const handleGenerate = async () => {
     // 1. Guardar primero
     const savedId = await persist()
@@ -354,6 +364,15 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
       if (isNew) router.replace(`/protocols/${savedId}/edit?tab=output`)
       else setTab('output')
     }
+  }
+
+  const handleStatusChange = async (value: ProtocolStatus) => {
+    setStatus(value)
+    setStatusMenuOpen(false)
+    if (isNew) return
+    const fresh = useProtocolStore.getState().getProtocolById(id) ?? protocol
+    if (!fresh) return
+    await updateProtocol({ ...fresh, protoStatus: value })
   }
 
   const handleApprove = async () => {
@@ -381,70 +400,117 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     return <CompleteForm {...formProps} />
   }
 
+  const currentStatus =
+    EDITOR_STATUS_OPTIONS.find((o) => o.value === status) ?? EDITOR_STATUS_OPTIONS[0]
+
   return (
     <div className={styles.page}>
-      <Breadcrumbs
-        items={[
-          { label: 'Mis Protocolos', href: '/protocols' },
-          { label: name.trim() || initial.name },
-          { label: isNew ? 'Crear' : 'Editar' },
-        ]}
-      />
-
-      <header className={styles.topbar}>
-        <div className={styles.topLeft}>
-          <Link href="/protocols" className={styles.back} aria-label="Volver">
-            ←
-          </Link>
-          <input
-            className={styles.nameInput}
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            placeholder="Nombre del protocolo"
-          />
-          <StatusPill status={initial.status} size="sm" />
-          <span className={styles.saveStatus}>
-            {isSaving ? (
-              <>
-                <span className={styles.savingDot} aria-hidden /> Guardando…
-              </>
-            ) : isDirty ? (
-              <span className={styles.dirty}>● Sin guardar</span>
-            ) : agoLabel != null ? (
-              <span className={styles.saved}>✓ Guardado {agoLabel}</span>
-            ) : null}
-          </span>
-        </div>
-        <div className={styles.topRight}>
-          {isInReview && unresolvedCount > 0 && (
+      {/* Topbar del editor fiel al original: [← Volver] [nombre] [estado ▾]. */}
+      <div className="editor-header-wrap">
+        <div className="editor-topbar">
+          <div className="editor-topbar-left">
             <button
               type="button"
-              className={styles.commentBadge}
-              onClick={openAllComments}
-              title="Ver todos los comentarios"
+              className="editor-back-btn"
+              onClick={() => router.push('/protocols')}
             >
-              💬 {unresolvedCount}
+              ← Volver
             </button>
-          )}
-          <Button
-            variant="secondary"
-            onClick={handleSave}
-            loading={isSaving}
-            disabled={isGenerating}
+            <div>
+              <input
+                className="editor-proto-name"
+                value={name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder="Nombre del protocolo"
+                aria-label="Nombre del protocolo"
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  padding: 0,
+                  width: '100%',
+                  outline: 'none',
+                }}
+              />
+              <div className="editor-proto-subtitle">
+                Completa la siguiente información de tu protocolo
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="editor-action-btns"
+            style={{
+              display: 'flex',
+              gap: 8,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flexShrink: 0,
+              marginLeft: 'auto',
+            }}
           >
-            Guardar
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleGenerate}
-            loading={isGenerating}
-            disabled={isSaving}
-            leftIcon={isGenerating ? undefined : '✨'}
-          >
-            {isGenerating ? 'Generando…' : 'Generar con IA'}
-          </Button>
+            <span className={styles.saveStatus}>
+              {isSaving ? (
+                <>
+                  <span className={styles.savingDot} aria-hidden /> Guardando…
+                </>
+              ) : isDirty ? (
+                <span className={styles.dirty}>● Sin guardar</span>
+              ) : agoLabel != null ? (
+                <span className={styles.saved}>✓ Guardado {agoLabel}</span>
+              ) : null}
+            </span>
+
+            {isInReview && unresolvedCount > 0 && (
+              <button
+                type="button"
+                className={styles.commentBadge}
+                onClick={openAllComments}
+                title="Ver todos los comentarios"
+              >
+                💬 {unresolvedCount}
+              </button>
+            )}
+
+            {/* Badge de estado con dropdown (Borrador ▾). */}
+            <div
+              className={`editor-status-badge ${status}`}
+              onClick={() => setStatusMenuOpen((v) => !v)}
+              title="Cambiar estado"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setStatusMenuOpen((v) => !v)
+                }
+              }}
+              style={{ position: 'relative' }}
+            >
+              <span className="editor-status-badge-dot" />
+              <span>{currentStatus.label}</span>
+              <span className="editor-status-badge-chevron">▾</span>
+              <div className={`editor-status-dropdown${statusMenuOpen ? ' open' : ''}`}>
+                {EDITOR_STATUS_OPTIONS.map((opt) => (
+                  <div
+                    key={opt.value}
+                    className={`editor-status-opt${opt.value === status ? ' active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void handleStatusChange(opt.value)
+                    }}
+                  >
+                    <span
+                      className="editor-status-opt-dot"
+                      style={{ background: opt.dot }}
+                    />
+                    {opt.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
 
       {isInReview && (
         <ReviewBanner
@@ -478,6 +544,24 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
           <>
             {renderForm()}
             <RelatedResources type={initial.type} />
+            {/* Botón principal al final del formulario (fiel al original). */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: 20,
+              }}
+            >
+              <Button
+                variant="primary"
+                onClick={handleGenerate}
+                loading={isGenerating}
+                disabled={isSaving}
+                leftIcon={isGenerating ? undefined : '✦'}
+              >
+                {isGenerating ? 'Generando…' : 'Generar protocolo'}
+              </Button>
+            </div>
           </>
         ) : outputProtocol ? (
           <ProtocolOutput protocol={outputProtocol} />
