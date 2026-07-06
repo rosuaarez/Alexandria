@@ -59,13 +59,34 @@ function formatDMY(d: Date): string {
   return `${dd}-${mm}-${d.getFullYear()}`
 }
 
-// Tag de plantilla/tipo mostrado en la meta del editor (fallback por tipo).
-const TYPE_TAG: Record<ProtocolType, { icon: string; label: string }> = {
-  express: { icon: '⚡', label: 'Express' },
-  complete: { icon: '📋', label: 'Completo' },
-  presentation: { icon: '🎯', label: 'Presentación' },
-  ab: { icon: '🔀', label: 'A/B Testing' },
+// Pill del template en el header del editor (label + colores por template).
+interface TemplateTag {
+  icon: string
+  label: string
+  bg: string
+  color: string
+  border: string
 }
+const TEMPLATE_TAG: Record<string, TemplateTag> = {
+  usabilidad: { icon: '🎯', label: 'Prueba de Usabilidad', bg: '#FDF4FF', color: '#7C3AED', border: '#E9D5FF' },
+  ab: { icon: '⚖️', label: 'A/B Testing', bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA' },
+  entrevistas: { icon: '💬', label: 'Entrevistas', bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
+  cardsorting: { icon: '🗂️', label: 'Card Sorting', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
+  treetesting: { icon: '🌲', label: 'Tree Testing', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
+  encuestas: { icon: '📊', label: 'Encuestas', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
+  presentacion: { icon: '🎯', label: 'Presentación', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
+}
+
+// Fallback por tipo cuando no hay template (protocolos antiguos).
+const TYPE_FALLBACK_LABEL: Record<ProtocolType, string> = {
+  express: 'Express',
+  complete: 'Completo',
+  presentation: 'Presentación',
+  ab: 'A/B Testing',
+}
+
+// Templates que usan el formulario Completo (Corrección 3).
+const COMPLETE_TEMPLATES = ['usabilidad', 'entrevistas', 'cardsorting', 'treetesting', 'ab']
 
 // Opciones del badge de estado del editor (dropdown "Borrador ▾" del original).
 const EDITOR_STATUS_OPTIONS: { value: ProtocolStatus; label: string; dot: string }[] = [
@@ -100,9 +121,13 @@ export default function ProtocolEditorPage() {
     if (isNew) {
       const type = normalizeType(searchParams.get('type'))
       const platform = searchParams.get('platform') as 'maze' | 'forms' | null
-      const tpl = PROTOCOL_TEMPLATES[searchParams.get('template') ?? '']
+      const templateKey = searchParams.get('template') ?? ''
+      const tpl = PROTOCOL_TEMPLATES[templateKey]
       const data: FormData = {}
       if (platform) data.platform = platform
+      // Se guarda el template en data.template para el pill del header y para
+      // decidir qué formulario mostrar (independiente del tipo).
+      if (templateKey) data.template = templateKey
       if (tpl) {
         data.objetivo = tpl.objetivo
         data.questions = tpl.questions
@@ -407,18 +432,33 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
 
   const outputProtocol = liveProtocol ?? protocol
 
+  // Template del protocolo (guardado en data.template o en protocol.template).
+  const templateKey =
+    (typeof initial.data.template === 'string' ? initial.data.template : '') ||
+    protocol?.template ||
+    ''
+
+  // El formulario depende del TEMPLATE, no del tipo (Corrección 3).
   const renderForm = () => {
     const formProps = { initialData: initial.data, onChange: handleFormChange }
-    if (initial.type === 'express') return <ExpressForm {...formProps} />
+    if (COMPLETE_TEMPLATES.includes(templateKey)) return <CompleteForm {...formProps} />
     if (initial.type === 'presentation') return <PresentationForm {...formProps} />
-    return <CompleteForm {...formProps} />
+    if (initial.type === 'complete' || initial.type === 'ab')
+      return <CompleteForm {...formProps} />
+    return <ExpressForm {...formProps} />
   }
 
   const currentStatus =
     EDITOR_STATUS_OPTIONS.find((o) => o.value === status) ?? EDITOR_STATUS_OPTIONS[0]
 
   const versionLabel = `V${protocol?.version ?? 1}`
-  const templateTag = TYPE_TAG[initial.type] ?? TYPE_TAG.express
+  const templateTag: TemplateTag = TEMPLATE_TAG[templateKey] ?? {
+    icon: '🎯',
+    label: TYPE_FALLBACK_LABEL[initial.type] ?? 'Protocolo',
+    bg: 'var(--accent-lt)',
+    color: 'var(--accent)',
+    border: 'transparent',
+  }
 
   return (
     <div className={styles.page}>
@@ -435,28 +475,36 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
             </button>
             <div>
               <h2 className="editor-proto-name">{name || 'Nuevo protocolo'}</h2>
-              <div className="editor-proto-meta">
-                <span>
-                  <strong>Fecha:</strong> {metaDate || '—'}
-                </span>
-                <span className="editor-proto-meta-sep">·</span>
-                <span>
-                  <strong>Versión:</strong> {versionLabel}
-                </span>
-                <span className="editor-proto-meta-sep">·</span>
+              {/* Subtítulo + pill del template inline (Correcciones 1 y 2). */}
+              <div
+                className="editor-proto-subtitle"
+                style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}
+              >
+                Completa la siguiente información de tu protocolo
                 <span
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 4,
-                    background: 'var(--accent-lt)',
-                    color: 'var(--accent)',
+                    background: templateTag.bg,
+                    color: templateTag.color,
+                    border: `1px solid ${templateTag.border}`,
                     borderRadius: 999,
                     padding: '2px 10px',
+                    fontSize: 11.5,
                     fontWeight: 600,
                   }}
                 >
                   {templateTag.icon} {templateTag.label}
+                </span>
+              </div>
+              <div className="editor-proto-meta">
+                <span>
+                  <strong>Fecha:</strong> {metaDate || '—'}
+                </span>
+                <span className="editor-proto-meta-sep">|</span>
+                <span>
+                  <strong>Versión:</strong> {versionLabel}
                 </span>
               </div>
             </div>

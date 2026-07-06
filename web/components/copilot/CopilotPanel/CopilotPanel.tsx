@@ -3,23 +3,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
+import {
+  analyzeProtocol,
+  calculateQualityScore,
+  type AnalysisDimension,
+} from '@/lib/gemini/analyzeProtocol'
 
 // Anillo de calidad — radio 16 (mismo SVG que el HTML original).
 const RING_RADIUS = 16
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
-
-interface QualityDimension {
-  label: string
-  value: number
-}
-
-// Score y dimensiones mock (75) — fieles a la maqueta del HTML original.
-const QUALITY_SCORE = 75
-const QUALITY_DIMENSIONS: QualityDimension[] = [
-  { label: 'Objetivos', value: 80 },
-  { label: 'Preguntas', value: 75 },
-  { label: 'Completitud', value: 70 },
-]
 
 function qualityTier(score: number): { cls: string; color: string; badge: string; sub: string } {
   if (score >= 70)
@@ -48,10 +40,21 @@ function SendIcon() {
   )
 }
 
-function QualityRing() {
+interface QualityRingProps {
+  score: number
+  dimensions: AnalysisDimension[]
+  analyzed: boolean
+}
+
+function QualityRing({ score, dimensions, analyzed }: QualityRingProps) {
   const [open, setOpen] = useState(false)
-  const tier = qualityTier(QUALITY_SCORE)
-  const offset = RING_CIRCUMFERENCE * (1 - QUALITY_SCORE / 100)
+  const tier = qualityTier(score)
+  const offset = RING_CIRCUMFERENCE * (1 - score / 100)
+
+  // Al completar un análisis, expande la sección de calidad automáticamente.
+  useEffect(() => {
+    if (analyzed) setOpen(true)
+  }, [analyzed])
 
   return (
     <div
@@ -83,7 +86,7 @@ function QualityRing() {
               transform="rotate(-90 20 20)"
             />
           </svg>
-          <span className="acp-quality-num">{QUALITY_SCORE}</span>
+          <span className="acp-quality-num">{score}</span>
         </div>
         <div className="acp-quality-info">
           <div className="acp-quality-label">Calidad del protocolo</div>
@@ -94,18 +97,19 @@ function QualityRing() {
       </div>
 
       <div className="acp-quality-body">
-        {QUALITY_DIMENSIONS.map((dim) => (
+        {dimensions.map((dim) => (
           <div key={dim.label} className="acp-qdim">
             <span className="acp-qdim-label">{dim.label}</span>
             <div className="acp-qdim-bar">
-              <div className="acp-qdim-fill" style={{ width: `${dim.value}%` }} />
+              <div className="acp-qdim-fill" style={{ width: `${dim.value * 10}%` }} />
             </div>
             <span className="acp-qdim-val">{dim.value}</span>
           </div>
         ))}
         <p className="acp-quality-hint">
-          Análisis de demostración — conecta una API para evaluar tu protocolo en
-          tiempo real.
+          {analyzed
+            ? 'Análisis completado. Revisa los detalles arriba.'
+            : 'Pulsa "Analizar protocolo" para evaluar objetivos, preguntas y completitud.'}
         </p>
       </div>
     </div>
@@ -119,19 +123,25 @@ export function CopilotPanel() {
   const currentProtocolId = useCopilotStore((s) => s.currentProtocolId)
   const setOpen = useCopilotStore((s) => s.setOpen)
   const askCopilot = useCopilotStore((s) => s.askCopilot)
-  const generateProtocol = useCopilotStore((s) => s.generateProtocol)
+  const addMessage = useCopilotStore((s) => s.addMessage)
 
   const protocol = useProtocolStore((s) =>
     currentProtocolId ? s.protocols.find((p) => p.id === currentProtocolId) : undefined
   )
 
   const [input, setInput] = useState('')
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analyzed, setAnalyzed] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
+
+  // Score y dimensiones dinámicos del protocolo actual (Corrección 6).
+  const score = calculateQualityScore(protocol)
+  const dimensions = analyzeProtocol(protocol).dimensions
 
   // Auto-scroll al último mensaje.
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight })
-  }, [messages, isGenerating])
+  }, [messages, isGenerating, analyzing])
 
   const canAsk = !!protocol && !isGenerating
 
@@ -142,20 +152,29 @@ export function CopilotPanel() {
     void askCopilot(text, protocol)
   }
 
-  const handleGenerate = () => {
-    if (!protocol || isGenerating) return
-    void generateProtocol(protocol)
-  }
-
+  // Analiza el protocolo localmente y muestra el resultado en el chat.
   const handleAnalyze = () => {
-    if (!protocol || isGenerating) return
-    void askCopilot('Analiza la calidad de este protocolo y dime cómo mejorarlo.', protocol)
+    if (!protocol || isGenerating || analyzing) return
+    setAnalyzing(true)
+    const result = analyzeProtocol(protocol)
+    window.setTimeout(() => {
+      addMessage('assistant', `${result.summary}\n\n${result.note}`)
+      setAnalyzed(true)
+      setAnalyzing(false)
+    }, 500)
   }
 
   const handleSuggestQuestions = () => {
     if (!protocol || isGenerating) return
     void askCopilot('Sugiéreme preguntas adicionales para este protocolo.', protocol)
   }
+
+  const handleImproveObjective = () => {
+    if (!protocol || isGenerating) return
+    void askCopilot('Mejora el objetivo de investigación de este protocolo.', protocol)
+  }
+
+  const busy = isGenerating || analyzing
 
   // El panel se renderiza siempre; su visibilidad la controlan #acp-panel.open
   // y body.acp-open (transform slide), igual que el HTML original.
@@ -181,12 +200,12 @@ export function CopilotPanel() {
       </div>
 
       <div className="acp-actions">
-        <button type="button" className="acp-action-btn" onClick={handleGenerate} disabled={!canAsk}>
-          <span className="acp-action-icon">✨</span>
-          <span className="acp-action-text">Generar protocolo</span>
-          <span className="acp-action-arrow">→</span>
-        </button>
-        <button type="button" className="acp-action-btn" onClick={handleAnalyze} disabled={!canAsk}>
+        <button
+          type="button"
+          className={`acp-action-btn${analyzing ? ' acp-active' : ''}`}
+          onClick={handleAnalyze}
+          disabled={!canAsk}
+        >
           <span className="acp-action-icon">🔍</span>
           <span className="acp-action-text">Analizar protocolo</span>
           <span className="acp-action-arrow">→</span>
@@ -196,12 +215,17 @@ export function CopilotPanel() {
           <span className="acp-action-text">Sugerir preguntas</span>
           <span className="acp-action-arrow">→</span>
         </button>
+        <button type="button" className="acp-action-btn" onClick={handleImproveObjective} disabled={!canAsk}>
+          <span className="acp-action-icon">🎯</span>
+          <span className="acp-action-text">Mejorar objetivo</span>
+          <span className="acp-action-arrow">→</span>
+        </button>
       </div>
 
       <div className="acp-chat-label">Ai Copilot</div>
 
       <div className="acp-chat-area" ref={listRef}>
-        {messages.length === 0 && !isGenerating && (
+        {messages.length === 0 && !busy && (
           <div className="acp-welcome">
             <p>¡Hola! Soy tu asistente de investigación UX.</p>
             <p>
@@ -222,11 +246,13 @@ export function CopilotPanel() {
             key={m.id}
             className={`acp-msg ${m.role === 'user' ? 'acp-msg-user' : 'acp-msg-ai'}`}
           >
-            <div className="acp-bubble">{m.content}</div>
+            <div className="acp-bubble" style={{ whiteSpace: 'pre-line' }}>
+              {m.content}
+            </div>
           </div>
         ))}
 
-        {isGenerating && (
+        {busy && (
           <div className="acp-msg acp-msg-ai">
             <div className="acp-bubble acp-typing">
               <span />
@@ -237,7 +263,7 @@ export function CopilotPanel() {
         )}
       </div>
 
-      <QualityRing />
+      <QualityRing score={score} dimensions={dimensions} analyzed={analyzed} />
 
       <div className="acp-input-wrap">
         <input
