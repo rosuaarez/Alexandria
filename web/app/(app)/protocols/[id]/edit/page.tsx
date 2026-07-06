@@ -569,21 +569,22 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
           <>
             {renderForm()}
             <RelatedResources type={initial.type} />
-            {/* Botón principal al final del formulario (fiel al original:
-                acento, texto "✦ Generar protocolo"). */}
+            {/* Botón principal al final del formulario (centrado, con separador
+                superior, fiel al original). */}
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                marginTop: 20,
+                textAlign: 'center',
+                padding: '32px 0',
+                borderTop: '1px solid var(--border)',
+                marginTop: 8,
               }}
             >
               <button
                 type="button"
-                className="generate-protocol-btn"
+                className="btn btn-primary"
                 onClick={handleGenerate}
                 disabled={isSaving || isGenerating}
-                style={{ background: 'var(--accent)', color: '#fff' }}
+                style={{ padding: '14px 40px', fontSize: 16 }}
               >
                 {isGenerating ? 'Generando…' : '✦ Generar protocolo'}
               </button>
