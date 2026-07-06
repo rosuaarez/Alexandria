@@ -129,6 +129,9 @@ export default function ProtocolEditorPage() {
       // decidir qué formulario mostrar (independiente del tipo).
       if (templateKey) data.template = templateKey
       if (tpl) {
+        // Datos iniciales del formulario completo definidos por el template
+        // (team, docs, metodo, herramientas… se van al CompleteForm).
+        if (tpl.initialData) Object.assign(data, tpl.initialData)
         data.objetivo = tpl.objetivo
         data.questions = tpl.questions
       }

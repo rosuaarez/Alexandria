@@ -4,12 +4,21 @@ export interface ProtocolTemplate {
   name: string
   objetivo: string
   questions: Question[]
+  // Datos iniciales del formulario completo (claves = campos del CompleteForm).
+  initialData?: Record<string, unknown>
 }
 
 export const PROTOCOL_TEMPLATES: Record<string, ProtocolTemplate> = {
   usabilidad: {
     name: 'Test de Usabilidad',
     objetivo: 'Evaluar la facilidad de uso de [producto] con usuarios reales.',
+    // Pre-llenado del CompleteForm para el template de usabilidad.
+    initialData: {
+      team: [{ name: 'Ana García', rolInvestigacion: '', rolPdu: '' }],
+      docs: [{ nombre: 'Research plan', link: '' }],
+      metodo: 'Prueba de Usabilidad',
+      herramientas: ['Maze', 'Figma'],
+    },
     questions: [
       { id: '1', text: '¿Pudiste completar la tarea sin dificultad?', type: 'scale5' },
       { id: '2', text: '¿Qué fue lo más confuso del proceso?', type: 'open' },
