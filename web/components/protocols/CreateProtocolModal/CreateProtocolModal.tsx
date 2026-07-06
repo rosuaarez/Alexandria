@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { ProtocolType } from '@/lib/types'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useFolderStore } from '@/lib/stores/useFolderStore'
 
 interface TemplateOption {
   value: string
@@ -78,7 +79,6 @@ const VERSION_OPTIONS = Array.from({ length: 10 }, (_, i) => String(i + 1))
 // Mocks vacíos por ahora (se poblarán con datos reales más adelante).
 const CLIENTE_OPTIONS: { value: string; label: string }[] = []
 const PROYECTO_OPTIONS: { value: string; label: string }[] = []
-const FOLDER_OPTIONS: { value: string; label: string }[] = []
 
 // Slug fiel al original: espacios→guion, minúsculas, solo [a-z0-9-], recorte.
 function slugify(value: string, max: number): string {
@@ -97,6 +97,7 @@ interface CreateProtocolModalProps {
 
 export function CreateProtocolModal({ isOpen, onClose }: CreateProtocolModalProps) {
   const router = useRouter()
+  const folders = useFolderStore((s) => s.folders)
 
   const [step, setStep] = useState<1 | 2>(1)
   const [cliente, setCliente] = useState('')
@@ -246,9 +247,9 @@ export function CreateProtocolModal({ isOpen, onClose }: CreateProtocolModalProp
                   onChange={(e) => setFolder(e.target.value)}
                 >
                   <option value="">Sin carpeta</option>
-                  {FOLDER_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {folders.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.emoji} {f.name}
                     </option>
                   ))}
                 </select>

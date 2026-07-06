@@ -33,6 +33,16 @@ export interface Folder {
   icon?: string;
 }
 
+// Carpeta de proyecto de la Biblioteca de Protocolos (gestor de carpetas).
+export interface ProjectFolder {
+  id: string;
+  name: string;
+  emoji: string; // emoji del ícono, default '📁'
+  description?: string;
+  createdAt: string;
+  protocolCount: number; // calculado desde protocols
+}
+
 export interface SharedUser {
   id: string;
   name: string;

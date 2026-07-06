@@ -1,272 +1,174 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import type { LibraryCategory, LibraryResourceType } from '@/lib/types'
-import { filterResources, useLibraryStore } from '@/lib/stores/useLibraryStore'
-import { ResourceCard, RESOURCE_TYPE_LABELS } from '@/components/library/ResourceCard'
-import { SearchBar, EmptyState, Skeleton } from '@/components/ui'
-import styles from './library.module.css'
-
-const CATEGORY_LABELS: Record<LibraryCategory, string> = {
-  usabilidad: 'Usabilidad',
-  entrevistas: 'Entrevistas',
-  metricas: 'Métricas',
-  accesibilidad: 'Accesibilidad',
-  investigacion: 'Investigación',
-  herramientas: 'Herramientas',
-  metodologia: 'Metodología',
-}
-
-const CATEGORIES = Object.keys(CATEGORY_LABELS) as LibraryCategory[]
-const TYPES = Object.keys(RESOURCE_TYPE_LABELS) as LibraryResourceType[]
-
-function SkeletonCard() {
-  return (
-    <div className={styles.skeletonCard}>
-      <Skeleton width="32px" height="32px" borderRadius="8px" />
-      <Skeleton width="80%" height="15px" />
-      <Skeleton width="100%" height="13px" />
-      <Skeleton width="60%" height="13px" />
-      <Skeleton width="40%" height="12px" />
-    </div>
-  )
-}
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import type { ProjectFolder } from '@/lib/types'
+import { useFolderStore } from '@/lib/stores/useFolderStore'
+import { FolderCard } from '@/components/library/FolderCard'
+import { FolderModal, type FolderModalData } from '@/components/library/FolderModal'
 
 export default function LibraryPage() {
-  const resources = useLibraryStore((s) => s.resources)
-  const loading = useLibraryStore((s) => s.loading)
-  const activeCategory = useLibraryStore((s) => s.activeCategory)
-  const activeType = useLibraryStore((s) => s.activeType)
-  const searchQuery = useLibraryStore((s) => s.searchQuery)
-  const showFavoritesOnly = useLibraryStore((s) => s.showFavoritesOnly)
+  const router = useRouter()
+  const loading = useFolderStore((s) => s.loading)
+  const searchQuery = useFolderStore((s) => s.searchQuery)
+  const setSearch = useFolderStore((s) => s.setSearch)
+  const filteredFolders = useFolderStore((s) => s.filteredFolders)
+  // Se recalcula cuando cambian folders o searchQuery (ambos están en el store).
+  useFolderStore((s) => s.folders)
+  const createFolder = useFolderStore((s) => s.createFolder)
+  const updateFolder = useFolderStore((s) => s.updateFolder)
+  const deleteFolder = useFolderStore((s) => s.deleteFolder)
 
-  const view = useLibraryStore((s) => s.view)
-  const setCategory = useLibraryStore((s) => s.setCategory)
-  const setType = useLibraryStore((s) => s.setType)
-  const setSearch = useLibraryStore((s) => s.setSearch)
-  const setShowFavorites = useLibraryStore((s) => s.setShowFavorites)
-  const setView = useLibraryStore((s) => s.setView)
-  const initView = useLibraryStore((s) => s.initView)
-  const toggleFavoriteResource = useLibraryStore((s) => s.toggleFavoriteResource)
+  const folders = filteredFolders()
 
-  // Limpia los filtros compartidos al entrar (Cápsulas usa el mismo store) y
-  // sincroniza la preferencia de vista desde localStorage.
-  useEffect(() => {
-    setCategory(null)
-    setType(null)
-    setSearch('')
-    setShowFavorites(false)
-    initView()
-  }, [setCategory, setType, setSearch, setShowFavorites, initView])
+  const [createOpen, setCreateOpen] = useState(false)
+  const [editFolder, setEditFolder] = useState<ProjectFolder | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<ProjectFolder | null>(null)
 
-  const filtered = useMemo(
-    () =>
-      filterResources(resources, {
-        activeCategory,
-        activeType,
-        searchQuery,
-        showFavoritesOnly,
-      }),
-    [resources, activeCategory, activeType, searchQuery, showFavoritesOnly]
-  )
+  const handleCreate = (data: FolderModalData) => {
+    void createFolder({
+      name: data.name,
+      emoji: data.emoji,
+      description: data.description,
+    })
+  }
 
-  const countByCategory = (cat: LibraryCategory) =>
-    resources.filter((r) => r.category === cat).length
+  const handleEdit = (data: FolderModalData) => {
+    if (!editFolder) return
+    void updateFolder(editFolder.id, {
+      name: data.name,
+      emoji: data.emoji,
+      description: data.description,
+      createdAt: data.createdAt,
+    })
+  }
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return
+    void deleteFolder(deleteTarget.id)
+    setDeleteTarget(null)
+  }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.heading}>Biblioteca</h1>
-          <p className={styles.subtitle}>Tu repositorio de conocimiento UX</p>
+    <div className="page-transition" id="view-library">
+      <div className="bib-header">
+        <div className="bib-title">Biblioteca de protocolos</div>
+        <div className="bib-sub">
+          Gestiona y organiza todos tus proyectos de investigación
         </div>
-        <SearchBar
-          placeholder="Buscar recursos…"
-          value={searchQuery}
-          onChange={setSearch}
-        />
-      </header>
-
-      <div className={styles.body}>
-        <aside className={styles.filters}>
-          <p className={styles.filtersTitle}>Categorías</p>
-          <ul className={styles.categoryList}>
-            <li>
-              <button
-                type="button"
-                className={`${styles.categoryItem} ${activeCategory === null ? styles.categoryActive : ''}`}
-                onClick={() => setCategory(null)}
-              >
-                <span>Todas</span>
-                <span className={styles.count}>{resources.length}</span>
-              </button>
-            </li>
-            {CATEGORIES.map((cat) => (
-              <li key={cat}>
-                <button
-                  type="button"
-                  className={`${styles.categoryItem} ${activeCategory === cat ? styles.categoryActive : ''}`}
-                  onClick={() => setCategory(cat)}
-                >
-                  <span>{CATEGORY_LABELS[cat]}</span>
-                  <span className={styles.count}>{countByCategory(cat)}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </aside>
-
-        <section className={styles.main}>
-          <div className={styles.pills} role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={!showFavoritesOnly}
-              className={`${styles.pill} ${!showFavoritesOnly ? styles.pillActive : ''}`}
-              onClick={() => setShowFavorites(false)}
-            >
-              Todos
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={showFavoritesOnly}
-              className={`${styles.pill} ${showFavoritesOnly ? styles.pillActive : ''}`}
-              onClick={() => setShowFavorites(true)}
-            >
-              ♥ Favoritos
-            </button>
-            <span className={styles.pillDivider} aria-hidden />
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeType === null}
-              className={`${styles.pill} ${activeType === null ? styles.pillActive : ''}`}
-              onClick={() => setType(null)}
-            >
-              Todos los tipos
-            </button>
-            {TYPES.map((t) => (
-              <button
-                key={t}
-                type="button"
-                role="tab"
-                aria-selected={activeType === t}
-                className={`${styles.pill} ${activeType === t ? styles.pillActive : ''}`}
-                onClick={() => setType(t)}
-              >
-                {RESOURCE_TYPE_LABELS[t]}
-              </button>
-            ))}
-
-            <span className={styles.viewToggle} role="group" aria-label="Vista">
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === 'grid' ? styles.viewActive : ''}`}
-                onClick={() => setView('grid')}
-                aria-pressed={view === 'grid'}
-                title="Vista en cuadrícula"
-              >
-                ▦ Grid
-              </button>
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === 'list' ? styles.viewActive : ''}`}
-                onClick={() => setView('list')}
-                aria-pressed={view === 'list'}
-                title="Vista en lista"
-              >
-                ☰ Lista
-              </button>
-            </span>
-          </div>
-
-          {loading ? (
-            <div className={styles.grid}>
-              {Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              emoji="🔍"
-              title="Sin resultados"
-              description="No encontramos recursos con estos filtros. Prueba con otra categoría o limpia la búsqueda."
-              action={{
-                label: 'Limpiar filtros',
-                onClick: () => {
-                  setCategory(null)
-                  setType(null)
-                  setSearch('')
-                  setShowFavorites(false)
-                },
-              }}
-            />
-          ) : view === 'list' ? (
-            <div className={styles.list}>
-              {filtered.map((r) => (
-                <div key={r.id} className={styles.listRow}>
-                  <span className={styles.listEmoji} aria-hidden="true">
-                    {r.thumbnailEmoji}
-                  </span>
-                  <div className={styles.listMain}>
-                    <span className={styles.listTitle}>
-                      {r.title}
-                      <span className={styles.listType}>
-                        {RESOURCE_TYPE_LABELS[r.type]}
-                      </span>
-                    </span>
-                    <span className={styles.listSub}>
-                      {r.author && <span>{r.author}</span>}
-                      {r.author && <span> · </span>}
-                      <span>{r.category}</span>
-                    </span>
-                    <div className={styles.listTags}>
-                      {r.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className={styles.listTag}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  {r.readTime && (
-                    <span className={styles.listTime}>{r.readTime}</span>
-                  )}
-                  <button
-                    type="button"
-                    className={`${styles.listFav} ${r.isFavorite ? styles.listFavActive : ''}`}
-                    onClick={() => toggleFavoriteResource(r.id)}
-                    aria-pressed={r.isFavorite}
-                    aria-label={
-                      r.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'
-                    }
-                  >
-                    {r.isFavorite ? '♥' : '♡'}
-                  </button>
-                  <a
-                    className={styles.listView}
-                    href={r.url || undefined}
-                    target={r.url ? '_blank' : undefined}
-                    rel="noopener noreferrer"
-                  >
-                    Ver →
-                  </a>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.grid}>
-              {filtered.map((r) => (
-                <ResourceCard
-                  key={r.id}
-                  resource={r}
-                  onToggleFavorite={toggleFavoriteResource}
-                />
-              ))}
-            </div>
-          )}
-        </section>
       </div>
+
+      <div className="bib-toolbar">
+        <div className="bib-search-wrap">
+          <span className="bib-search-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          <input
+            className="bib-search"
+            type="text"
+            placeholder="Buscar proyectos..."
+            value={searchQuery}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <button className="bib-filter-btn" type="button" title="Filtros">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          Filtros
+        </button>
+        <button
+          className="bib-create-btn"
+          type="button"
+          onClick={() => setCreateOpen(true)}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+            <line x1="12" y1="11" x2="12" y2="17" />
+            <line x1="9" y1="14" x2="15" y2="14" />
+          </svg>
+          Crear carpeta
+        </button>
+      </div>
+
+      <div className="bib-folders-grid">
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="bib-folder-card"
+              style={{ opacity: 0.5, minHeight: 150 }}
+            />
+          ))
+        ) : (
+          folders.map((folder) => (
+            <FolderCard
+              key={folder.id}
+              folder={folder}
+              count={folder.protocolCount}
+              onOpen={(id) => router.push(`/library/${id}`)}
+              onEdit={(f) => setEditFolder(f)}
+              onDelete={(f) => setDeleteTarget(f)}
+              onChangeEmoji={(id, emoji) => void updateFolder(id, { emoji })}
+            />
+          ))
+        )}
+      </div>
+
+      <FolderModal
+        isOpen={createOpen}
+        mode="create"
+        onClose={() => setCreateOpen(false)}
+        onSubmit={handleCreate}
+      />
+
+      <FolderModal
+        isOpen={editFolder !== null}
+        mode="edit"
+        folder={editFolder}
+        onClose={() => setEditFolder(null)}
+        onSubmit={handleEdit}
+      />
+
+      {/* Confirmación de borrado (fiel al confirm-box del original). */}
+      {deleteTarget && (
+        <div className="modal-overlay open" onClick={() => setDeleteTarget(null)}>
+          <div
+            className="confirm-box"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Eliminar carpeta"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="confirm-icon">🗑️</div>
+            <div className="confirm-title">Eliminar carpeta</div>
+            <div className="confirm-body">
+              ¿Estás seguro de que quieres eliminar &ldquo;{deleteTarget.name}&rdquo;?
+              <br />
+              Los protocolos que contenga quedarán sin carpeta.
+            </div>
+            <div className="confirm-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setDeleteTarget(null)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleConfirmDelete}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
