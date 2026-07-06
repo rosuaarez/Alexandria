@@ -13,14 +13,37 @@ import { asArray, asQuestions, asString } from '@/components/protocols/forms/uti
 // Opciones fieles a los <select> del formulario completo del original.
 const METODO_OPTIONS = [
   'Prueba de Usabilidad',
-  'A/B Testing',
+  'Entrevistas',
   'Card Sorting',
   'Tree Testing',
-  'Entrevistas',
-  'Encuesta NPS',
-  'First-click test',
-  'Think-aloud',
+  'A/B Testing',
+  'Encuestas',
+  'Eye Tracking',
+  'Think Aloud',
 ]
+const ROL_INVESTIGACION_OPTIONS = [
+  'Investigador principal',
+  'Investigador de apoyo',
+  'Facilitador',
+  'Observador',
+  'Note-taker',
+]
+const ROL_PDU_OPTIONS = [
+  'Líder de producto',
+  'Diseñador',
+  'Desarrollador',
+  'Stakeholder',
+  'QA',
+]
+const ENTREGABLE_OPTIONS = [
+  'Reporte de hallazgos',
+  'Grabaciones de sesiones',
+  'Highlight reel',
+  'Mapa de experiencia',
+  'Recomendaciones priorizadas',
+  'Presentación ejecutiva',
+]
+const CLIENTE_OPTIONS: string[] = []
 const ENFOQUE_OPTIONS = ['Cualitativo', 'Cuantitativo', 'Mixto (cualitativo/cuantitativo)']
 const DURACION_OPTIONS = ['1 hr', '45 min', '30 min', '20 min', '10 min', '5 min']
 const DIGITAL_OPTIONS = ['Indiferente', 'Básico', 'Intermedio', 'Avanzado', 'Experto']
@@ -47,7 +70,7 @@ const PAIS_OPTIONS = [
   'España',
   'Estados Unidos',
 ]
-const HERRAMIENTA_PRUEBA_OPTIONS = ['Maze', 'Lookback', 'UserZoom', 'UserTesting', 'Figma', 'Otro']
+const HERRAMIENTA_PRUEBA_OPTIONS = ['Maze', 'Lookback', 'UserZoom', 'Otro']
 
 // Muestra sugerida por método (mock del botón "✦ Corregir con IA").
 function suggestSampleFor(metodo: string): { range: string; lower: number } {
@@ -91,9 +114,7 @@ interface CompleteValues {
   // 6. Fechas
   fechaInicio: string
   fechaResultados: string
-  // 7. Entregables
-  entregables: TextItem[]
-  // 8. Documentación
+  // 8. Documentación (7. Entregables se maneja como chips en estado local)
   docs: DocItem[]
   // 9. Metodología
   metodo: string
@@ -138,7 +159,6 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       kpis: asArray<TextItem>(initialData.kpis),
       fechaInicio: asString(initialData.fechaInicio),
       fechaResultados: asString(initialData.fechaResultados),
-      entregables: asArray<TextItem>(initialData.entregables),
       docs: asArray<DocItem>(initialData.docs),
       metodo: asString(initialData.metodo),
       enfoque: asString(initialData.enfoque),
@@ -167,29 +187,36 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
   const team = useFieldArray({ control, name: 'team' })
   const objetivos = useFieldArray({ control, name: 'objetivos' })
   const kpis = useFieldArray({ control, name: 'kpis' })
-  const entregables = useFieldArray({ control, name: 'entregables' })
   const docs = useFieldArray({ control, name: 'docs' })
 
-  // Herramientas como chips removibles (estado local, se incluye en el payload).
+  // Herramientas y entregables como chips removibles (estado local en el payload).
   const [herramientas, setHerramientas] = useState<string[]>(
     asArray<string>(initialData.herramientas)
   )
   const [herramientaInput, setHerramientaInput] = useState('')
+  const [entregables, setEntregables] = useState<string[]>(
+    asArray<string>(initialData.entregables)
+  )
 
   const [questions, setQuestions] = useState<Question[]>(
     asQuestions(initialData.questions)
   )
 
+  // Emite el estado combinado (RHF + listas locales) al padre.
+  const emit = (over?: Record<string, unknown>) => {
+    onChange({ ...getValues(), questions, herramientas, entregables, ...over })
+  }
+
   useEffect(() => {
     const sub = watch((values, { name }) => {
-      if (name) onChange({ ...values, questions, herramientas })
+      if (name) onChange({ ...values, questions, herramientas, entregables })
     })
     return () => sub.unsubscribe()
-  }, [watch, onChange, questions, herramientas])
+  }, [watch, onChange, questions, herramientas, entregables])
 
   const handleQuestions = (next: Question[]) => {
     setQuestions(next)
-    onChange({ ...getValues(), questions: next, herramientas })
+    onChange({ ...getValues(), questions: next, herramientas, entregables })
   }
 
   const addHerramienta = (value: string) => {
@@ -198,20 +225,34 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
     const next = [...herramientas, v]
     setHerramientas(next)
     setHerramientaInput('')
-    onChange({ ...getValues(), questions, herramientas: next })
+    onChange({ ...getValues(), questions, herramientas: next, entregables })
   }
 
   const removeHerramienta = (value: string) => {
     const next = herramientas.filter((h) => h !== value)
     setHerramientas(next)
-    onChange({ ...getValues(), questions, herramientas: next })
+    onChange({ ...getValues(), questions, herramientas: next, entregables })
+  }
+
+  const addEntregable = (value: string) => {
+    const v = value.trim()
+    if (!v || entregables.includes(v)) return
+    const next = [...entregables, v]
+    setEntregables(next)
+    onChange({ ...getValues(), questions, herramientas, entregables: next })
+  }
+
+  const removeEntregable = (value: string) => {
+    const next = entregables.filter((e) => e !== value)
+    setEntregables(next)
+    onChange({ ...getValues(), questions, herramientas, entregables: next })
   }
 
   const handleSuggestSample = () => {
     const metodo = getValues('metodo')
     const { range, lower } = suggestSampleFor(metodo)
     setValue('muestra', String(lower))
-    onChange({ ...getValues(), questions, herramientas, muestra: String(lower) })
+    emit({ muestra: String(lower) })
     showToast(
       `Muestra sugerida: ${range} participantes basado en ${metodo || 'el método'}`,
       'success'
@@ -223,7 +264,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       {/* 1. DATOS DEL PROYECTO */}
       <div className="card" id="s-datos-proyecto">
         <div className="card-header">
-          <div className="card-icon">📁</div>
+          <div className="card-icon">📋</div>
           <div>
             <div className="card-title">Datos del proyecto</div>
             <div className="card-subtitle">Información general del proyecto</div>
@@ -232,11 +273,25 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         <div className="form-grid">
           <div className="form-group">
             <label>Proyecto</label>
-            <input type="text" placeholder="Nombre del proyecto" {...register('proyecto')} />
+            <select {...register('proyecto')}>
+              <option value="">Seleccionar...</option>
+              {folders.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.emoji} {f.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>Cliente</label>
-            <input type="text" placeholder="Nombre del cliente o empresa" {...register('cliente')} />
+            <select {...register('cliente')}>
+              <option value="">Ninguno</option>
+              {CLIENTE_OPTIONS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>Tema</label>
@@ -259,7 +314,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       {/* 2. TEAM Y STAKEHOLDERS */}
       <div className="card" id="s-team">
         <div className="card-header">
-          <div className="card-icon">🧑‍💻</div>
+          <div className="card-icon">👥</div>
           <div>
             <div className="card-title">Team y stakeholders</div>
             <div className="card-subtitle">Equipo involucrado en el estudio</div>
@@ -269,11 +324,22 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
           {team.fields.map((f, i) => (
             <div key={f.id} className="list-item">
               <input placeholder="Nombre" {...register(`team.${i}.name` as const)} />
-              <input
-                placeholder="Rol de Investigación"
-                {...register(`team.${i}.rolInvestigacion` as const)}
-              />
-              <input placeholder="Rol en PDU" {...register(`team.${i}.rolPdu` as const)} />
+              <select {...register(`team.${i}.rolInvestigacion` as const)}>
+                <option value="">Rol de Investigación</option>
+                {ROL_INVESTIGACION_OPTIONS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+              <select {...register(`team.${i}.rolPdu` as const)}>
+                <option value="">Rol en PDU</option>
+                {ROL_PDU_OPTIONS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
               <button type="button" onClick={() => team.remove(i)} aria-label="Quitar miembro">
                 ✕
               </button>
@@ -335,7 +401,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       {/* 4. HIPÓTESIS */}
       <div className="card" id="s-hipotesis">
         <div className="card-header">
-          <div className="card-icon">💡</div>
+          <div className="card-icon">🧪</div>
           <div>
             <div className="card-title">Hipótesis</div>
             <div className="card-subtitle">Supuesto que guía la investigación</div>
@@ -401,29 +467,62 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
           <div className="card-icon">📦</div>
           <div>
             <div className="card-title">Entregables esperados</div>
-            <div className="card-subtitle">Outputs del estudio</div>
+            <div className="card-subtitle">Output del estudio</div>
           </div>
         </div>
-        <div className="list-container">
-          {entregables.fields.map((f, i) => (
-            <div key={f.id} className="list-item">
-              <input
-                placeholder="Entregable..."
-                {...register(`entregables.${i}.value` as const)}
-              />
-              <button type="button" onClick={() => entregables.remove(i)} aria-label="Quitar">
-                ✕
-              </button>
-            </div>
-          ))}
+        <div className="form-group">
+          <label>Entregable</label>
+          <select
+            value=""
+            onChange={(e) => {
+              if (e.target.value) addEntregable(e.target.value)
+            }}
+          >
+            <option value="">+ Agregar entregable</option>
+            {ENTREGABLE_OPTIONS.filter((o) => !entregables.includes(o)).map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
         </div>
-        <button
-          type="button"
-          className="add-btn"
-          onClick={() => entregables.append({ value: '' })}
-        >
-          ＋ Agregar entregable
-        </button>
+        {entregables.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+            {entregables.map((e) => (
+              <span
+                key={e}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: 'var(--accent-lt)',
+                  color: 'var(--accent)',
+                  borderRadius: 999,
+                  padding: '3px 10px',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                }}
+              >
+                {e}
+                <button
+                  type="button"
+                  onClick={() => removeEntregable(e)}
+                  aria-label={`Quitar ${e}`}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    color: 'inherit',
+                    fontSize: 13,
+                    lineHeight: 1,
+                  }}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 8. DOCUMENTACIÓN */}
@@ -458,7 +557,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       {/* 9. METODOLOGÍA */}
       <div className="card" id="s-metodologia">
         <div className="card-header">
-          <div className="card-icon">🔬</div>
+          <div className="card-icon">⚗️</div>
           <div>
             <div className="card-title">Metodología</div>
             <div className="card-subtitle">Método y configuración de la prueba</div>
@@ -467,14 +566,24 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         <div className="form-grid">
           <div className="form-group">
             <label>Método</label>
-            <select {...register('metodo')}>
-              <option value="">Seleccionar...</option>
-              {METODO_OPTIONS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <select style={{ flex: 1 }} {...register('metodo')}>
+                <option value="">Seleccionar...</option>
+                {METODO_OPTIONS.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: 12, flexShrink: 0 }}
+                onClick={() => showToast('Edición de metodologías próximamente', 'info')}
+              >
+                Editar
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label>Enfoque</label>
@@ -610,7 +719,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       {/* 10. PERFIL DEL USUARIO */}
       <div className="card" id="s-perfil-usuario">
         <div className="card-header">
-          <div className="card-icon">🧬</div>
+          <div className="card-icon">👤</div>
           <div>
             <div className="card-title">Perfil del usuario</div>
             <div className="card-subtitle">Características del participante objetivo</div>
@@ -618,15 +727,14 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         </div>
         <div className="form-grid">
           <div className="form-group full">
-            <label>Característica específica</label>
-            <input
-              type="text"
-              placeholder="Ej. Usuario activo de apps de finanzas..."
+            <label>Características específicas</label>
+            <textarea
+              placeholder="Usuario activo de apps de finanzas..."
               {...register('caracteristica')}
             />
           </div>
           <div className="form-group">
-            <label>Digitalización de usuarios</label>
+            <label>Digitalización de usuario</label>
             <select {...register('nivelDigital')}>
               <option value="">Seleccionar...</option>
               {DIGITAL_OPTIONS.map((o) => (
@@ -646,6 +754,9 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
+            <label className="cuota-toggle">
+              <input type="checkbox" /> <span>Agregar cuota</span>
+            </label>
           </div>
           <div className="form-group">
             <label>Género</label>
@@ -657,6 +768,9 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
+            <label className="cuota-toggle">
+              <input type="checkbox" /> <span>Agregar cuota</span>
+            </label>
           </div>
           <div className="form-group">
             <label>NSE</label>
@@ -668,6 +782,9 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
+            <label className="cuota-toggle">
+              <input type="checkbox" /> <span>Agregar cuota</span>
+            </label>
           </div>
           <div className="form-group">
             <label>Ocupación</label>
@@ -679,6 +796,9 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
+            <label className="cuota-toggle">
+              <input type="checkbox" /> <span>Agregar cuota</span>
+            </label>
           </div>
           <div className="form-group">
             <label>País</label>
@@ -715,7 +835,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
           <div className="card-icon">❓</div>
           <div>
             <div className="card-title">Preguntas de la prueba</div>
-            <div className="card-subtitle">Maze — tipos de preguntas UX</div>
+            <div className="card-subtitle">Maze · tipos de preguntas ①②</div>
           </div>
         </div>
         <div className="form-grid">
