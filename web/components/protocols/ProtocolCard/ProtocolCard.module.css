@@ -1,0 +1,156 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px var(--accent-lt);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.menuWrap {
+  position: relative;
+  margin-left: auto;
+}
+
+.menuButton {
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.menuButton:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.dropdown {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  z-index: 50;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 8px 24px var(--accent-lt);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.menuItem:hover {
+  background: var(--surface-2);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.linkRow {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+}
+
+.linkInput {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 12px;
+}
+
+.linkInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.linkSave {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.name {
+  font-family: var(--font-display);
+  color: var(--text-1);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.meta {
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.folder {
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.date {
+  color: var(--text-4);
+  font-size: 12px;
+}

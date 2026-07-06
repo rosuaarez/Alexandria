@@ -1,0 +1,194 @@
+.row {
+  border-bottom: 1px solid var(--border);
+}
+
+.row td {
+  padding: 12px 16px;
+  vertical-align: middle;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.avatarCell {
+  width: 56px;
+}
+
+.nameCell {
+  white-space: nowrap;
+}
+
+.name {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font);
+  font-size: inherit;
+  color: var(--text-1);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: color 150ms ease;
+}
+
+.name:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.you {
+  color: var(--text-4);
+  font-weight: 400;
+}
+
+.emailCell {
+  color: var(--text-3);
+}
+
+.countCell {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+/* Badge de rol */
+.roleBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.leader {
+  background: var(--accent-lt);
+  color: var(--accent);
+}
+
+.researcher {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.stakeholder {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Badge de estado */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.active {
+  background: var(--success);
+}
+
+.invited {
+  background: #d97706;
+}
+
+.inactive {
+  background: var(--text-4);
+}
+
+/* Menú de acciones */
+.actionsCell {
+  position: relative;
+  width: 48px;
+  text-align: right;
+}
+
+.menuButton {
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.menuButton:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.dropdown {
+  position: absolute;
+  top: 36px;
+  right: 12px;
+  z-index: 50;
+  min-width: 190px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.dropdownLabel {
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-4);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.menuItem:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.menuItem:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.menuItemActive {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.check {
+  color: var(--accent);
+}
+
+.danger {
+  color: var(--danger);
+}

@@ -1,0 +1,1 @@
+export { CapsulaModal } from './CapsulaModal'

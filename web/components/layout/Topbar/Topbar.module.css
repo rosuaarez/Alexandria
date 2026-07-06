@@ -1,0 +1,237 @@
+.topbar {
+  height: var(--topbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botón hamburger: oculto salvo en mobile (< 768px). */
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.hamburger:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+  border-color: var(--border-2);
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: inline-flex;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Icono del toggle de tema: rota 180° al cambiar de modo. */
+.themeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 300ms ease, opacity 150ms ease;
+}
+
+.themeIconRotated {
+  transform: rotate(180deg);
+}
+
+.logoText {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--accent);
+}
+
+/* Badge "UIX" — pill (border-radius:999px) fiel al original .topbar-badge. */
+.badge {
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.iconButton:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+  border-color: var(--border-2);
+}
+
+.copilotButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.copilotButton:hover {
+  background: var(--accent-lt);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.copilotActive {
+  background: var(--accent-lt);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Bloque de usuario (avatar gradiente + nombre + email) ── */
+.topbarUser {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease;
+}
+
+.topbarUser:hover {
+  background: var(--bg);
+}
+
+.topbarAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6d28c7, #8c59fe);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.topbarUserInfo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.topbarUserName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.topbarUserEmail {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* En pantallas pequeñas el original oculta el bloque de texto del usuario. */
+@media (max-width: 768px) {
+  .topbarUserInfo {
+    display: none;
+  }
+}
+
+/* ── Bloque AI Copilot dentro del topbar (visible con el copiloto abierto) ── */
+.acpTopbarBlock {
+  display: flex;
+  width: var(--acp-w);
+  min-width: var(--acp-w);
+  height: var(--topbar-h);
+  background: #2d1178;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  margin-right: -20px;
+  margin-left: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.acpTopbarIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.acpTopbarIcon svg {
+  color: #fff;
+}
+
+.acpTopbarInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.acpTopbarTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.acpTopbarSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1px;
+}
+
+@media (max-width: 768px) {
+  .acpTopbarBlock {
+    display: none;
+  }
+}
+

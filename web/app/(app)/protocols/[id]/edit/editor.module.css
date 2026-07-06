@@ -1,0 +1,266 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 4px 0 60px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.back {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.back:hover {
+  background: var(--accent-lt);
+}
+
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  max-width: 460px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.nameInput:hover {
+  border-color: var(--border);
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.saveStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dirty {
+  color: var(--text-4);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.saved {
+  color: var(--success);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Spinner pequeño del estado "Guardando…" */
+.savingDot {
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--border-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Badge de comentarios sin resolver (abre el panel con todos los comentarios). */
+.commentBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: var(--danger);
+  color: #fff;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.commentBadge:hover {
+  opacity: 0.9;
+}
+
+.saveBtn {
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-1);
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.generateBtn {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 150ms ease;
+}
+
+.generateBtn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.saveBtn:disabled,
+.generateBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.generateBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: var(--text-1);
+}
+
+.tabActive {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.content {
+  padding-top: 6px;
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 60px 20px;
+  border: 1px dashed var(--border-2);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.outputIcon {
+  font-size: 36px;
+}
+
+.outputTitle {
+  color: var(--text-1);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.outputText {
+  color: var(--text-3);
+  font-size: 14px;
+  max-width: 420px;
+  margin: 0;
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 80px 20px;
+  color: var(--text-2);
+}
+
+.backLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}

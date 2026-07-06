@@ -1,0 +1,218 @@
+.panel {
+  position: fixed;
+  top: var(--topbar-h);
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  z-index: 150;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-1);
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.close {
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  flex: 0 0 auto;
+}
+
+.close:hover {
+  color: var(--text-1);
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.empty {
+  color: var(--text-4);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.comment:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Comentario resuelto: atenuado y tachado. */
+.resolved {
+  opacity: 0.5;
+}
+
+.resolved .text {
+  text-decoration: line-through;
+}
+
+.commentHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.author {
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.you {
+  color: var(--text-4);
+  font-weight: 400;
+}
+
+.time {
+  color: var(--text-4);
+  font-size: 11px;
+}
+
+.fieldTag {
+  align-self: flex-start;
+  background: var(--surface-2);
+  color: var(--text-3);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.text {
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.reply {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 16px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-2);
+}
+
+.resolveBtn {
+  align-self: flex-start;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--accent);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.resolveBtn:hover {
+  background: var(--accent-lt);
+  border-color: var(--accent);
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input::placeholder {
+  color: var(--text-4);
+}
+
+.send {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.send:hover:not(:disabled) {
+  background: var(--accent-hv);
+}
+
+.send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* En pantallas pequeñas el panel ocupa casi todo el ancho como overlay. */
+@media (max-width: 640px) {
+  .panel {
+    width: 85vw;
+    max-width: 320px;
+  }
+}

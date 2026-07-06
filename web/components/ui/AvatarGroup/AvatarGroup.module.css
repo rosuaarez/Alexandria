@@ -1,0 +1,32 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  margin-left: -8px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+  flex: 0 0 auto;
+}
+
+/* El primer avatar no se superpone. */
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.overflow {
+  background: var(--text-4);
+  color: #fff;
+}

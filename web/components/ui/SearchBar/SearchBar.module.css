@@ -1,0 +1,62 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+.icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-4);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-1);
+  border-radius: 8px;
+  padding: 8px 32px 8px 36px;
+  font-family: var(--font);
+  font-size: 14px;
+  transition: border-color 150ms ease;
+}
+
+.input::placeholder {
+  color: var(--text-4);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Oculta la X nativa del input[type=search] (usamos la nuestra). */
+.input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.clear {
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.clear:hover {
+  color: var(--text-1);
+  background: var(--surface-2);
+}

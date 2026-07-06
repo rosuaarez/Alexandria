@@ -1,0 +1,1 @@
+export { CapsulaCard } from './CapsulaCard'

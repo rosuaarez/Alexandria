@@ -1,0 +1,223 @@
+.sidebar {
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.navLabel {
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Label de sección en mayúsculas (PRINCIPAL, RECURSOS). */
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-4);
+  padding: 0 10px;
+  margin-bottom: 4px;
+  margin-top: 20px;
+}
+
+.section:first-child .sectionLabel {
+  margin-top: 0;
+}
+
+/* Divider entre secciones. */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 4px;
+}
+
+.navItem {
+  position: relative;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.navItem:hover {
+  background: var(--bg);
+  color: var(--text-1);
+}
+
+.active {
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Wrapper del ícono: cuadro de 30x30 con el SVG a 15px. */
+.navIconWrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--text-3);
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.navItem:hover .navIconWrap {
+  background: var(--border);
+  color: var(--text-1);
+}
+
+.active .navIconWrap {
+  background: var(--accent);
+  color: #fff;
+}
+
+.navIconWrap svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.8;
+}
+
+/* Badge contador (ej. nº de protocolos). */
+.navBadge {
+  margin-left: auto;
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.active .navBadge {
+  background: var(--accent);
+  color: #fff;
+}
+
+.userBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.userName {
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.userEmail {
+  color: var(--text-4);
+  font-size: 11px;
+}
+
+/* ── Tablet: colapsado a solo iconos, se expande al hover como overlay ── */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-collapsed-w);
+    z-index: 90;
+    overflow: hidden;
+    transition: width 180ms ease, box-shadow 180ms ease;
+  }
+
+  .sidebar:hover {
+    width: var(--sidebar-w);
+    box-shadow: 4px 0 18px rgba(15, 11, 26, 0.16);
+  }
+
+  .navItem {
+    justify-content: flex-start;
+  }
+
+  /* Oculta los textos cuando está colapsado; reaparecen al expandir por hover. */
+  .navLabel,
+  .userText,
+  .sectionLabel,
+  .navBadge {
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .sidebar:hover .navLabel,
+  .sidebar:hover .userText,
+  .sidebar:hover .sectionLabel,
+  .sidebar:hover .navBadge {
+    opacity: 1;
+  }
+
+  .userBox {
+    padding: 12px 8px;
+  }
+}
+
+/* ── Mobile: overlay deslizable controlado por el botón hamburger ── */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: 0;
+    left: calc(-1 * var(--sidebar-w));
+    width: var(--sidebar-w);
+    z-index: 150;
+    overflow-y: auto;
+    transition: left 200ms ease;
+    box-shadow: none;
+  }
+
+  .sidebar:hover {
+    width: var(--sidebar-w);
+    box-shadow: none;
+  }
+
+  .sidebar.mobileOpen {
+    left: 0;
+    box-shadow: 4px 0 24px rgba(15, 11, 26, 0.28);
+  }
+
+  /* En mobile el overlay muestra siempre los textos completos. */
+  .navLabel,
+  .userText,
+  .sectionLabel,
+  .navBadge {
+    opacity: 1;
+  }
+}

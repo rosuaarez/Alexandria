@@ -1,0 +1,295 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  font-family: var(--font-display);
+  color: var(--text-1);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Indicador de pasos (1 → 2) del modal. */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--text-3);
+  border: 1px solid var(--border-2);
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.stepActive {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.stepLine {
+  width: 20px;
+  height: 2px;
+  background: var(--border-2);
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row .field {
+  flex: 1;
+}
+
+.versionField {
+  max-width: 96px;
+  flex: 0 0 auto;
+}
+
+/* Campo de nombre auto-generado (solo lectura) con badge ✦ Auto. */
+.autoNameWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.autoNameInput {
+  padding-right: 70px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: default;
+}
+
+.autoNameInput:focus {
+  border-color: var(--border-2);
+}
+
+.autoBadge {
+  position: absolute;
+  right: 10px;
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+/* Grid de selección de template (paso 2). */
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.templateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  text-align: center;
+  border: 2px solid var(--border-2);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.templateCard:hover {
+  border-color: var(--accent);
+}
+
+.templateActive {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+}
+
+.templateIcon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.templateTitle {
+  color: var(--text-1);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 14px;
+  transition: border-color 150ms ease;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input::placeholder {
+  color: var(--text-4);
+}
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.typeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  text-align: left;
+  border: 2px solid var(--border-2);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.typeCard:hover {
+  border-color: var(--accent);
+}
+
+.typeActive {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+}
+
+.typeIcon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.typeTitle {
+  color: var(--text-1);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.typeDesc {
+  color: var(--text-3);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.radioRow {
+  display: flex;
+  gap: 20px;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radio input {
+  accent-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.cancel,
+.create {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+
+.cancel {
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.create {
+  background: var(--accent);
+  color: #fff;
+}
+
+.create:hover:not(:disabled) {
+  background: var(--accent-hv);
+}
+
+.cancel:disabled,
+.create:disabled {
+  opacity: 0.7;
+  cursor: default;
+}

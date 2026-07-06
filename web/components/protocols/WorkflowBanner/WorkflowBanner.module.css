@@ -1,0 +1,125 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+/* Barra de completitud del protocolo */
+.completion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.completionLabel {
+  font-size: 13px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.completionTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.completionFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 300ms ease;
+}
+
+.completionValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  min-width: 38px;
+  text-align: right;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.step:last-child {
+  flex: 0 0 auto;
+}
+
+.dot {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.done {
+  background: var(--accent);
+  color: #fff;
+}
+
+.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--accent-lt);
+}
+
+.future {
+  background: var(--surface-2);
+  color: var(--text-4);
+  border: 1px solid var(--border-2);
+}
+
+.label {
+  margin-left: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.label_done {
+  color: var(--text-2);
+}
+
+.label_active {
+  color: var(--text-1);
+  font-weight: 600;
+}
+
+.label_future {
+  color: var(--text-4);
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  margin: 0 12px;
+  background: var(--border-2);
+  min-width: 16px;
+}
+
+.lineDone {
+  background: var(--accent);
+}

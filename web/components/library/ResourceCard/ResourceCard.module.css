@@ -1,0 +1,141 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(109, 40, 199, 0.1);
+  transform: translateY(-2px);
+}
+
+.newBadge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--success);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emoji {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.typeBadge {
+  background: var(--accent-lt);
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.fav {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--text-4);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 150ms ease, color 150ms ease;
+}
+
+.fav:hover {
+  color: var(--accent);
+  transform: scale(1.15);
+}
+
+.favActive {
+  color: var(--accent);
+}
+
+.favActive:active {
+  transform: scale(1.3);
+}
+
+.title {
+  color: var(--text-1);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.description {
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: var(--surface-2);
+  color: var(--text-3);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.meta {
+  color: var(--text-4);
+  font-size: 12px;
+}
+
+.view {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.view:disabled {
+  color: var(--text-4);
+  cursor: default;
+}
