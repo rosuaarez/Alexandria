@@ -1,4 +1,4 @@
-import type { ProtocolComment, TeamMember } from '@/lib/types'
+import type { TeamMember } from '@/lib/types'
 
 // TODO: reemplazar con llamada a Supabase (tabla team_members).
 export const MOCK_TEAM_MEMBERS: TeamMember[] = [
@@ -109,49 +109,5 @@ export const MOCK_TEAM_ACTIVITY: TeamActivity[] = [
     action: 'se unió al equipo',
     target: '',
     createdAt: '2025-01-13T08:00:00Z',
-  },
-]
-
-// TODO: reemplazar con llamada a Supabase (tabla protocol_comments).
-export const MOCK_COMMENTS: ProtocolComment[] = [
-  {
-    id: 'comment-001',
-    protocolId: 'proto-mock-001',
-    fieldKey: 'objetivo',
-    fieldLabel: 'Objetivo del protocolo',
-    author: MOCK_TEAM_MEMBERS[1], // Ana
-    text: 'El objetivo está bien pero podría ser más específico respecto al segmento de usuarios.',
-    resolved: false,
-    replies: [
-      {
-        id: 'reply-001',
-        author: MOCK_TEAM_MEMBERS[0], // Rolando
-        text: 'Tienes razón, lo actualizo esta tarde.',
-        createdAt: '2025-01-15T15:30:00Z',
-      },
-    ],
-    createdAt: '2025-01-15T14:00:00Z',
-  },
-  {
-    id: 'comment-002',
-    protocolId: 'proto-mock-001',
-    fieldKey: 'preguntas',
-    fieldLabel: 'Preguntas del protocolo',
-    author: MOCK_TEAM_MEMBERS[2], // Carlos
-    text: '¿Podemos agregar una pregunta sobre NPS al final?',
-    resolved: false,
-    replies: [],
-    createdAt: '2025-01-15T16:00:00Z',
-  },
-  {
-    id: 'comment-003',
-    protocolId: 'proto-mock-001',
-    fieldKey: 'perfil_usuario',
-    fieldLabel: 'Perfil del participante',
-    author: MOCK_TEAM_MEMBERS[1],
-    text: 'El perfil es demasiado amplio. Sugiero acotarlo a usuarios 25-40 años.',
-    resolved: true,
-    replies: [],
-    createdAt: '2025-01-14T11:00:00Z',
   },
 ]

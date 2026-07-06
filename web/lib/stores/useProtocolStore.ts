@@ -5,7 +5,6 @@ import type {
   ProtocolStatus,
 } from '@/lib/types'
 import { useUIStore } from '@/lib/stores/useUIStore'
-import { MOCK_SHARED_PROTOCOL } from '@/lib/data/mockProtocols'
 import { FLAGS } from '@/lib/config/flags'
 import * as api from '@/lib/supabase/protocols'
 
@@ -13,21 +12,8 @@ function toast(message: string, type?: 'success' | 'error' | 'info') {
   useUIStore.getState().showToast(message, type)
 }
 
-// Simula latencia de red en modo mock para que los skeletons sean visibles.
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : 'Error desconocido'
-}
-
-// Inyecta el protocolo mock compartido junto a los de Supabase, sin duplicar si
-// ya está presente. Permite probar el flujo de revisión + comentarios por campo.
-// TODO: eliminar cuando los protocolos compartidos vengan de Supabase.
-function withMockShared(protocols: Protocol[]): Protocol[] {
-  const exists = protocols.some((p) => p.id === MOCK_SHARED_PROTOCOL.id)
-  return exists ? protocols : [MOCK_SHARED_PROTOCOL, ...protocols]
 }
 
 interface ProtocolState {
@@ -60,22 +46,15 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
   loadProtocols: async (userId) => {
     set({ loading: true, error: null })
     try {
-      let protocols: Protocol[]
-      if (FLAGS.USE_REAL_SUPABASE) {
-        // Real: cargar de Supabase + inyectar el mock compartido para el
-        // flujo de revisión (hasta que los compartidos vengan de la BD).
-        protocols = withMockShared(await api.loadUserProtocols(userId))
-      } else {
-        // Mock: solo el protocolo compartido, con latencia simulada.
-        await delay(400)
-        protocols = [MOCK_SHARED_PROTOCOL]
-      }
+      // Solo datos reales de Supabase; en modo mock (creds placeholder) se
+      // devuelve una lista vacía (sin protocolos ficticios inyectados).
+      const protocols = FLAGS.USE_REAL_SUPABASE
+        ? await api.loadUserProtocols(userId)
+        : []
       set({ protocols, loading: false })
     } catch (e) {
       const message = errorMessage(e)
-      // Aunque Supabase falle, inyectamos el protocolo mock compartido para que
-      // el flujo de revisión siga siendo probable.
-      set({ protocols: withMockShared([]), loading: false, error: message })
+      set({ protocols: [], loading: false, error: message })
       toast(`No se pudieron cargar los protocolos: ${message}`, 'error')
     }
   },

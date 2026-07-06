@@ -8,7 +8,6 @@ import type {
 import { useUIStore } from '@/lib/stores/useUIStore'
 import {
   CURRENT_TEAM_MEMBER,
-  MOCK_COMMENTS,
   MOCK_TEAM_MEMBERS,
 } from '@/lib/data/mockTeam'
 
@@ -92,12 +91,10 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     set({ members: MOCK_TEAM_MEMBERS, loading: false })
   },
 
-  loadComments: async (protocolId) => {
-    // TODO: reemplazar con llamada a Supabase
-    await delay(300)
-    set({
-      comments: MOCK_COMMENTS.filter((c) => c.protocolId === protocolId),
-    })
+  loadComments: async () => {
+    // TODO: cargar de Supabase (tabla protocol_comments). Sin backend real,
+    // no hay comentarios: el array inicia y permanece vacío.
+    set({ comments: [] })
   },
 
   clearComments: () => set({ comments: [] }),
