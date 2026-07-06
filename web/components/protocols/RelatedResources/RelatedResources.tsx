@@ -5,7 +5,7 @@ import { MOCK_LIBRARY_RESOURCES } from '@/lib/data/mockLibrary'
 import { RESOURCE_TYPE_LABELS } from '@/components/library/ResourceCard'
 import styles from './RelatedResources.module.css'
 
-// Categoría de biblioteca sugerida según el tipo de protocolo.
+// Categoría de biblioteca sugerida según el tipo de protocolo (fallback).
 const CATEGORY_BY_TYPE: Record<ProtocolType, LibraryCategory> = {
   express: 'usabilidad',
   complete: 'metodologia',
@@ -13,8 +13,25 @@ const CATEGORY_BY_TYPE: Record<ProtocolType, LibraryCategory> = {
   presentation: 'investigacion',
 }
 
-export function RelatedResources({ type }: { type: ProtocolType }) {
-  const category = CATEGORY_BY_TYPE[type]
+// Categoría de biblioteca sugerida según el TEMPLATE (preferente).
+const CATEGORY_BY_TEMPLATE: Record<string, LibraryCategory> = {
+  usabilidad: 'usabilidad',
+  entrevistas: 'entrevistas',
+  cardsorting: 'investigacion',
+  treetesting: 'investigacion',
+  ab: 'metricas',
+  encuestas: 'metricas',
+}
+
+export function RelatedResources({
+  type,
+  template,
+}: {
+  type: ProtocolType
+  template?: string
+}) {
+  const category =
+    (template && CATEGORY_BY_TEMPLATE[template]) || CATEGORY_BY_TYPE[type]
   const resources = MOCK_LIBRARY_RESOURCES.filter(
     (r) => r.category === category
   ).slice(0, 2)

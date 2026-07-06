@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 
@@ -117,6 +117,8 @@ export function Sidebar() {
   const protocols = useProtocolStore((s) => s.protocols)
   const protocolCount = protocols.length
   const presentationCount = protocols.filter((p) => p.type === 'presentation').length
+  // Notificación de protocolos nuevos (descartable) al fondo del sidebar.
+  const [notifOpen, setNotifOpen] = useState(true)
 
   const badgeValue = (key: NavItem['badge']): number | null => {
     if (key === 'protocols') return protocolCount > 0 ? protocolCount : null
@@ -133,7 +135,10 @@ export function Sidebar() {
   // Clases globales del HTML original (Sprint 12). `sidebar-mobile-open` es una
   // ayuda propia de Next para el overlay en móvil.
   return (
-    <aside className={`sidebar${mobileSidebarOpen ? ' sidebar-mobile-open' : ''}`}>
+    <aside
+      className={`sidebar${mobileSidebarOpen ? ' sidebar-mobile-open' : ''}`}
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
       {NAV_SECTIONS.map((section, i) => (
         <div key={section.label ?? `section-${i}`}>
           {i > 0 && <div className="sidebar-divider" aria-hidden="true" />}
@@ -152,7 +157,19 @@ export function Sidebar() {
               >
                 <span className="nav-icon-wrap">{item.icon}</span>
                 {item.label}
-                {badge != null && <span className="nav-badge">{badge}</span>}
+                {badge != null && (
+                  <span
+                    className="nav-badge"
+                    // "Mis Protocolos" usa badge rojo (protocolos nuevos/sin leer).
+                    style={
+                      item.badge === 'protocols'
+                        ? { background: 'var(--danger-lt)', color: 'var(--danger)' }
+                        : undefined
+                    }
+                  >
+                    {badge}
+                  </span>
+                )}
               </Link>
             )
           })}
@@ -175,6 +192,44 @@ export function Sidebar() {
             </span>
             Exportar
           </Link>
+        </div>
+      )}
+
+      {/* Notificación de protocolos nuevos al fondo del sidebar (descartable). */}
+      {notifOpen && protocolCount > 0 && (
+        <div
+          className="sidebar-notification"
+          style={{
+            marginTop: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            background: 'var(--danger)',
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: 600,
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-sm)',
+          }}
+        >
+          <span>{protocolCount} Nueva{protocolCount !== 1 ? 's' : ''}</span>
+          <button
+            type="button"
+            className="sidebar-notif-close"
+            aria-label="Descartar notificación"
+            onClick={() => setNotifOpen(false)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: 14,
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
         </div>
       )}
     </aside>

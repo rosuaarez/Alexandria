@@ -70,7 +70,7 @@ interface TemplateTag {
 const TEMPLATE_TAG: Record<string, TemplateTag> = {
   usabilidad: { icon: '🎯', label: 'Prueba de Usabilidad', bg: '#FDF4FF', color: '#7C3AED', border: '#E9D5FF' },
   ab: { icon: '⚖️', label: 'A/B Testing', bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA' },
-  entrevistas: { icon: '💬', label: 'Entrevistas', bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
+  entrevistas: { icon: '💬', label: 'Entrevistas en Profundidad', bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
   cardsorting: { icon: '🗂️', label: 'Card Sorting', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
   treetesting: { icon: '🌲', label: 'Tree Testing', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
   encuestas: { icon: '📊', label: 'Encuestas', bg: 'var(--accent-lt)', color: 'var(--accent)', border: 'transparent' },
@@ -616,7 +616,7 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
         {tab === 'edit' ? (
           <>
             {renderForm()}
-            <RelatedResources type={initial.type} />
+            <RelatedResources type={initial.type} template={templateKey} />
             {/* Botón principal al final del formulario (centrado, con separador
                 superior, fiel al original). */}
             <div

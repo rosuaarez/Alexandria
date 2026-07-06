@@ -43,7 +43,6 @@ const ENTREGABLE_OPTIONS = [
   'Recomendaciones priorizadas',
   'Presentación ejecutiva',
 ]
-const CLIENTE_OPTIONS: string[] = []
 const ENFOQUE_OPTIONS = ['Cualitativo', 'Cuantitativo', 'Mixto (cualitativo/cuantitativo)']
 const DURACION_OPTIONS = ['1 hr', '45 min', '30 min', '20 min', '10 min', '5 min']
 const DIGITAL_OPTIONS = ['Indiferente', 'Básico', 'Intermedio', 'Avanzado', 'Experto']
@@ -273,25 +272,15 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         <div className="form-grid">
           <div className="form-group">
             <label>Proyecto</label>
-            <select {...register('proyecto')}>
-              <option value="">Seleccionar...</option>
-              {folders.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.emoji} {f.name}
-                </option>
-              ))}
-            </select>
+            <input type="text" placeholder="Nombre del proyecto" {...register('proyecto')} />
           </div>
           <div className="form-group">
             <label>Cliente</label>
-            <select {...register('cliente')}>
-              <option value="">Ninguno</option>
-              {CLIENTE_OPTIONS.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Nombre del cliente o empresa"
+              {...register('cliente')}
+            />
           </div>
           <div className="form-group">
             <label>Tema</label>
