@@ -142,14 +142,6 @@ export function CopilotPanel() {
   const score = calculateQualityScore(protocol)
   const dimensions = analyzeProtocol(protocol).dimensions
 
-  // Mantiene body.acp-open sincronizado con isOpen (estrecha .main y controla el
-  // bloque del topbar). Belt-and-suspenders por si algún flujo no lo aplicó.
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.body.classList.toggle('acp-open', isOpen)
-    }
-  }, [isOpen])
-
   // Auto-scroll al último mensaje.
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight })

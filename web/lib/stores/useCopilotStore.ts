@@ -30,12 +30,9 @@ function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : 'Error desconocido'
 }
 
-// Refleja el estado del copiloto en el <body> igual que el HTML original:
-// body.acp-open estrecha el .main y muestra el bloque AI Copilot del topbar.
-function applyAcpClass(isOpen: boolean): void {
-  if (typeof document === 'undefined') return
-  document.body.classList.toggle('acp-open', isOpen)
-}
+// El estado del copiloto es la única fuente de verdad. La clase body.acp-open
+// (que estrecha .main y controla el bloque del topbar) la sincroniza AppShell
+// desde este estado, evitando desincronizaciones imperativas.
 
 async function postGemini(body: unknown): Promise<Record<string, unknown>> {
   const res = await fetch('/api/gemini', {
@@ -56,16 +53,8 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
   messages: [],
   currentProtocolId: null,
 
-  setOpen: (isOpen) => {
-    applyAcpClass(isOpen)
-    set({ isOpen })
-  },
-  toggleCopilot: () =>
-    set((s) => {
-      const isOpen = !s.isOpen
-      applyAcpClass(isOpen)
-      return { isOpen }
-    }),
+  setOpen: (isOpen) => set({ isOpen }),
+  toggleCopilot: () => set((s) => ({ isOpen: !s.isOpen })),
   setGenerating: (v) => set({ isGenerating: v }),
 
   addMessage: (role, content) =>
