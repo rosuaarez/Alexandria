@@ -232,7 +232,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       duracion: asString(initialData.duracion),
       fechasAplicacionInicio: asString(initialData.fechasAplicacionInicio),
       fechasAplicacionFin: asString(initialData.fechasAplicacionFin),
-      muestra: asString(initialData.muestra),
+      muestra: asString(initialData.muestra) || (isUsabilidad ? '8' : ''),
       razonMuestra: asString(initialData.razonMuestra),
       caracteristica: asString(initialData.caracteristica),
       nivelDigital: asString(initialData.nivelDigital),

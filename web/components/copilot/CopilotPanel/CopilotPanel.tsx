@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import {
-  analyzeProtocol,
+  analyzeProtocol as computeAnalysis,
   calculateQualityScore,
   type AnalysisDimension,
 } from '@/lib/gemini/analyzeProtocol'
@@ -123,15 +123,15 @@ export function CopilotPanel() {
   const currentProtocolId = useCopilotStore((s) => s.currentProtocolId)
   const setOpen = useCopilotStore((s) => s.setOpen)
   const askCopilot = useCopilotStore((s) => s.askCopilot)
-  const addMessage = useCopilotStore((s) => s.addMessage)
+  const analyzeProtocol = useCopilotStore((s) => s.analyzeProtocol)
+  const hasAnalysis = useCopilotStore((s) => s.hasAnalysis)
+  const analysisScores = useCopilotStore((s) => s.analysisScores)
 
   const protocol = useProtocolStore((s) =>
     currentProtocolId ? s.protocols.find((p) => p.id === currentProtocolId) : undefined
   )
 
   const [input, setInput] = useState('')
-  const [analyzing, setAnalyzing] = useState(false)
-  const [analyzed, setAnalyzed] = useState(false)
   // Acción destacada del panel. "analizar" queda resaltada por defecto (Dif 6).
   const [activeAction, setActiveAction] = useState<'analizar' | 'preguntas' | 'objetivo'>(
     'analizar'
@@ -140,12 +140,12 @@ export function CopilotPanel() {
 
   // Score y dimensiones dinámicos del protocolo actual (Corrección 6).
   const score = calculateQualityScore(protocol)
-  const dimensions = analyzeProtocol(protocol).dimensions
+  const dimensions = computeAnalysis(protocol).dimensions
 
   // Auto-scroll al último mensaje.
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight })
-  }, [messages, isGenerating, analyzing])
+  }, [messages, isGenerating])
 
   const canAsk = !!protocol && !isGenerating
 
@@ -156,17 +156,11 @@ export function CopilotPanel() {
     void askCopilot(text, protocol)
   }
 
-  // Analiza el protocolo localmente y muestra el resultado en el chat.
+  // Analiza el protocolo vía el store (publica mensaje + scores).
   const handleAnalyze = () => {
     setActiveAction('analizar')
-    if (!protocol || isGenerating || analyzing) return
-    setAnalyzing(true)
-    const result = analyzeProtocol(protocol)
-    window.setTimeout(() => {
-      addMessage('assistant', `${result.summary}\n\n${result.note}`)
-      setAnalyzed(true)
-      setAnalyzing(false)
-    }, 500)
+    if (!protocol || isGenerating) return
+    void analyzeProtocol(protocol)
   }
 
   const handleSuggestQuestions = () => {
@@ -181,7 +175,7 @@ export function CopilotPanel() {
     void askCopilot('Mejora el objetivo de investigación de este protocolo.', protocol)
   }
 
-  const busy = isGenerating || analyzing
+  const busy = isGenerating
 
   // El panel se renderiza siempre; su visibilidad la controlan #acp-panel.open
   // y body.acp-open (transform slide), igual que el HTML original.
@@ -280,18 +274,19 @@ export function CopilotPanel() {
         )}
 
         {/* Barras de score tras un análisis (Objetivos / Preguntas / Completitud). */}
-        {analyzed && !analyzing && (
+        {hasAnalysis && analysisScores && !busy && (
           <div className="acp-scores">
-            {dimensions.map((dim) => (
-              <div key={dim.label} className="acp-score-row">
-                <span className="acp-score-label">{dim.label}</span>
+            {[
+              { label: 'Objetivos', score: analysisScores.objetivos },
+              { label: 'Preguntas', score: analysisScores.preguntas },
+              { label: 'Completitud', score: analysisScores.completitud },
+            ].map(({ label, score: s }) => (
+              <div key={label} className="acp-score-row">
+                <span className="acp-score-label">{label}</span>
                 <div className="acp-score-bar">
-                  <div
-                    className="acp-score-fill"
-                    style={{ width: `${dim.value * 10}%` }}
-                  />
+                  <div className="acp-score-fill" style={{ width: `${s * 10}%` }} />
                 </div>
-                <span className="acp-score-num">{dim.value}</span>
+                <span className="acp-score-num">{s}</span>
               </div>
             ))}
             <p className="acp-analysis-done">
@@ -301,7 +296,7 @@ export function CopilotPanel() {
         )}
       </div>
 
-      <QualityRing score={score} dimensions={dimensions} analyzed={analyzed} />
+      <QualityRing score={score} dimensions={dimensions} analyzed={hasAnalysis} />
 
       <div className="acp-input-wrap">
         <input
