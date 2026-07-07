@@ -234,9 +234,9 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     setEditorPlatform(initial.platform ?? null)
     setEditingProtocol(isNew ? null : id)
     setCurrentProtocol(isNew ? null : id)
-    // El AI Copilot está siempre visible en el editor (fiel al original):
-    // se abre al entrar y se cierra al salir.
-    setCopilotOpen(true)
+    // El panel del copiloto arranca CERRADO: en el editor solo se ve el bloque
+    // del topbar; al hacer click, el panel se abre (sin duplicar el header).
+    // Al salir del editor se cierra por si quedó abierto.
     return () => {
       resetEditor()
       setCurrentProtocol(null)

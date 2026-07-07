@@ -56,9 +56,12 @@ export function Topbar() {
   const toggleDarkMode = useUIStore((s) => s.toggleDarkMode)
   const toggleMobileSidebar = useUIStore((s) => s.toggleMobileSidebar)
   const toggleCopilot = useCopilotStore((s) => s.toggleCopilot)
+  const copilotOpen = useCopilotStore((s) => s.isOpen)
   const pathname = usePathname()
-  // El bloque AI Copilot solo aparece en el editor (/protocols/[id]/edit).
-  const inEditor = /^\/protocols\/[^/]+\/edit/.test(pathname)
+  // El bloque AI Copilot solo aparece en el editor (/protocols/[id]/edit) y
+  // únicamente cuando el panel está cerrado: al abrirlo, el header del panel lo
+  // reemplaza (evita ver "AI Copilot" duplicado).
+  const showCopilotBlock = /^\/protocols\/[^/]+\/edit/.test(pathname) && !copilotOpen
 
   return (
     <header className="topbar">
@@ -121,9 +124,9 @@ export function Topbar() {
         Salir
       </button>
 
-      {/* Bloque AI Copilot en el topbar global. Solo en el editor; siempre
-          visible allí (display forzado) y su click togglea el panel. */}
-      {inEditor && (
+      {/* Bloque AI Copilot en el topbar global. Solo en el editor y con el panel
+          cerrado; su click abre el panel (cuyo header lo sustituye). */}
+      {showCopilotBlock && (
         <div
           className="acp-topbar-block"
           style={{ display: 'flex' }}
