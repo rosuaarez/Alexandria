@@ -82,8 +82,8 @@ const OCUPACION_CUOTA_ROWS = [
 ]
 
 // Checkbox "Agregar cuota" que expande una tabla de cuotas con controles − N +.
-function CuotaField({ rows }: { rows: string[] }) {
-  const [open, setOpen] = useState(false)
+function CuotaField({ rows, defaultOpen = false }: { rows: string[]; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
   const [values, setValues] = useState<number[]>(() => rows.map(() => 0))
 
   const setAt = (i: number, n: number) =>
@@ -201,6 +201,9 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
   const showToast = useUIStore((s) => s.showToast)
   const folders = useFolderStore((s) => s.folders)
 
+  // El template 'usabilidad' pre-selecciona método/herramientas y expande cuotas.
+  const isUsabilidad = asString(initialData.template) === 'usabilidad'
+
   const { register, watch, getValues, setValue, control } = useForm<CompleteValues>({
     defaultValues: {
       proyecto: asString(initialData.proyecto),
@@ -208,7 +211,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       tema: asString(initialData.tema),
       folderId: asString(initialData.folderId),
       // Al menos una fila de team por defecto (con placeholders); si el
-      // protocolo ya trae miembros, se usan esos (Dif 3).
+      // protocolo ya trae miembros, se usan esos.
       team: (() => {
         const t = asArray<TeamMember>(initialData.team)
         return t.length > 0 ? t : [{ name: '', rolInvestigacion: '', rolPdu: '' }]
@@ -219,8 +222,12 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       kpis: asArray<TextItem>(initialData.kpis),
       fechaInicio: asString(initialData.fechaInicio),
       fechaResultados: asString(initialData.fechaResultados),
-      docs: asArray<DocItem>(initialData.docs),
-      metodo: asString(initialData.metodo),
+      // Al menos una fila de documentación por defecto (con placeholders).
+      docs: (() => {
+        const d = asArray<DocItem>(initialData.docs)
+        return d.length > 0 ? d : [{ nombre: '', link: '' }]
+      })(),
+      metodo: asString(initialData.metodo) || (isUsabilidad ? 'Prueba de Usabilidad' : ''),
       enfoque: asString(initialData.enfoque),
       duracion: asString(initialData.duracion),
       fechasAplicacionInicio: asString(initialData.fechasAplicacionInicio),
@@ -250,9 +257,11 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
   const docs = useFieldArray({ control, name: 'docs' })
 
   // Herramientas y entregables como chips removibles (estado local en el payload).
-  const [herramientas, setHerramientas] = useState<string[]>(
-    asArray<string>(initialData.herramientas)
-  )
+  // El template 'usabilidad' pre-carga Maze y Figma si no hay herramientas.
+  const [herramientas, setHerramientas] = useState<string[]>(() => {
+    const h = asArray<string>(initialData.herramientas)
+    return h.length > 0 ? h : isUsabilidad ? ['Maze', 'Figma'] : []
+  })
   const [herramientaInput, setHerramientaInput] = useState('')
   const [entregables, setEntregables] = useState<string[]>(
     asArray<string>(initialData.entregables)
@@ -587,8 +596,8 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         <div className="list-container">
           {docs.fields.map((f, i) => (
             <div key={f.id} className="list-item">
-              <input placeholder="Documento" {...register(`docs.${i}.nombre` as const)} />
-              <input placeholder="Link (https://...)" {...register(`docs.${i}.link` as const)} />
+              <input placeholder="Ej. Research plan" {...register(`docs.${i}.nombre` as const)} />
+              <input placeholder="https://..." {...register(`docs.${i}.link` as const)} />
               <button type="button" onClick={() => docs.remove(i)} aria-label="Quitar">
                 ✕
               </button>
@@ -804,7 +813,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={EDAD_CUOTA_ROWS} />
+            <CuotaField rows={EDAD_CUOTA_ROWS} defaultOpen={isUsabilidad} />
           </div>
           <div className="form-group">
             <label>Género</label>
@@ -816,7 +825,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={GENERO_CUOTA_ROWS} />
+            <CuotaField rows={GENERO_CUOTA_ROWS} defaultOpen={isUsabilidad} />
           </div>
           <div className="form-group">
             <label>NSE</label>
@@ -828,7 +837,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={NSE_CUOTA_ROWS} />
+            <CuotaField rows={NSE_CUOTA_ROWS} defaultOpen={isUsabilidad} />
           </div>
           <div className="form-group">
             <label>Ocupación</label>
@@ -840,7 +849,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={OCUPACION_CUOTA_ROWS} />
+            <CuotaField rows={OCUPACION_CUOTA_ROWS} defaultOpen={isUsabilidad} />
           </div>
           <div className="form-group">
             <label>País</label>

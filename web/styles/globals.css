@@ -319,6 +319,15 @@ body:not(.acp-open) #acp-panel:not(.open) {
 .acp-qdim-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width .5s ease; }
 .acp-qdim-val { font-size: 10px; font-weight: 700; color: var(--text-3); width: 24px; text-align: right; flex-shrink: 0; }
 .acp-quality-hint { font-size: 11px; color: var(--text-3); line-height: 1.5; margin-top: 4px; }
+
+/* Barras de score del análisis del copiloto (dentro del chat). */
+.acp-scores { padding: 12px 16px; border-top: 1px solid var(--border); }
+.acp-score-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.acp-score-label { width: 80px; color: var(--text-3); }
+.acp-score-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.acp-score-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 500ms ease; }
+.acp-score-num { width: 16px; color: var(--text-2); font-weight: 600; }
+.acp-analysis-done { font-size: 11px; color: var(--text-4); margin-top: 8px; font-style: italic; }
 .acp-quality-analyze-btn {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   padding: 7px 12px; border-radius: var(--radius-sm);

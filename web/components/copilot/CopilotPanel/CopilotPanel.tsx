@@ -278,6 +278,27 @@ export function CopilotPanel() {
             </div>
           </div>
         )}
+
+        {/* Barras de score tras un análisis (Objetivos / Preguntas / Completitud). */}
+        {analyzed && !analyzing && (
+          <div className="acp-scores">
+            {dimensions.map((dim) => (
+              <div key={dim.label} className="acp-score-row">
+                <span className="acp-score-label">{dim.label}</span>
+                <div className="acp-score-bar">
+                  <div
+                    className="acp-score-fill"
+                    style={{ width: `${dim.value * 10}%` }}
+                  />
+                </div>
+                <span className="acp-score-num">{dim.value}</span>
+              </div>
+            ))}
+            <p className="acp-analysis-done">
+              Análisis completado. Revisa los detalles arriba.
+            </p>
+          </div>
+        )}
       </div>
 
       <QualityRing score={score} dimensions={dimensions} analyzed={analyzed} />
