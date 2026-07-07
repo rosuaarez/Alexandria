@@ -1,0 +1,1 @@
+export { MetodoModal } from './MetodoModal'

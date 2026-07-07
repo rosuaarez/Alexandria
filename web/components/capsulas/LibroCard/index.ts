@@ -1,0 +1,1 @@
+export { LibroCard } from './LibroCard'

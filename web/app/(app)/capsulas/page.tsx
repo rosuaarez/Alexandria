@@ -1,189 +1,219 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import type { Capsula, CapsulaCategory } from '@/lib/types'
-import { filterCapsulas, useLibraryStore } from '@/lib/stores/useLibraryStore'
-import { CAPSULA_CATEGORY_LABELS } from '@/lib/data/capsulaMeta'
-import { CapsulaCard } from '@/components/capsulas/CapsulaCard'
-import { CapsulaModal } from '@/components/capsulas/CapsulaModal'
-import { SearchBar, EmptyState, Skeleton } from '@/components/ui'
-import styles from './capsulas.module.css'
+import { useState } from 'react'
+import type { Metodologia } from '@/lib/data/metodologias'
+import { METODOLOGIAS } from '@/lib/data/metodologias'
+import { LIBROS } from '@/lib/data/libros'
+import { useCapsulasStore } from '@/lib/stores/useCapsulasStore'
+import { MetodoCard } from '@/components/capsulas/MetodoCard'
+import { LibroCard } from '@/components/capsulas/LibroCard'
+import { MetodoModal } from '@/components/capsulas/MetodoModal'
 
-// Etiquetas cortas para los pills de filtro.
-const PILL_LABELS: Record<CapsulaCategory, string> = {
-  metodo: 'Método',
-  consejo: 'Consejo',
-  'caso-estudio': 'Caso',
-  herramienta: 'Herramienta',
-  dato: 'Dato',
-}
+const CATEGORY_TABS: { value: 'all' | 'metodologias' | 'libros'; label: string }[] = [
+  { value: 'all', label: 'Todas' },
+  { value: 'metodologias', label: '🔬 Metodologías' },
+  { value: 'libros', label: '📚 Libros' },
+]
 
-const CATEGORIES = Object.keys(PILL_LABELS) as CapsulaCategory[]
+const TIPO_PILLS: { value: string; label: string }[] = [
+  { value: 'all', label: 'Todas' },
+  { value: 'generativa', label: 'Generativa' },
+  { value: 'evaluativa', label: 'Evaluativa' },
+  { value: 'moderada', label: 'Moderada' },
+  { value: 'no-moderada', label: 'No Mod.' },
+  { value: 'presencial', label: 'Presencial' },
+  { value: 'remota', label: 'Remota' },
+  { value: 'content', label: 'Content' },
+]
 
-// Cápsula del día: rotación determinista por fecha (misma cápsula todo el día).
-function getCapsuleOfTheDay(capsulas: Capsula[]): Capsula | null {
-  if (capsulas.length === 0) return null
-  const now = new Date()
-  const seed =
-    now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
-  return capsulas[seed % capsulas.length]
-}
-
-function SkeletonCard() {
-  return (
-    <div className={styles.skeletonCard}>
-      <Skeleton width="40px" height="40px" borderRadius="8px" />
-      <Skeleton width="80%" height="15px" />
-      <Skeleton width="100%" height="13px" />
-      <Skeleton width="50%" height="12px" />
-    </div>
-  )
-}
+const FASE_TABS: { value: string; label: string }[] = [
+  { value: 'all', label: '◉ TODAS LAS FASES' },
+  { value: 'empatizar', label: '① EMPATIZAR' },
+  { value: 'definir', label: '② DEFINIR' },
+  { value: 'idear', label: '③ IDEAR' },
+  { value: 'prototipar', label: '④ PROTOTIPAR' },
+  { value: 'testear', label: '⑤ TESTEAR' },
+  { value: 'medir', label: '⑥ MEDIR' },
+]
 
 export default function CapsulasPage() {
-  const capsulas = useLibraryStore((s) => s.capsulas)
-  const loading = useLibraryStore((s) => s.loading)
-  const activeCategory = useLibraryStore((s) => s.activeCategory)
-  const searchQuery = useLibraryStore((s) => s.searchQuery)
-  const showFavoritesOnly = useLibraryStore((s) => s.showFavoritesOnly)
+  const activeTab = useCapsulasStore((s) => s.activeTab)
+  const searchQuery = useCapsulasStore((s) => s.searchQuery)
+  const sortOrder = useCapsulasStore((s) => s.sortOrder)
+  const tipoFilter = useCapsulasStore((s) => s.tipoFilter)
+  const faseFilter = useCapsulasStore((s) => s.faseFilter)
+  const setTab = useCapsulasStore((s) => s.setTab)
+  const setSearch = useCapsulasStore((s) => s.setSearch)
+  const setSort = useCapsulasStore((s) => s.setSort)
+  const setTipo = useCapsulasStore((s) => s.setTipo)
+  const setFase = useCapsulasStore((s) => s.setFase)
+  const filteredItems = useCapsulasStore((s) => s.filteredItems)
+  const filteredMetodologias = useCapsulasStore((s) => s.filteredMetodologias)
+  const filteredLibros = useCapsulasStore((s) => s.filteredLibros)
 
-  const setCategory = useLibraryStore((s) => s.setCategory)
-  const setSearch = useLibraryStore((s) => s.setSearch)
-  const toggleFavoriteCapsula = useLibraryStore((s) => s.toggleFavoriteCapsula)
+  const [selected, setSelected] = useState<Metodologia | null>(null)
 
-  const [selected, setSelected] = useState<Capsula | null>(null)
+  // Conteos "Mostrando N de N" según la pestaña activa.
+  let shown = 0
+  let total = 0
+  if (activeTab === 'all') {
+    shown = filteredItems().length
+    total = METODOLOGIAS.length + LIBROS.length
+  } else if (activeTab === 'metodologias') {
+    shown = filteredMetodologias().length
+    total = METODOLOGIAS.length
+  } else {
+    shown = filteredLibros().length
+    total = LIBROS.length
+  }
 
-  // Limpia los filtros compartidos al entrar (la Biblioteca usa el mismo store).
-  useEffect(() => {
-    setCategory(null)
-    setSearch('')
-  }, [setCategory, setSearch])
-
-  const filtered = useMemo(
-    () =>
-      filterCapsulas(capsulas, {
-        activeCategory,
-        activeType: null,
-        searchQuery,
-        showFavoritesOnly,
-      }),
-    [capsulas, activeCategory, searchQuery, showFavoritesOnly]
-  )
-
-  // El featured solo se muestra sin filtros activos.
-  const showFeatured = activeCategory === null && searchQuery.trim() === ''
-  const featured = useMemo(() => getCapsuleOfTheDay(capsulas), [capsulas])
-  const gridItems =
-    showFeatured && featured ? filtered.filter((c) => c.id !== featured.id) : filtered
-
-  // Mantiene la cápsula abierta sincronizada con el store (favorito en vivo).
-  const selectedLive = selected
-    ? capsulas.find((c) => c.id === selected.id) ?? null
-    : null
+  const searchPlaceholder =
+    activeTab === 'metodologias'
+      ? 'Buscar metodología...'
+      : activeTab === 'libros'
+        ? 'Buscar libro o autor…'
+        : 'Buscar cápsula, metodología o libro...'
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.heading}>Cápsulas de Conocimiento</h1>
-          <p className={styles.subtitle}>Aprende UX research en pequeñas dosis</p>
-        </div>
-        <SearchBar
-          placeholder="Buscar cápsulas…"
-          value={searchQuery}
-          onChange={setSearch}
-        />
-      </header>
+    <div className="page-transition" id="view-capsulas">
+      <div className="caps-header">
+        <h1 className="caps-title">💡 Cápsulas de Conocimiento</h1>
+        <p className="caps-sub">
+          Tips, metodologías y mejores prácticas para sacarle el mayor provecho a
+          tus encuestas, pruebas de usabilidad y research en general.
+        </p>
+      </div>
 
-      <div className={styles.pills} role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeCategory === null}
-          className={`${styles.pill} ${activeCategory === null ? styles.pillActive : ''}`}
-          onClick={() => setCategory(null)}
-        >
-          Todos
-        </button>
-        {CATEGORIES.map((cat) => (
+      {/* Filtros por categoría (3 tabs). */}
+      <div className="caps-filters">
+        {CATEGORY_TABS.map((t) => (
           <button
-            key={cat}
+            key={t.value}
             type="button"
-            role="tab"
-            aria-selected={activeCategory === cat}
-            className={`${styles.pill} ${activeCategory === cat ? styles.pillActive : ''}`}
-            onClick={() => setCategory(cat)}
+            className={`caps-filter-btn${activeTab === t.value ? ' active' : ''}`}
+            onClick={() => setTab(t.value)}
           >
-            {PILL_LABELS[cat]}
+            {t.label}
           </button>
         ))}
       </div>
 
-      {loading ? (
-        <div className={styles.grid}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          emoji="💊"
-          title="Sin cápsulas"
-          description="No hay cápsulas que coincidan con tu búsqueda. Prueba otra categoría o limpia el filtro."
-          action={{
-            label: 'Limpiar filtros',
-            onClick: () => {
-              setCategory(null)
-              setSearch('')
-            },
-          }}
-        />
-      ) : (
-        <>
-          {showFeatured && featured && (
+      {/* Toolbar de "Todas" y "Libros": buscador + orden + contador. */}
+      {activeTab !== 'metodologias' && (
+        <div className="all-toolbar visible">
+          <div className="books-search-wrap">
+            <input
+              className="books-search"
+              type="text"
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="books-sort-wrap">
             <button
               type="button"
-              className={styles.featured}
-              onClick={() => setSelected(featured)}
+              className={`books-sort-btn${sortOrder === 'az' ? ' active' : ''}`}
+              onClick={() => setSort('az')}
             >
-              <span className={styles.featuredEmoji} aria-hidden>
-                {featured.emoji}
-              </span>
-              <div className={styles.featuredBody}>
-                <div className={styles.featuredTop}>
-                  <span className={styles.dailyBadge}>✨ Cápsula del día</span>
-                  <span className={styles.featuredLabel}>
-                    {CAPSULA_CATEGORY_LABELS[featured.category]}
-                  </span>
-                  <span className={styles.featuredTime}>{featured.readTime} ▶</span>
-                </div>
-                <h2 className={styles.featuredTitle}>{featured.title}</h2>
-                <p className={styles.featuredDesc}>{featured.description}</p>
-                <span className={styles.featuredCta}>Leer cápsula →</span>
-              </div>
+              A → Z
             </button>
-          )}
-
-          {gridItems.length > 0 && (
-            <div className={styles.grid}>
-              {gridItems.map((c) => (
-                <CapsulaCard
-                  key={c.id}
-                  capsula={c}
-                  onOpen={setSelected}
-                  onToggleFavorite={toggleFavoriteCapsula}
-                />
-              ))}
-            </div>
-          )}
-        </>
+            <button
+              type="button"
+              className={`books-sort-btn${sortOrder === 'za' ? ' active' : ''}`}
+              onClick={() => setSort('za')}
+            >
+              Z → A
+            </button>
+          </div>
+          <span className="books-count">
+            Mostrando {shown} de {total} cápsulas
+          </span>
+        </div>
       )}
 
-      <CapsulaModal
-        capsula={selectedLive}
-        onClose={() => setSelected(null)}
-        onToggleFavorite={toggleFavoriteCapsula}
-      />
+      {/* Toolbar de "Metodologías": buscador + TIPO pills + fases + orden. */}
+      {activeTab === 'metodologias' && (
+        <div className="metodo-toolbar visible">
+          <div className="metodo-toolbar-row1">
+            <div className="metodo-search-wrap">
+              <input
+                className="metodo-search"
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <span className="metodo-tipo-label">TIPO:</span>
+            <div className="metodo-tipo-pills">
+              {TIPO_PILLS.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  className={`metodo-tipo-btn${tipoFilter === t.value ? ' active' : ''}`}
+                  onClick={() => setTipo(t.value)}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="metodo-fase-tabs">
+            {FASE_TABS.map((f) => (
+              <button
+                key={f.value}
+                type="button"
+                className={`metodo-fase-tab${faseFilter === f.value ? ' active' : ''}`}
+                onClick={() => setFase(f.value)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <div className="metodo-count-bar">
+            <div className="metodo-sort-wrap">
+              <button
+                type="button"
+                className={`books-sort-btn${sortOrder === 'az' ? ' active' : ''}`}
+                onClick={() => setSort('az')}
+              >
+                A → Z
+              </button>
+              <button
+                type="button"
+                className={`books-sort-btn${sortOrder === 'za' ? ' active' : ''}`}
+                onClick={() => setSort('za')}
+              >
+                Z → A
+              </button>
+            </div>
+            <span className="metodo-count">
+              Mostrando {shown} de {total} metodologías
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Grid mixto de cápsulas. */}
+      <div className="caps-grid">
+        {activeTab === 'all' &&
+          filteredItems().map((item) =>
+            item.kind === 'metodologia' ? (
+              <MetodoCard key={item.id} metodo={item} onOpen={setSelected} />
+            ) : (
+              <LibroCard key={item.id} libro={item} />
+            )
+          )}
+        {activeTab === 'metodologias' &&
+          filteredMetodologias().map((m) => (
+            <MetodoCard key={m.id} metodo={m} onOpen={setSelected} />
+          ))}
+        {activeTab === 'libros' &&
+          filteredLibros().map((l) => <LibroCard key={l.id} libro={l} />)}
+      </div>
+
+      <MetodoModal metodo={selected} onClose={() => setSelected(null)} />
     </div>
   )
 }
