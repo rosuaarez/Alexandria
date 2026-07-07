@@ -99,7 +99,7 @@ export function Topbar() {
             {currentUser?.name ?? 'Usuario'}
           </span>
           <span className="topbar-user-email">
-            {currentUser?.email ?? ''}
+            {currentUser?.role === 'leader' ? 'UX Lead' : 'UX Researcher'}
           </span>
         </div>
       </div>
