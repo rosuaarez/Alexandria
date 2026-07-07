@@ -69,7 +69,7 @@ function SortableQuestion({
       </button>
       <div className={styles.body}>
         <div className={styles.row}>
-          <span className={styles.index}>{index + 1}.</span>
+          <span className={styles.index}>{index + 1}</span>
           <input
             className={styles.text}
             value={question.text}

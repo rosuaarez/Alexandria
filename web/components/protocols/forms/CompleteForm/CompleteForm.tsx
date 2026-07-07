@@ -69,7 +69,63 @@ const PAIS_OPTIONS = [
   'España',
   'Estados Unidos',
 ]
-const HERRAMIENTA_PRUEBA_OPTIONS = ['Maze', 'Lookback', 'UserZoom', 'Otro']
+// Filas de cuota por campo del perfil (fieles al original).
+const EDAD_CUOTA_ROWS = ['18–30 años', '31–45 años', '46–60 años', '61+ años']
+const GENERO_CUOTA_ROWS = ['Masculino', 'Femenino', 'No binario']
+const NSE_CUOTA_ROWS = ['AB', 'C+', 'C', 'C-', 'D+', 'D, D-']
+const OCUPACION_CUOTA_ROWS = [
+  'Estudiante',
+  'Empleado',
+  'Trabajador Independiente',
+  'Dedicado al hogar',
+  'Pensionado',
+]
+
+// Checkbox "Agregar cuota" que expande una tabla de cuotas con controles − N +.
+function CuotaField({ rows }: { rows: string[] }) {
+  const [open, setOpen] = useState(false)
+  const [values, setValues] = useState<number[]>(() => rows.map(() => 0))
+
+  const setAt = (i: number, n: number) =>
+    setValues((v) => v.map((x, idx) => (idx === i ? Math.max(0, n) : x)))
+
+  return (
+    <>
+      <label className="cuota-toggle">
+        <input
+          type="checkbox"
+          checked={open}
+          onChange={(e) => setOpen(e.target.checked)}
+        />{' '}
+        <span>Agregar cuota</span>
+      </label>
+      {open && (
+        <div className="cuota-panel">
+          {rows.map((r, i) => (
+            <div className="cuota-row" key={r}>
+              <span>{r}</span>
+              <div className="cuota-ctrl">
+                <button type="button" onClick={() => setAt(i, values[i] - 1)}>
+                  −
+                </button>
+                <input
+                  className="cuota-num"
+                  type="number"
+                  min={0}
+                  value={values[i]}
+                  onChange={(e) => setAt(i, parseInt(e.target.value, 10) || 0)}
+                />
+                <button type="button" onClick={() => setAt(i, values[i] + 1)}>
+                  +
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  )
+}
 
 // Muestra sugerida por método (mock del botón "✦ Corregir con IA").
 function suggestSampleFor(metodo: string): { range: string; lower: number } {
@@ -748,9 +804,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <label className="cuota-toggle">
-              <input type="checkbox" /> <span>Agregar cuota</span>
-            </label>
+            <CuotaField rows={EDAD_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>Género</label>
@@ -762,9 +816,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <label className="cuota-toggle">
-              <input type="checkbox" /> <span>Agregar cuota</span>
-            </label>
+            <CuotaField rows={GENERO_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>NSE</label>
@@ -776,9 +828,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <label className="cuota-toggle">
-              <input type="checkbox" /> <span>Agregar cuota</span>
-            </label>
+            <CuotaField rows={NSE_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>Ocupación</label>
@@ -790,9 +840,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <label className="cuota-toggle">
-              <input type="checkbox" /> <span>Agregar cuota</span>
-            </label>
+            <CuotaField rows={OCUPACION_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>País</label>
@@ -829,7 +877,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
           <div className="card-icon">❓</div>
           <div>
             <div className="card-title">Preguntas de la prueba</div>
-            <div className="card-subtitle">Maze · tipos de preguntas ①②</div>
+            <div className="card-subtitle">Maze — tipos de preguntas UX</div>
           </div>
         </div>
         <div className="form-grid">
@@ -861,14 +909,11 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
           </div>
           <div className="form-group">
             <label>Herramienta</label>
-            <select {...register('herramientaPrueba')}>
-              <option value="">Seleccionar...</option>
-              {HERRAMIENTA_PRUEBA_OPTIONS.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Ej. Maze, Lookback, UserZoom..."
+              {...register('herramientaPrueba')}
+            />
           </div>
         </div>
       </div>

@@ -559,7 +559,7 @@ optgroup{font-weight:600;color:var(--text-3);font-size:11px}
 .entregable-select.has-value{color:var(--text-1)!important}
 .remove-btn{width:32px;height:34px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:transparent;cursor:pointer;display:grid;place-items:center;color:var(--text-4);transition:all .15s;flex-shrink:0;font-size:14px}
 .remove-btn:hover{background:var(--danger-lt);border-color:var(--danger);color:var(--danger)}
-.add-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;margin-top:8px;border-radius:var(--radius-sm);border:1.5px dashed var(--border-2);background:transparent;cursor:pointer;font-family:var(--font);font-size:12.5px;font-weight:500;color:var(--text-3);transition:all .15s}
+.add-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;margin-top:8px;border-radius:var(--radius-sm);border:1.5px dashed var(--accent);background:transparent;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;color:var(--accent);transition:all .15s}
 .add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt)}
 
 /* A/B TEST QUESTION TYPE */
