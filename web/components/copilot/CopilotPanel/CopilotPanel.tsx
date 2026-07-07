@@ -132,6 +132,10 @@ export function CopilotPanel() {
   const [input, setInput] = useState('')
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzed, setAnalyzed] = useState(false)
+  // Acción destacada del panel. "analizar" queda resaltada por defecto (Dif 6).
+  const [activeAction, setActiveAction] = useState<'analizar' | 'preguntas' | 'objetivo'>(
+    'analizar'
+  )
   const listRef = useRef<HTMLDivElement>(null)
 
   // Score y dimensiones dinámicos del protocolo actual (Corrección 6).
@@ -154,6 +158,7 @@ export function CopilotPanel() {
 
   // Analiza el protocolo localmente y muestra el resultado en el chat.
   const handleAnalyze = () => {
+    setActiveAction('analizar')
     if (!protocol || isGenerating || analyzing) return
     setAnalyzing(true)
     const result = analyzeProtocol(protocol)
@@ -165,11 +170,13 @@ export function CopilotPanel() {
   }
 
   const handleSuggestQuestions = () => {
+    setActiveAction('preguntas')
     if (!protocol || isGenerating) return
     void askCopilot('Sugiéreme preguntas adicionales para este protocolo.', protocol)
   }
 
   const handleImproveObjective = () => {
+    setActiveAction('objetivo')
     if (!protocol || isGenerating) return
     void askCopilot('Mejora el objetivo de investigación de este protocolo.', protocol)
   }
@@ -202,7 +209,7 @@ export function CopilotPanel() {
       <div className="acp-actions">
         <button
           type="button"
-          className={`acp-action-btn${analyzing ? ' acp-active' : ''}`}
+          className={`acp-action-btn${activeAction === 'analizar' ? ' acp-active' : ''}`}
           onClick={handleAnalyze}
           disabled={!canAsk}
         >
@@ -210,12 +217,22 @@ export function CopilotPanel() {
           <span className="acp-action-text">Analizar protocolo</span>
           <span className="acp-action-arrow">→</span>
         </button>
-        <button type="button" className="acp-action-btn" onClick={handleSuggestQuestions} disabled={!canAsk}>
+        <button
+          type="button"
+          className={`acp-action-btn${activeAction === 'preguntas' ? ' acp-active' : ''}`}
+          onClick={handleSuggestQuestions}
+          disabled={!canAsk}
+        >
           <span className="acp-action-icon">💡</span>
           <span className="acp-action-text">Sugerir preguntas</span>
           <span className="acp-action-arrow">→</span>
         </button>
-        <button type="button" className="acp-action-btn" onClick={handleImproveObjective} disabled={!canAsk}>
+        <button
+          type="button"
+          className={`acp-action-btn${activeAction === 'objetivo' ? ' acp-active' : ''}`}
+          onClick={handleImproveObjective}
+          disabled={!canAsk}
+        >
           <span className="acp-action-icon">🎯</span>
           <span className="acp-action-text">Mejorar objetivo</span>
           <span className="acp-action-arrow">→</span>

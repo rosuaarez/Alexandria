@@ -12,15 +12,12 @@ import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useTeamStore } from '@/lib/stores/useTeamStore'
 import { PROTOCOL_TEMPLATES } from '@/lib/data/templates'
-import { WorkflowBanner } from '@/components/protocols/WorkflowBanner'
 import { ReviewBanner } from '@/components/protocols/ReviewBanner'
 import { RelatedResources } from '@/components/protocols/RelatedResources'
-import { ProtocolOutput } from '@/components/protocols/ProtocolOutput'
 import { ExpressForm } from '@/components/protocols/forms/ExpressForm'
 import { CompleteForm } from '@/components/protocols/forms/CompleteForm'
 import { PresentationForm } from '@/components/protocols/forms/PresentationForm'
 import type { FormData } from '@/components/protocols/forms/types'
-import { computeCompletion } from '@/lib/utils/completion'
 import styles from './editor.module.css'
 
 // Panel pesado cargado solo en cliente cuando el protocolo está en revisión.
@@ -30,7 +27,6 @@ const CommentsPanel = dynamic(
   { ssr: false }
 )
 
-type Tab = 'edit' | 'output'
 
 const EDITOR_TYPES: ProtocolType[] = ['express', 'complete', 'presentation', 'ab']
 
@@ -188,13 +184,10 @@ interface EditorViewProps {
 
 function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const currentUser = useAuthStore((s) => s.currentUser)
   const createProtocol = useProtocolStore((s) => s.createProtocol)
   const updateProtocol = useProtocolStore((s) => s.updateProtocol)
-  // Versión viva del protocolo en el store (incluye generatedData tras generar).
-  const liveProtocol = useProtocolStore((s) => s.protocols.find((p) => p.id === id))
   const showToast = useUIStore((s) => s.showToast)
   const generateProtocol = useCopilotStore((s) => s.generateProtocol)
   const isGenerating = useCopilotStore((s) => s.isGenerating)
@@ -224,16 +217,9 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const [statusMenuOpen, setStatusMenuOpen] = useState(false)
   // Fecha de la meta: se captura tras el montaje para no llamar new Date() en render.
   const [metaDate, setMetaDate] = useState('')
-  const [tab, setTab] = useState<Tab>(
-    searchParams.get('tab') === 'output' ? 'output' : 'edit'
-  )
   const dataRef = useRef<FormData>(initial.data)
   const nameRef = useRef<string>(initial.name)
 
-  // Completitud reactiva del protocolo (campos requeridos según el tipo).
-  const [completion, setCompletion] = useState(() =>
-    computeCompletion(initial.type, initial.name, initial.data)
-  )
   // Marca de tiempo del último guardado + etiqueta "hace Ns" ya formateada.
   // El reloj (Date.now) se lee solo en handlers/efectos, nunca en render
   // (mantiene el render puro para el React Compiler).
@@ -242,12 +228,6 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Ref a persist para que el autosave no dependa del orden de declaración.
   const persistRef = useRef<(() => Promise<string | null>) | null>(null)
-
-  const recomputeCompletion = useCallback(() => {
-    setCompletion(
-      computeCompletion(initial.type, nameRef.current, dataRef.current)
-    )
-  }, [initial.type])
 
   useEffect(() => {
     setEditorType(initial.type === 'ab' ? 'complete' : initial.type)
@@ -313,10 +293,9 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     (data: FormData) => {
       dataRef.current = { ...dataRef.current, ...data }
       markDirty()
-      recomputeCompletion()
       scheduleAutosave()
     },
-    [markDirty, recomputeCompletion, scheduleAutosave]
+    [markDirty, scheduleAutosave]
   )
 
   const persist = useCallback(async (): Promise<string | null> => {
@@ -402,9 +381,8 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     const result = await generateProtocol(fresh)
     if (result) {
       showToast('Protocolo generado con IA ✨', 'success')
-      // 3. Activar tab Output
-      if (isNew) router.replace(`/protocols/${savedId}/edit?tab=output`)
-      else setTab('output')
+      // 3. Ir a la vista de Output (accesible también desde el sidebar).
+      router.push(`/protocols/${savedId}`)
     }
   }
 
@@ -432,8 +410,6 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
       if (s.isDirty && !isNew) void persist()
     }
   }, [isNew, persist])
-
-  const outputProtocol = liveProtocol ?? protocol
 
   // Template del protocolo (guardado en data.template o en protocol.template).
   const templateKey =
@@ -596,58 +572,31 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
         />
       )}
 
-      <WorkflowBanner status={initial.status} completion={completion} />
-
-      <nav className={styles.tabs}>
-        <button
-          type="button"
-          className={`${styles.tab} ${tab === 'edit' ? styles.tabActive : ''}`}
-          onClick={() => setTab('edit')}
-        >
-          Editar
-        </button>
-        <button
-          type="button"
-          className={`${styles.tab} ${tab === 'output' ? styles.tabActive : ''}`}
-          onClick={() => setTab('output')}
-        >
-          Output
-        </button>
-      </nav>
-
+      {/* El formulario aparece directamente tras el header (sin stepper, sin
+          barra de completitud ni tabs — el Output se accede desde el sidebar). */}
       <section className={styles.content}>
-        {tab === 'edit' ? (
-          <>
-            {renderForm()}
-            <RelatedResources type={initial.type} template={templateKey} />
-            {/* Botón principal al final del formulario (centrado, con separador
-                superior, fiel al original). */}
-            <div
-              style={{
-                textAlign: 'center',
-                padding: '32px 0',
-                borderTop: '1px solid var(--border)',
-                marginTop: 8,
-              }}
-            >
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleGenerate}
-                disabled={isSaving || isGenerating}
-                style={{ padding: '14px 40px', fontSize: 16 }}
-              >
-                {isGenerating ? 'Generando…' : '✦ Generar protocolo'}
-              </button>
-            </div>
-          </>
-        ) : outputProtocol ? (
-          <ProtocolOutput protocol={outputProtocol} />
-        ) : (
-          <p className={styles.outputText}>
-            Guarda el protocolo y genera el output con IA para verlo aquí.
-          </p>
-        )}
+        {renderForm()}
+        <RelatedResources type={initial.type} template={templateKey} />
+        {/* Botón principal al final del formulario (centrado, con separador
+            superior, fiel al original). */}
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '32px 0',
+            borderTop: '1px solid var(--border)',
+            marginTop: 8,
+          }}
+        >
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleGenerate}
+            disabled={isSaving || isGenerating}
+            style={{ padding: '14px 40px', fontSize: 16 }}
+          >
+            {isGenerating ? 'Generando…' : '✦ Generar protocolo'}
+          </button>
+        </div>
       </section>
 
       {isInReview && <CommentsPanel protocolId={id} />}

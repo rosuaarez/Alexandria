@@ -60,6 +60,8 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
   },
 
   createProtocol: async (data, userId) => {
+    // Feedback de carga mientras se crea (toast oscuro tipo 'info').
+    toast('⊙ Creando protocolo...', 'info')
     // id local optimista; se reemplaza con el registro real (incluye _supabaseId).
     const localId = crypto.randomUUID()
     const optimistic: Protocol = {
@@ -72,7 +74,7 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
     set((s) => ({ protocols: [optimistic, ...s.protocols] }))
     if (!FLAGS.USE_REAL_SUPABASE) {
       // Mock: el protocolo vive solo en memoria (sin _supabaseId).
-      toast('Protocolo creado', 'success')
+      toast('Protocolo creado ✓', 'success')
       return optimistic
     }
     try {

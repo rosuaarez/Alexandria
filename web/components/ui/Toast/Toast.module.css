@@ -31,8 +31,9 @@
   background: var(--danger);
 }
 
+/* Toast de proceso ("Creando protocolo…"): fondo oscuro (Dif 4). */
 .info {
-  background: var(--accent);
+  background: #1a1a2e;
 }
 
 @keyframes slideIn {

@@ -151,7 +151,12 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       cliente: asString(initialData.cliente),
       tema: asString(initialData.tema),
       folderId: asString(initialData.folderId),
-      team: asArray<TeamMember>(initialData.team),
+      // Al menos una fila de team por defecto (con placeholders); si el
+      // protocolo ya trae miembros, se usan esos (Dif 3).
+      team: (() => {
+        const t = asArray<TeamMember>(initialData.team)
+        return t.length > 0 ? t : [{ name: '', rolInvestigacion: '', rolPdu: '' }]
+      })(),
       objetivoGeneral: asString(initialData.objetivoGeneral),
       objetivos: asArray<TextItem>(initialData.objetivos),
       hipotesis: asString(initialData.hipotesis),
@@ -312,9 +317,9 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         <div className="list-container">
           {team.fields.map((f, i) => (
             <div key={f.id} className="list-item">
-              <input placeholder="Nombre" {...register(`team.${i}.name` as const)} />
+              <input placeholder="Ej. Ana García" {...register(`team.${i}.name` as const)} />
               <select {...register(`team.${i}.rolInvestigacion` as const)}>
-                <option value="">Rol de Investigación</option>
+                <option value="">Seleccionar...</option>
                 {ROL_INVESTIGACION_OPTIONS.map((r) => (
                   <option key={r} value={r}>
                     {r}
@@ -322,7 +327,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 ))}
               </select>
               <select {...register(`team.${i}.rolPdu` as const)}>
-                <option value="">Rol en PDU</option>
+                <option value="">Seleccionar...</option>
                 {ROL_PDU_OPTIONS.map((r) => (
                   <option key={r} value={r}>
                     {r}
