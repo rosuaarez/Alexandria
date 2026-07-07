@@ -123,6 +123,9 @@ body.acp-open .acp-topbar-block { display: flex; }
   top: var(--topbar-h);
   right: 0;
   bottom: 32px;
+  /* Altura explícita de respaldo: garantiza que el panel (y su contenido flex)
+     tenga alto aunque top/bottom no lo establezcan en algún layout. */
+  height: calc(100vh - var(--topbar-h) - 32px);
   width: var(--acp-w);
   background: var(--surface);
   border-left: 1px solid var(--border);
@@ -141,10 +144,12 @@ body.acp-open .acp-topbar-block { display: flex; }
 }
 /* Panel visible solo cuando view-editor está activo */
 #acp-panel.open {
-  transform: translateX(0);
+  transform: translateX(0) !important;
 }
-/* CSS de seguridad: si acp-open no está en body, forzar oculto sin importar el JS */
-body:not(.acp-open) #acp-panel {
+/* Seguridad: oculto solo si el panel NO tiene .open (que refleja isOpen del store).
+   Antes dependía de body.acp-open y, si esa clase se desincronizaba, el panel
+   quedaba fuera de pantalla mostrando solo el header. */
+body:not(.acp-open) #acp-panel:not(.open) {
   transform: translateX(100%) !important;
 }
 #acp-panel .acp-chat-area {
