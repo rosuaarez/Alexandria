@@ -8,16 +8,26 @@ import { CreateProtocolModal } from '@/components/protocols/CreateProtocolModal'
 import { DeleteModal } from '@/components/ui/DeleteModal'
 import styles from './protocols.module.css'
 
-type Filter = 'all' | ProtocolStatus
+type Filter = 'all' | 'draft' | 'activo' | 'onhold' | 'finalizado' | 'cerrado'
 
-const FILTERS: { value: Filter; label: string }[] = [
+// Pills de filtro con punto de color por estado (fiel al original).
+const FILTERS: { value: Filter; label: string; dot?: string }[] = [
   { value: 'all', label: 'Todos' },
-  { value: 'draft', label: 'Borrador' },
-  { value: 'in-review', label: 'En revisión' },
-  { value: 'approved', label: 'Aprobado' },
-  { value: 'ready', label: 'Listo' },
-  { value: 'completed', label: 'Completado' },
+  { value: 'draft', label: 'Draft', dot: '#9CA3AF' },
+  { value: 'activo', label: 'Activo', dot: '#10B981' },
+  { value: 'onhold', label: 'On Hold', dot: '#F59E0B' },
+  { value: 'finalizado', label: 'Finalizado', dot: '#3B82F6' },
+  { value: 'cerrado', label: 'Cerrado', dot: '#6B7280' },
 ]
+
+// Cada filtro agrupa uno o varios estados internos.
+const STATUS_GROUPS: Record<Exclude<Filter, 'all'>, ProtocolStatus[]> = {
+  draft: ['draft'],
+  activo: ['activo', 'approved', 'ready'],
+  onhold: ['onhold'],
+  finalizado: ['finalizado', 'completed'],
+  cerrado: ['cerrado'],
+}
 
 export default function ProtocolsPage() {
   const protocols = useProtocolStore((s) => s.protocols)
@@ -32,7 +42,7 @@ export default function ProtocolsPage() {
     () =>
       filter === 'all'
         ? protocols
-        : protocols.filter((p) => p.protoStatus === filter),
+        : protocols.filter((p) => STATUS_GROUPS[filter].includes(p.protoStatus)),
     [protocols, filter]
   )
 
@@ -59,6 +69,7 @@ export default function ProtocolsPage() {
       </div>
 
       <div className={styles.filters} role="tablist">
+        <span className={styles.filterLabel}>Filtrar:</span>
         {FILTERS.map((f) => (
           <button
             key={f.value}
@@ -68,15 +79,18 @@ export default function ProtocolsPage() {
             className={`${styles.pill} ${filter === f.value ? styles.pillActive : ''}`}
             onClick={() => setFilter(f.value)}
           >
+            {f.dot && (
+              <span className={styles.pillDot} style={{ background: f.dot }} />
+            )}
             {f.label}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="proto-list">
+        <div className={styles.grid}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="proto-item" style={{ opacity: 0.5 }} />
+            <div key={i} className={styles.skeletonCard} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -96,7 +110,7 @@ export default function ProtocolsPage() {
           </button>
         </div>
       ) : (
-        <div className="proto-list">
+        <div className={styles.grid}>
           {filtered.map((p) => (
             <ProtocolCard
               key={p.id}

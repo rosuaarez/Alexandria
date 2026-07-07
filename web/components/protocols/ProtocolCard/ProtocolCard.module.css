@@ -12,7 +12,7 @@
 
 .card:hover {
   border-color: var(--accent);
-  box-shadow: 0 4px 16px var(--accent-lt);
+  box-shadow: var(--shadow-md);
 }
 
 .top {
@@ -24,6 +24,7 @@
 .icon {
   font-size: 20px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .menuWrap {
@@ -127,8 +128,51 @@
 .name {
   font-family: var(--font-display);
   color: var(--text-1);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge "+ Generado" cuando el protocolo tiene output generado. */
+.genBadge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+}
+
+/* Fila de íconos de acción (SVG) alineados a la derecha. */
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.actionBtn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.actionBtn:hover {
+  background: var(--surface-2);
+  color: var(--accent);
 }
 
 .meta {

@@ -38,8 +38,27 @@
 
 .filters {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.filterLabel {
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+/* Punto de color a la izquierda del pill según el estado. */
+.pillDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .pill {
@@ -66,8 +85,8 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .skeletonCard {
