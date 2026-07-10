@@ -44,15 +44,19 @@ function fromRow(row: ProtocolRow): Protocol {
   }
 }
 
-// Protocol → fila para Supabase (data serializado como JSON string)
+// Protocol → fila para Supabase (data serializado como JSON string).
+// `empId` (equipo del usuario, de UiX Lingo) es opcional: si el usuario no
+// tiene equipo, la columna queda sin setear (null).
 function toRow(
   protocol: Protocol,
-  userId: string
-): { title: string; data: string; user_id: string } {
+  userId: string,
+  empId?: string
+): { title: string; data: string; user_id: string; emp_id?: string } {
   return {
     title: protocol.name,
     data: JSON.stringify(protocol),
     user_id: userId,
+    ...(empId ? { emp_id: empId } : {}),
   }
 }
 
@@ -70,12 +74,13 @@ export async function loadUserProtocols(userId: string): Promise<Protocol[]> {
 
 export async function createProtocol(
   protocol: Protocol,
-  userId: string
+  userId: string,
+  empId?: string
 ): Promise<Protocol> {
   const supabase = createClient()
   const { data, error } = await supabase
     .from(TABLE)
-    .insert(toRow(protocol, userId))
+    .insert(toRow(protocol, userId, empId))
     .select()
     .single()
 
@@ -107,7 +112,8 @@ export async function deleteProtocol(supabaseId: string): Promise<void> {
 
 export async function duplicateProtocol(
   protocol: Protocol,
-  userId: string
+  userId: string,
+  empId?: string
 ): Promise<Protocol> {
   // Nuevo registro con nombre "Copia de [nombre]"; se descarta el id/_supabaseId
   // original para que Supabase genere uno nuevo.
@@ -117,5 +123,5 @@ export async function duplicateProtocol(
     _supabaseId: undefined,
     name: `Copia de ${protocol.name}`,
   }
-  return createProtocol(copy, userId)
+  return createProtocol(copy, userId, empId)
 }

@@ -56,30 +56,26 @@ export default function LoginPage() {
   })
 
   const signIn = useAuthStore((s) => s.signIn)
+  const currentUser = useAuthStore((s) => s.currentUser)
+  const authLoading = useAuthStore((s) => s.loading)
   const [formError, setFormError] = useState<string | null>(null)
 
-  // SSO (Escenario A): si ya hay sesión en el Supabase externo, entrar directo
-  // al dashboard; si no, redirigir al login del otro proyecto. Solo en modo real.
+  // SSO UiX Lingo (Escenario B1): el handoff y la resolución de sesión los hace
+  // initAuth (root AuthProvider) sobre el store. Aquí solo reaccionamos al
+  // resultado para no consumir dos veces los tokens de un solo uso.
+  //   - loading → seguimos "Verificando sesión…"
+  //   - con usuario → dashboard
+  //   - sin usuario → login del proyecto externo (UiX Lingo)
   useEffect(() => {
     if (!FLAGS.USE_REAL_AUTH) return
-    let active = true
-    void (async () => {
-      const { createAuthClient } = await import('@/lib/supabase/authClient')
-      const {
-        data: { session },
-      } = await createAuthClient().auth.getSession()
-      if (!active) return
-      if (session) {
-        router.push('/dashboard')
-      } else {
-        const loginUrl = process.env.NEXT_PUBLIC_EXTERNAL_LOGIN_URL
-        if (loginUrl) window.location.href = loginUrl
-      }
-    })()
-    return () => {
-      active = false
+    if (authLoading) return
+    if (currentUser) {
+      router.push('/dashboard')
+      return
     }
-  }, [router])
+    const loginUrl = process.env.NEXT_PUBLIC_EXTERNAL_LOGIN_URL
+    if (loginUrl) window.location.href = loginUrl
+  }, [currentUser, authLoading, router])
 
   const onSubmit = async (data: LoginForm) => {
     setLoading(true)

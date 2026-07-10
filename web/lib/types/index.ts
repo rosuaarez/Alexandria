@@ -72,6 +72,11 @@ export interface AlexandriaUser {
   name: string;
   role: 'researcher' | 'leader';
   initials: string;
+  // Datos de equipo provenientes de UiX Lingo (SSO). Opcionales: un usuario
+  // sin `emp_id` (no está en ranking_user o no tiene equipo) opera en scope
+  // personal.
+  emp_id?: string;
+  proyectos?: string[];
 }
 
 export type ProtocolStatus = Protocol['protoStatus'];
