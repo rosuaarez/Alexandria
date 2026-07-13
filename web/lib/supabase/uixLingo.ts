@@ -76,29 +76,9 @@ export async function fetchUiXProfile(email: string): Promise<UiXProfile> {
 export async function consumeSsoHandoff(): Promise<boolean> {
   if (typeof window === 'undefined') return false
 
-  // ── [SSO-DEBUG] temporal: ¿por dónde llegan (o no) los tokens? ────────────
-  // sessionStorage NO se comparte entre orígenes ni a una pestaña nueva de otra
-  // app; el único canal cross-origin al abrir pestaña es la URL (?query o #hash).
-  console.log('[SSO-DEBUG] consumeSsoHandoff() start', {
-    href: window.location.href,
-    search: window.location.search,
-    hash: window.location.hash,
-    hasTokenInSearch:
-      window.location.search.includes('_sso_at') ||
-      window.location.hash.includes('_sso_at'),
-    ssAt: sessionStorage.getItem('_sso_at') ? 'present' : 'absent',
-    ssRt: sessionStorage.getItem('_sso_rt') ? 'present' : 'absent',
-  })
-  // ──────────────────────────────────────────────────────────────────────────
-
   const ssoAt = sessionStorage.getItem('_sso_at')
   const ssoRt = sessionStorage.getItem('_sso_rt')
-  if (!ssoAt || !ssoRt) {
-    console.log(
-      '[SSO-DEBUG] consumeSsoHandoff() → NO hay tokens en sessionStorage; se aborta el canje (no habrá sesión)'
-    )
-    return false
-  }
+  if (!ssoAt || !ssoRt) return false
 
   // Tokens de un solo uso: se borran antes de canjearlos.
   sessionStorage.removeItem('_sso_at')
@@ -111,10 +91,6 @@ export async function consumeSsoHandoff(): Promise<boolean> {
   })
 
   const email = data.session?.user?.email
-  console.log('[SSO-DEBUG] setSession() result', {
-    error: error?.message ?? null,
-    email: email ?? null,
-  })
   if (error || !email) return false
 
   sessionStorage.setItem('uix_email', email)

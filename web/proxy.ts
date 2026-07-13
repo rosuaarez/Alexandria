@@ -6,7 +6,10 @@ import type { NextRequest } from 'next/server'
 // Next.js 16 (misma lógica y matcher, solo cambia el nombre del archivo/función).
 
 // Rutas siempre accesibles (sin sesión).
-const PUBLIC_PATHS = ['/login', '/api/health', '/api/auth']
+// `/sso`: callback del handoff SSO de UiX Space. DEBE ser público para que el
+// cliente canjee los tokens de la URL y escriba la cookie ANTES de ir a una
+// ruta protegida (ver app/sso/page.tsx).
+const PUBLIC_PATHS = ['/login', '/sso', '/api/health', '/api/auth']
 // Solo se protegen las rutas de la app.
 const PROTECTED_PREFIXES = [
   '/dashboard',

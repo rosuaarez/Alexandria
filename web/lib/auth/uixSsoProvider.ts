@@ -59,10 +59,6 @@ export function createUixSsoProvider(): AuthProvider {
       // 2) Lee la sesión ya materializada en cookie.
       const { data } = await supabase.auth.getSession()
       const session = data.session
-      console.log('[SSO-DEBUG] getSession() → sesión en cookie:', {
-        hasSession: !!session,
-        user: session?.user?.email ?? null,
-      })
       if (!session?.user) return null
       return toSession(session)
     },
