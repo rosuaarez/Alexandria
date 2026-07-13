@@ -5,8 +5,10 @@
 // Activar de a uno conforme se prueba cada integración:
 //   1. USE_REAL_SUPABASE  2. USE_REAL_AUTH  3. USE_REAL_GEMINI
 export const FLAGS = {
-  // Cambiar a true cuando la integración esté lista y probada.
-  USE_REAL_AUTH: process.env.NEXT_PUBLIC_USE_REAL_AUTH === 'true',
+  // [SSO-DEBUG] TEMPORAL: forzado a true para diagnosticar el handoff SSO en
+  // prod sin depender de la env var de Vercel. REVERTIR a:
+  //   USE_REAL_AUTH: process.env.NEXT_PUBLIC_USE_REAL_AUTH === 'true',
+  USE_REAL_AUTH: true as boolean,
   USE_REAL_SUPABASE: process.env.NEXT_PUBLIC_USE_REAL_SUPABASE === 'true',
   USE_REAL_GEMINI: process.env.NEXT_PUBLIC_USE_REAL_GEMINI === 'true',
 } as const
