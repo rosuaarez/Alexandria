@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { AlexandriaUser } from '@/lib/types'
 import { FLAGS } from '@/lib/config/flags'
-import { createSupabaseAuthProvider } from '@/lib/auth/supabaseAdapter'
+import { createUixSsoProvider } from '@/lib/auth/uixSsoProvider'
 import type { AuthProvider } from '@/lib/auth/types'
 
 // Usuario mockeado para construir toda la estructura visual sin Auth real.
@@ -19,7 +19,7 @@ export const MOCK_USER: AlexandriaUser = {
 // Proveedor de Auth real (lazy): solo se instancia si el flag está activo.
 let authProvider: AuthProvider | null = null
 function getProvider(): AuthProvider {
-  if (!authProvider) authProvider = createSupabaseAuthProvider()
+  if (!authProvider) authProvider = createUixSsoProvider()
   return authProvider
 }
 
@@ -35,7 +35,10 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   currentUser: null,
-  loading: false,
+  // En modo real arrancamos en loading=true: initAuth (root AuthProvider) aún
+  // no corrió el handoff SSO. Evita que /login redirija al login externo antes
+  // de resolver la sesión. En mock, false (el formulario se muestra de una).
+  loading: FLAGS.USE_REAL_AUTH,
   setUser: (currentUser) => set({ currentUser }),
 
   signIn: async (email, password) => {

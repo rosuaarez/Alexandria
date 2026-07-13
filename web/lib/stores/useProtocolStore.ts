@@ -5,8 +5,15 @@ import type {
   ProtocolStatus,
 } from '@/lib/types'
 import { useUIStore } from '@/lib/stores/useUIStore'
+import { useAuthStore } from '@/lib/stores/useAuthStore'
 import { FLAGS } from '@/lib/config/flags'
 import * as api from '@/lib/supabase/protocols'
+
+// emp_id (equipo UiX Lingo) del usuario actual, para etiquetar los protocolos
+// que se crean/duplican. undefined si el usuario no tiene equipo.
+function currentEmpId(): string | undefined {
+  return useAuthStore.getState().currentUser?.emp_id
+}
 
 function toast(message: string, type?: 'success' | 'error' | 'info') {
   useUIStore.getState().showToast(message, type)
@@ -78,7 +85,7 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
       return optimistic
     }
     try {
-      const saved = await api.createProtocol(optimistic, userId)
+      const saved = await api.createProtocol(optimistic, userId, currentEmpId())
       set((s) => ({
         protocols: s.protocols.map((p) => (p.id === localId ? saved : p)),
       }))
@@ -151,7 +158,7 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
       return
     }
     try {
-      const copy = await api.duplicateProtocol(protocol, userId)
+      const copy = await api.duplicateProtocol(protocol, userId, currentEmpId())
       set((s) => ({ protocols: [copy, ...s.protocols] }))
       toast('Protocolo duplicado', 'success')
     } catch (e) {
