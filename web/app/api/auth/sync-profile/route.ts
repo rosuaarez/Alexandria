@@ -42,6 +42,10 @@ export async function POST() {
     error: authError,
   } = await auth.auth.getUser()
 
+  console.log('[SSO-DEBUG] /api/auth/sync-profile getUser()', {
+    error: authError?.message ?? null,
+    email: user?.email ?? null,
+  })
   if (authError || !user?.email) {
     return NextResponse.json({ error: 'No hay sesión válida' }, { status: 401 })
   }
