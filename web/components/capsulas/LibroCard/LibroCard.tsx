@@ -6,9 +6,10 @@ import { useUIStore } from '@/lib/stores/useUIStore'
 
 interface LibroCardProps {
   libro: Libro
+  onRead: (libro: Libro) => void
 }
 
-export function LibroCard({ libro }: LibroCardProps) {
+export function LibroCard({ libro, onRead }: LibroCardProps) {
   const showToast = useUIStore((s) => s.showToast)
   // Si la imagen de portada falla al cargar, se cae al placeholder púrpura.
   const [imgFailed, setImgFailed] = useState(false)
@@ -17,8 +18,8 @@ export function LibroCard({ libro }: LibroCardProps) {
   const openPdf = () => window.open(libro.pdfUrl, '_blank', 'noopener,noreferrer')
 
   const handleLeer = () => {
-    if (libro.pdfUrl) openPdf()
-    else showToast('Próximamente', 'info')
+    if (libro.pdfUrl) onRead(libro)
+    else showToast('PDF no disponible aún', 'info')
   }
 
   const handleDescargar = () => {

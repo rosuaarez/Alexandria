@@ -5,9 +5,11 @@ import type { Metodologia } from '@/lib/data/metodologias'
 import { METODOLOGIAS } from '@/lib/data/metodologias'
 import { LIBROS } from '@/lib/data/libros'
 import { useCapsulasStore } from '@/lib/stores/useCapsulasStore'
+import type { Libro } from '@/lib/data/libros'
 import { MetodoCard } from '@/components/capsulas/MetodoCard'
 import { LibroCard } from '@/components/capsulas/LibroCard'
 import { MetodoModal } from '@/components/capsulas/MetodoModal'
+import { PdfViewer } from '@/components/capsulas/PdfViewer'
 
 const CATEGORY_TABS: { value: 'all' | 'metodologias' | 'libros'; label: string }[] = [
   { value: 'all', label: 'Todas' },
@@ -52,6 +54,7 @@ export default function CapsulasPage() {
   const filteredLibros = useCapsulasStore((s) => s.filteredLibros)
 
   const [selected, setSelected] = useState<Metodologia | null>(null)
+  const [selectedLibro, setSelectedLibro] = useState<Libro | null>(null)
 
   // Conteos "Mostrando N de N" según la pestaña activa.
   let shown = 0
@@ -202,7 +205,7 @@ export default function CapsulasPage() {
             item.kind === 'metodologia' ? (
               <MetodoCard key={item.id} metodo={item} onOpen={setSelected} />
             ) : (
-              <LibroCard key={item.id} libro={item} />
+              <LibroCard key={item.id} libro={item} onRead={setSelectedLibro} />
             )
           )}
         {activeTab === 'metodologias' &&
@@ -210,10 +213,15 @@ export default function CapsulasPage() {
             <MetodoCard key={m.id} metodo={m} onOpen={setSelected} />
           ))}
         {activeTab === 'libros' &&
-          filteredLibros().map((l) => <LibroCard key={l.id} libro={l} />)}
+          filteredLibros().map((l) => (
+            <LibroCard key={l.id} libro={l} onRead={setSelectedLibro} />
+          ))}
       </div>
 
       <MetodoModal metodo={selected} onClose={() => setSelected(null)} />
+      {selectedLibro && (
+        <PdfViewer libro={selectedLibro} onClose={() => setSelectedLibro(null)} />
+      )}
     </div>
   )
 }
