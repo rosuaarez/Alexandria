@@ -13,7 +13,6 @@ import { useUIStore } from '@/lib/stores/useUIStore'
 import { useTeamStore } from '@/lib/stores/useTeamStore'
 import { PROTOCOL_TEMPLATES } from '@/lib/data/templates'
 import { ReviewBanner } from '@/components/protocols/ReviewBanner'
-import { RelatedResources } from '@/components/protocols/RelatedResources'
 import { ExpressForm } from '@/components/protocols/forms/ExpressForm'
 import { CompleteForm } from '@/components/protocols/forms/CompleteForm'
 import { PresentationForm } from '@/components/protocols/forms/PresentationForm'
@@ -576,12 +575,12 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
           barra de completitud ni tabs — el Output se accede desde el sidebar). */}
       <section className={styles.content}>
         {renderForm()}
-        <RelatedResources type={initial.type} template={templateKey} />
-        {/* Botón principal al final del formulario (centrado, con separador
-            superior, fiel al original). */}
+        {/* Botón principal al final del formulario (alineado a la derecha,
+            con separador superior). */}
         <div
           style={{
-            textAlign: 'center',
+            display: 'flex',
+            justifyContent: 'flex-end',
             padding: '32px 0',
             borderTop: '1px solid var(--border)',
             marginTop: 8,
