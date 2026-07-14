@@ -14,7 +14,7 @@ export const LIBROS: Libro[] = [
     autor: 'Steve Krug',
     descripcion: 'Colección práctica de consejos para conducir sesiones de user testing más efectivas: desde el reclutamiento hasta el análisis. Un recurso de referencia rápida para investigadores UX.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/230%20tips%20user%20testing.pdf',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/230%20Tips%20de%20User%20Testing.png',
   },
   {
     id: 'libro-02',
@@ -70,7 +70,7 @@ export const LIBROS: Libro[] = [
     autor: 'Erika Hall',
     descripcion: 'El manual práctico de Erika Hall para hacer investigación suficiente y útil sin sobreinvertir. Ideal para equipos ágiles que necesitan insights rápidos y accionables.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Just%20Enough%20Research.pdf',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Just%20Enough%20Research.png',
   },
   {
     id: 'libro-09',
@@ -78,7 +78,7 @@ export const LIBROS: Libro[] = [
     autor: 'Jon Yablonski',
     descripcion: 'Principios psicológicos aplicados al diseño de interfaces. Aprende cómo la mente humana procesa la información y cómo usarlo a tu favor al diseñar productos.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Laws%20of%20UX.pdf',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Laws%20of%20UX.png',
   },
   {
     id: 'libro-10',
@@ -118,7 +118,7 @@ export const LIBROS: Libro[] = [
     autor: 'Daniel Kahneman',
     descripcion: 'Daniel Kahneman explica los dos sistemas de pensamiento: el rápido e intuitivo (Sistema 1) y el lento y racional (Sistema 2). Esencial para entender sesgos cognitivos aplicados al diseño UX.',
     pdfUrl: '',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Pensar%20Racido,%20Pensar%20Despacio.png',
   },
   {
     id: 'libro-15',
@@ -126,7 +126,7 @@ export const LIBROS: Libro[] = [
     autor: 'Donald Norman',
     descripcion: 'El clásico de Donald Norman que cambió el diseño para siempre. Aprende sobre affordances, mappings y la psicología detrás de por qué los objetos (y apps) son fáciles o frustrantes de usar.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Psicologia%20objetos%20cotidianos_.pdf',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Psicologia%20de%20los%20Objetos%20Cotidianos.png',
   },
   {
     id: 'libro-16',
@@ -166,7 +166,7 @@ export const LIBROS: Libro[] = [
     autor: 'David Travis & Philip Hodgson',
     descripcion: 'Una guía completa para pensar y trabajar como investigador UX profesional. Cómo observar usuarios, influir en el diseño y comunicar hallazgos con impacto estratégico.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Think%20Like%20a%20UX%20Researcher.pdf',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Think%20Like%20a%20UX%20Researcher.png',
   },
   {
     id: 'libro-21',
@@ -174,7 +174,7 @@ export const LIBROS: Libro[] = [
     autor: 'Marc Stickdorn et al.',
     descripcion: 'La guía práctica definitiva del diseño de servicios. Cubre métodos, herramientas y casos reales para diseñar experiencias end-to-end centradas en el usuario.',
     pdfUrl: '',
-    coverUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/This%20is%20Service%20Design%20Doing.png',
   },
   {
     id: 'libro-22',
