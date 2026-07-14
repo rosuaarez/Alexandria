@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { Libro } from '@/lib/data/libros'
 import { useUIStore } from '@/lib/stores/useUIStore'
 
@@ -9,6 +10,9 @@ interface LibroCardProps {
 
 export function LibroCard({ libro }: LibroCardProps) {
   const showToast = useUIStore((s) => s.showToast)
+  // Si la imagen de portada falla al cargar, se cae al placeholder púrpura.
+  const [imgFailed, setImgFailed] = useState(false)
+  const showCover = !!libro.coverUrl && !imgFailed
 
   const openPdf = () => window.open(libro.pdfUrl, '_blank', 'noopener,noreferrer')
 
@@ -24,28 +28,35 @@ export function LibroCard({ libro }: LibroCardProps) {
 
   return (
     <div className="caps-card caps-card-libro visible">
-      {/* Portada: imagen real si hay coverUrl; si no, placeholder con el título. */}
-      {libro.coverUrl ? (
+      {/* Portada: imagen de coverUrl; si falla o no hay, placeholder púrpura. */}
+      {showCover ? (
         <img
-          className="caps-book-cover"
           src={libro.coverUrl}
-          alt={libro.titulo}
-          style={{ width: '100%', height: 180, objectFit: 'cover' }}
+          alt={`Portada de ${libro.titulo}`}
+          onError={() => setImgFailed(true)}
+          style={{
+            width: '100%',
+            height: '220px',
+            objectFit: 'cover',
+            borderRadius: 'var(--radius) var(--radius) 0 0',
+            display: 'block',
+          }}
         />
       ) : (
         <div
-          className="caps-book-cover"
           style={{
-            background: 'linear-gradient(135deg,#6D28C7,#8C59FE)',
-            height: 180,
+            width: '100%',
+            height: '220px',
+            background: 'linear-gradient(135deg, #6D28C7, #8C59FE)',
+            borderRadius: 'var(--radius) var(--radius) 0 0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
-            fontSize: 14,
+            fontSize: '15px',
             fontWeight: 600,
             textAlign: 'center',
-            padding: 16,
+            padding: '20px',
           }}
         >
           {libro.titulo}

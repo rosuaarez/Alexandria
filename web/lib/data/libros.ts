@@ -14,6 +14,7 @@ export const LIBROS: Libro[] = [
     autor: 'Steve Krug',
     descripcion: 'Colección práctica de consejos para conducir sesiones de user testing más efectivas: desde el reclutamiento hasta el análisis. Un recurso de referencia rápida para investigadores UX.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/230%20tips%20user%20testing.pdf',
+    coverUrl: '',
   },
   {
     id: 'libro-02',
@@ -21,6 +22,7 @@ export const LIBROS: Libro[] = [
     autor: 'Russ Unger & Carolyn Chandler',
     descripcion: 'Guía práctica y completa para diseñadores UX que trabajan en proyectos reales. Cubre el proceso completo: desde el descubrimiento y la estrategia hasta la arquitectura de información, diseño visual y entrega.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/A%20project%20guide%20to%20UX%20Design.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/A%20project%20guide%20to%20UX%20Design.png',
   },
   {
     id: 'libro-03',
@@ -28,6 +30,7 @@ export const LIBROS: Libro[] = [
     autor: 'Teresa Torres',
     descripcion: 'Un framework para equipos de producto que quieren integrar el descubrimiento de oportunidades como hábito continuo. Entrevistas de usuarios, mapas de oportunidades y experimentos sistemáticos.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Continuous%20Discovery%20Habits.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Continuous%20Discovery%20Habits.jpg',
   },
   {
     id: 'libro-04',
@@ -35,6 +38,7 @@ export const LIBROS: Libro[] = [
     autor: 'Chip Huyen',
     descripcion: 'Una guía completa para diseñar sistemas de ML listos para producción. Cubre la arquitectura de datos, diseño de features, entrenamiento, despliegue y monitoreo de modelos en entornos reales.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Designing%20Machine%20Learning%20Systems.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Designing%20Machine%20Learning%20Systems.jpg',
   },
   {
     id: 'libro-05',
@@ -42,6 +46,7 @@ export const LIBROS: Libro[] = [
     autor: 'Steve Krug',
     descripcion: 'El clásico indispensable de usabilidad web. Steve Krug explica con claridad y humor cómo diseñar sitios y apps que los usuarios comprendan de forma intuitiva, sin esfuerzo cognitivo innecesario.',
     pdfUrl: '',
+    coverUrl: "https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Don't%20Make%20Me%20Think.webp",
   },
   {
     id: 'libro-06',
@@ -49,6 +54,7 @@ export const LIBROS: Libro[] = [
     autor: 'Nir Eyal',
     descripcion: 'Nir Eyal explica el modelo Hook: cómo los productos más exitosos crean hábitos en los usuarios mediante ciclos de disparador, acción, recompensa variable e inversión. Imprescindible para diseño de producto.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Enganchado%20(Hooked).pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Enganchado%20(Hooked).webp',
   },
   {
     id: 'libro-07',
@@ -56,6 +62,7 @@ export const LIBROS: Libro[] = [
     autor: 'Steve Portigal',
     descripcion: 'La guía definitiva para conducir entrevistas de usuario efectivas. Steve Portigal comparte técnicas para escuchar con profundidad, evitar sesgos y obtener insights genuinos que transformen el diseño.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Interviewing%20Users.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Interviewing%20Users.webp',
   },
   {
     id: 'libro-08',
@@ -63,6 +70,7 @@ export const LIBROS: Libro[] = [
     autor: 'Erika Hall',
     descripcion: 'El manual práctico de Erika Hall para hacer investigación suficiente y útil sin sobreinvertir. Ideal para equipos ágiles que necesitan insights rápidos y accionables.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Just%20Enough%20Research.pdf',
+    coverUrl: '',
   },
   {
     id: 'libro-09',
@@ -70,6 +78,7 @@ export const LIBROS: Libro[] = [
     autor: 'Jon Yablonski',
     descripcion: 'Principios psicológicos aplicados al diseño de interfaces. Aprende cómo la mente humana procesa la información y cómo usarlo a tu favor al diseñar productos.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Laws%20of%20UX.pdf',
+    coverUrl: '',
   },
   {
     id: 'libro-10',
@@ -77,6 +86,7 @@ export const LIBROS: Libro[] = [
     autor: 'Cindy Alvarez',
     descripcion: 'Aprende a validar suposiciones de negocio antes de construir un producto. Una guía práctica para hacer entrevistas a usuarios y obtener insights reales que guíen el desarrollo de forma ágil.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Lean%20Customer%20Development.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Lean%20Customer%20Development.jpg',
   },
   {
     id: 'libro-11',
@@ -84,6 +94,7 @@ export const LIBROS: Libro[] = [
     autor: 'Tom Tullis & Bill Albert',
     descripcion: 'La referencia para medir UX con rigor: cómo recolectar, analizar e interpretar datos cuantitativos de usabilidad. Incluye métricas clave como SUPR-Q, SUS y Net Promoter Score aplicadas al diseño.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Measuring%20the%20User%20Experience.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Measuring%20the%20User%20Experience.jpg',
   },
   {
     id: 'libro-12',
@@ -91,6 +102,7 @@ export const LIBROS: Libro[] = [
     autor: 'Indi Young',
     descripcion: 'Cómo los usuarios forman representaciones mentales de los sistemas que usan, y cómo diseñar interfaces que se alineen con esos modelos. Esencial para crear productos que resulten intuitivos desde el primer uso.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Mental%20Models.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Mental%20Models.jpg',
   },
   {
     id: 'libro-13',
@@ -98,6 +110,7 @@ export const LIBROS: Libro[] = [
     autor: 'Richard H. Thaler',
     descripcion: 'Richard Thaler, Nobel de Economía, revela cómo el comportamiento humano real desafía la teoría económica clásica. Fundamental para entender los sesgos y decisiones irracionales de los usuarios.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Misbehaving.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Misbehaving.webp',
   },
   {
     id: 'libro-14',
@@ -105,6 +118,7 @@ export const LIBROS: Libro[] = [
     autor: 'Daniel Kahneman',
     descripcion: 'Daniel Kahneman explica los dos sistemas de pensamiento: el rápido e intuitivo (Sistema 1) y el lento y racional (Sistema 2). Esencial para entender sesgos cognitivos aplicados al diseño UX.',
     pdfUrl: '',
+    coverUrl: '',
   },
   {
     id: 'libro-15',
@@ -112,6 +126,7 @@ export const LIBROS: Libro[] = [
     autor: 'Donald Norman',
     descripcion: 'El clásico de Donald Norman que cambió el diseño para siempre. Aprende sobre affordances, mappings y la psicología detrás de por qué los objetos (y apps) son fáciles o frustrantes de usar.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Psicologia%20objetos%20cotidianos_.pdf',
+    coverUrl: '',
   },
   {
     id: 'libro-16',
@@ -119,6 +134,7 @@ export const LIBROS: Libro[] = [
     autor: 'Jeff Sauro & James R. Lewis',
     descripcion: 'Guía práctica para medir y cuantificar la experiencia de usuario con métodos estadísticos. Aprende a recopilar métricas de usabilidad, analizar datos y comunicar resultados con rigor científico.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Quantifying%20the%20User%20Experience.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Quantifying%20the%20User%20Experience.webp',
   },
   {
     id: 'libro-17',
@@ -126,6 +142,7 @@ export const LIBROS: Libro[] = [
     autor: 'Jake Knapp',
     descripcion: 'El método Google Ventures para resolver grandes problemas y probar nuevas ideas en solo cinco días. Una guía paso a paso para correr Design Sprints.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Sprint.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/Sprint.jpg',
   },
   {
     id: 'libro-18',
@@ -133,6 +150,7 @@ export const LIBROS: Libro[] = [
     autor: 'Rob Fitzpatrick',
     descripcion: 'El libro definitivo para aprender a hacer preguntas que obtengan respuestas honestas. Descubre cómo hablar con clientes sin que te digan lo que quieres escuchar.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/El%20Mom%20Test.pdf',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/El%20Mom%20Test.jpg',
   },
   {
     id: 'libro-19',
@@ -140,6 +158,7 @@ export const LIBROS: Libro[] = [
     autor: 'Leah Buley',
     descripcion: 'Manual de supervivencia para UX researchers y diseñadores que trabajan solos. Cómo priorizar, evangelizar UX y obtener resultados cuando eres el único defensor del usuario en tu organización.',
     pdfUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/81QroKJ3PhL._AC_UF350,350_QL50_.jpg',
   },
   {
     id: 'libro-20',
@@ -147,6 +166,7 @@ export const LIBROS: Libro[] = [
     autor: 'David Travis & Philip Hodgson',
     descripcion: 'Una guía completa para pensar y trabajar como investigador UX profesional. Cómo observar usuarios, influir en el diseño y comunicar hallazgos con impacto estratégico.',
     pdfUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/books/Think%20Like%20a%20UX%20Researcher.pdf',
+    coverUrl: '',
   },
   {
     id: 'libro-21',
@@ -154,6 +174,7 @@ export const LIBROS: Libro[] = [
     autor: 'Marc Stickdorn et al.',
     descripcion: 'La guía práctica definitiva del diseño de servicios. Cubre métodos, herramientas y casos reales para diseñar experiencias end-to-end centradas en el usuario.',
     pdfUrl: '',
+    coverUrl: '',
   },
   {
     id: 'libro-22',
@@ -161,5 +182,6 @@ export const LIBROS: Libro[] = [
     autor: 'Jeff Patton',
     descripcion: 'Jeff Patton presenta una técnica visual poderosa para mapear historias de usuario y construir mejores productos. Ideal para alinear equipos, priorizar features y mantener el foco en el usuario real.',
     pdfUrl: '',
+    coverUrl: 'https://dniubktmsjhpjhppqnzx.supabase.co/storage/v1/object/public/book-covers/User%20Story%20Mapping.webp',
   },
 ]
