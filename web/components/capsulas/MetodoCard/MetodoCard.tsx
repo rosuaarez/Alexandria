@@ -15,7 +15,7 @@ interface MetodoCardProps {
 export function MetodoCard({ metodo, onOpen }: MetodoCardProps) {
   return (
     <div
-      className="caps-card caps-card-metodo"
+      className="caps-card caps-card-metodo visible"
       onClick={() => onOpen(metodo)}
       role="button"
       tabIndex={0}

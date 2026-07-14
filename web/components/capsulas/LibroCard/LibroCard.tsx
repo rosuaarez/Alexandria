@@ -8,7 +8,7 @@ interface LibroCardProps {
 
 export function LibroCard({ libro }: LibroCardProps) {
   return (
-    <div className="caps-card caps-card-libro">
+    <div className="caps-card caps-card-libro visible">
       {/* Portada placeholder de color (Diferencia 7): se sustituye por <img>
           cuando se provean las imágenes reales. */}
       <div
