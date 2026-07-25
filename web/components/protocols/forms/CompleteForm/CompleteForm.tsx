@@ -7,10 +7,12 @@ import { QuestionList } from '@/components/protocols/QuestionList'
 import { FieldCommentIndicator } from '@/components/protocols/FieldCommentIndicator'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useFolderStore } from '@/lib/stores/useFolderStore'
+import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import type { FormProps } from '@/components/protocols/forms/types'
 import { asArray, asQuestions, asString } from '@/components/protocols/forms/utils'
 import docsStyles from './DocsSection.module.css'
 import methodStyles from './MethodologySection.module.css'
+import questionsStyles from './QuestionsSection.module.css'
 
 // Opciones fieles a los <select> del formulario completo del original.
 const METODO_OPTIONS = [
@@ -203,9 +205,10 @@ interface CompleteValues {
   herramientaPrueba: string
 }
 
-export function CompleteForm({ initialData, onChange }: FormProps) {
+export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
   const showToast = useUIStore((s) => s.showToast)
   const folders = useFolderStore((s) => s.folders)
+  const isGenerating = useCopilotStore((s) => s.isGenerating)
 
   // El template 'usabilidad' pre-selecciona método/herramientas y expande cuotas.
   const isUsabilidad = asString(initialData.template) === 'usabilidad'
@@ -281,9 +284,12 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
     asArray<string>(initialData.entregables)
   )
 
-  const [questions, setQuestions] = useState<Question[]>(
-    asQuestions(initialData.questions)
-  )
+  // Sin preguntas de ejemplo: si el protocolo ya trae preguntas guardadas se
+  // muestran esas; si no, se arranca con UNA sola pregunta vacía (tipo "Abierta").
+  const [questions, setQuestions] = useState<Question[]>(() => {
+    const saved = asQuestions(initialData.questions)
+    return saved.length > 0 ? saved : [{ id: 'q-1', text: '', type: 'open' }]
+  })
 
   // Emite el estado combinado (RHF + listas locales) al padre.
   const emit = (over?: Record<string, unknown>) => {
@@ -997,6 +1003,18 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
             />
           </div>
         </div>
+        {onGenerate && (
+          <div className={questionsStyles.generateRow}>
+            <button
+              type="button"
+              className={`btn btn-primary ${questionsStyles.generateBtn}`}
+              onClick={onGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? 'Generando…' : '✦ Generar protocolo'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

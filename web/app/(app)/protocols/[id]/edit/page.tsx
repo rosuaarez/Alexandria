@@ -418,7 +418,11 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
 
   // El formulario depende del TEMPLATE, no del tipo (Corrección 3).
   const renderForm = () => {
-    const formProps = { initialData: initial.data, onChange: handleFormChange }
+    const formProps = {
+      initialData: initial.data,
+      onChange: handleFormChange,
+      onGenerate: handleGenerate,
+    }
     if (COMPLETE_TEMPLATES.includes(templateKey)) return <CompleteForm {...formProps} />
     if (initial.type === 'presentation') return <PresentationForm {...formProps} />
     if (initial.type === 'complete' || initial.type === 'ab')

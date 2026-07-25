@@ -28,13 +28,13 @@
   border-radius: var(--radius-sm);
 }
 
-/* Número de pregunta en círculo púrpura sólido con texto blanco. */
+/* Número de pregunta como badge redondeado suave (lavanda). */
 .index {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  border-radius: var(--radius-sm);
+  background: var(--accent-lt);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,39 +46,57 @@
 .text {
   width: 100%;
   min-width: 0;
-  border: 1px solid var(--border-2);
+  border: 1.5px solid var(--border);
   background: var(--surface);
   color: var(--text-1);
   font-family: var(--font);
   font-size: 13.5px;
-  border-radius: 6px;
-  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.text:hover {
+  border-color: var(--border-2);
 }
 
 .text:focus {
-  outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-lt);
 }
 
 .text::placeholder {
   color: var(--text-4);
 }
 
+/* Select real con flecha chevron (misma del design system). */
 .typeSelect {
   width: 100%;
-  border: 1px solid var(--border-2);
-  background: var(--surface);
+  border: 1.5px solid var(--border);
+  background-color: var(--surface);
   color: var(--text-2);
-  border-radius: 6px;
-  padding: 7px 8px;
+  border-radius: var(--radius-sm);
+  padding: 8px 30px 8px 11px;
   font-family: var(--font);
   font-size: 12.5px;
   cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237C6FA0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px 14px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.typeSelect:hover {
+  border-color: var(--border-2);
 }
 
 .typeSelect:focus {
-  outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-lt);
 }
 
 .delete {
@@ -92,7 +110,7 @@
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 150ms ease, color 150ms ease;
 }
 
@@ -101,22 +119,23 @@
   color: var(--danger);
 }
 
-/* Botón "+ Agregar pregunta" debajo de la lista, alineado a la izquierda. */
+/* Botón "+ Agregar pregunta": borde punteado claro, colores del sistema. */
 .add {
   align-self: flex-start;
-  border: 1.5px dashed var(--accent);
+  border: 1.5px dashed var(--border-2);
   background: transparent;
-  color: var(--accent);
+  color: var(--text-3);
   border-radius: var(--radius-sm);
   padding: 8px 16px;
   font-family: var(--font);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .add:hover {
   background: var(--accent-lt);
   border-color: var(--accent);
+  color: var(--accent);
 }
