@@ -885,7 +885,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={EDAD_CUOTA_ROWS} defaultOpen={isUsabilidad} />
+            <CuotaField rows={EDAD_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>Género</label>
@@ -897,7 +897,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={GENERO_CUOTA_ROWS} defaultOpen={isUsabilidad} />
+            <CuotaField rows={GENERO_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>NSE</label>
@@ -909,7 +909,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={NSE_CUOTA_ROWS} defaultOpen={isUsabilidad} />
+            <CuotaField rows={NSE_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>Ocupación</label>
@@ -921,7 +921,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                 </option>
               ))}
             </select>
-            <CuotaField rows={OCUPACION_CUOTA_ROWS} defaultOpen={isUsabilidad} />
+            <CuotaField rows={OCUPACION_CUOTA_ROWS} />
           </div>
           <div className="form-group">
             <label>País</label>
