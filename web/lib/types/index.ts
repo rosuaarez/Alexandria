@@ -84,11 +84,28 @@ export type ProtocolType = Protocol['type'];
 export type ProtocolPlatform = Protocol['platform'];
 
 export type QuestionType =
+  // Grupo "Preguntas"
   | 'open'
+  | 'likert'
+  | 'multiple'
+  | 'yesno'
+  | 'abtest'
+  // Grupo "Tipos de sección Lyssna"
+  | 'prototype'
+  | 'instruction'
+  | 'first-click'
+  | 'five-second'
+  | 'survey'
+  | 'design-survey'
+  | 'preference'
+  | 'navigation'
+  | 'card-sort'
+  | 'tree-test'
+  | 'live-website'
+  // Valores heredados (plantillas/datos previos); no se ofrecen en el dropdown.
   | 'closed'
   | 'scale5'
   | 'scale7'
-  | 'multiple'
   | 'nps';
 
 export interface Question {

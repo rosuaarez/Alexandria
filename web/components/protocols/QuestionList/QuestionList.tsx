@@ -3,13 +3,45 @@
 import type { Question, QuestionType } from '@/lib/types'
 import styles from './QuestionList.module.css'
 
-const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
-  { value: 'open', label: 'Abierta' },
-  { value: 'closed', label: 'Cerrada' },
-  { value: 'scale5', label: 'Escala (1-5)' },
-  { value: 'scale7', label: 'Escala (1-7)' },
-  { value: 'multiple', label: 'Opción múltiple' },
-  { value: 'nps', label: 'NPS' },
+interface QuestionTypeOption {
+  value: QuestionType
+  label: string
+}
+
+interface QuestionTypeGroup {
+  label: string
+  options: QuestionTypeOption[]
+}
+
+// Opciones del dropdown agrupadas (headers no seleccionables vía <optgroup>).
+// El primer valor ('open' — Abierta) es el tipo por defecto.
+const QUESTION_TYPE_GROUPS: QuestionTypeGroup[] = [
+  {
+    label: 'Preguntas',
+    options: [
+      { value: 'open', label: 'Abierta' },
+      { value: 'likert', label: 'Likert' },
+      { value: 'multiple', label: 'Opción múltiple' },
+      { value: 'yesno', label: 'Sí / No' },
+      { value: 'abtest', label: 'A/B Test' },
+    ],
+  },
+  {
+    label: 'Tipos de sección Lyssna',
+    options: [
+      { value: 'prototype', label: 'Prototype test' },
+      { value: 'instruction', label: 'Instruction' },
+      { value: 'first-click', label: 'First click' },
+      { value: 'five-second', label: 'Five second test' },
+      { value: 'survey', label: 'Survey questions' },
+      { value: 'design-survey', label: 'Design survey' },
+      { value: 'preference', label: 'Preference test' },
+      { value: 'navigation', label: 'Navigation test' },
+      { value: 'card-sort', label: 'Card sort' },
+      { value: 'tree-test', label: 'Tree test' },
+      { value: 'live-website', label: 'Live website test' },
+    ],
+  },
 ]
 
 interface QuestionListProps {
@@ -56,10 +88,14 @@ export function QuestionList({ questions, onChange }: QuestionListProps) {
                 updateQuestion(q.id, { type: e.target.value as QuestionType })
               }
             >
-              {QUESTION_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
+              {QUESTION_TYPE_GROUPS.map((g) => (
+                <optgroup key={g.label} label={g.label}>
+                  {g.options.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
             <button
