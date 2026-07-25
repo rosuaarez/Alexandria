@@ -10,6 +10,7 @@ import { useFolderStore } from '@/lib/stores/useFolderStore'
 import type { FormProps } from '@/components/protocols/forms/types'
 import { asArray, asQuestions, asString } from '@/components/protocols/forms/utils'
 import docsStyles from './DocsSection.module.css'
+import methodStyles from './MethodologySection.module.css'
 
 // Opciones fieles a los <select> del formulario completo del original.
 const METODO_OPTIONS = [
@@ -730,7 +731,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
             <div className="card-subtitle">Método y configuración de la prueba</div>
           </div>
         </div>
-        <div className="form-grid">
+        <div className={`form-grid ${methodStyles.section}`}>
           <div className="form-group">
             <label>Método</label>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -744,8 +745,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
               </select>
               <button
                 type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: 12, flexShrink: 0 }}
+                className={methodStyles.editBtn}
                 onClick={() => showToast('Edición de metodologías próximamente', 'info')}
               >
                 Editar
@@ -766,35 +766,15 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
 
           <div className="form-group">
             <label>Herramientas</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+            <div className={methodStyles.chipsBox}>
               {herramientas.map((h) => (
-                <span
-                  key={h}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    background: 'var(--accent-lt)',
-                    color: 'var(--accent)',
-                    borderRadius: 999,
-                    padding: '3px 10px',
-                    fontSize: 12.5,
-                    fontWeight: 600,
-                  }}
-                >
+                <span key={h} className={methodStyles.chip}>
                   {h}
                   <button
                     type="button"
+                    className={methodStyles.chipRemove}
                     onClick={() => removeHerramienta(h)}
                     aria-label={`Quitar ${h}`}
-                    style={{
-                      border: 'none',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                      color: 'inherit',
-                      fontSize: 13,
-                      lineHeight: 1,
-                    }}
                   >
                     ×
                   </button>
@@ -802,6 +782,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
               ))}
               <input
                 type="text"
+                className={methodStyles.chipInput}
                 placeholder="+ Agregar herramienta"
                 value={herramientaInput}
                 onChange={(e) => setHerramientaInput(e.target.value)}
@@ -811,7 +792,6 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
                     addHerramienta(herramientaInput)
                   }
                 }}
-                style={{ flex: 1, minWidth: 140 }}
               />
             </div>
           </div>
@@ -855,23 +835,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
               }}
             >
               <label style={{ marginBottom: 0 }}>Razón del tamaño de la muestra</label>
-              <button
-                type="button"
-                onClick={handleSuggestSample}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: 'var(--accent)',
-                  background: 'var(--accent-lt)',
-                  border: '1px solid transparent',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '5px 10px',
-                  cursor: 'pointer',
-                }}
-              >
+              <button type="button" className={methodStyles.aiBtn} onClick={handleSuggestSample}>
                 ✦ Corregir con IA
               </button>
             </div>

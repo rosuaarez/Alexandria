@@ -1,0 +1,171 @@
+/* Sección "Metodología" — usa tokens de styles/globals.css.
+   Los campos se estilizan con selectores descendientes de .section para
+   ganar especificidad sobre las reglas globales de input[type=...] sin
+   tocar el grid/layout (form-grid / cols-3 se mantienen).
+   El dark mode se hereda vía tokens (body.dark-mode los redefine); solo
+   se añade un override donde el contraste lo requiere. */
+
+/* Campos: fondo lavanda suave, borde suave, radius medio, más padding.
+   Se usa background-color (no el shorthand) para no borrar la flecha
+   del <select> que define globals.css. */
+.section input,
+.section select,
+.section textarea {
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+
+.section input,
+.section textarea {
+  padding: 10px 13px;
+}
+
+/* Deja espacio para la flecha del design system a la derecha. */
+.section select {
+  padding: 10px 32px 10px 13px;
+}
+
+.section input:hover,
+.section select:hover,
+.section textarea:hover {
+  border-color: var(--border-2);
+}
+
+.section input:focus,
+.section select:focus,
+.section textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-lt);
+  background-color: var(--surface);
+}
+
+/* Herramientas: contenedor que se ve como un campo y contiene los chips
+   junto al input inline (sin borde propio). */
+.chipsBox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.chipsBox:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-lt);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 11px;
+  background-color: var(--accent-lt);
+  color: var(--accent);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.chipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .15s, background-color .15s;
+}
+
+.chipRemove:hover {
+  opacity: 1;
+  background-color: var(--accent);
+  color: var(--surface);
+}
+
+/* Input inline dentro del contenedor de chips: sin borde ni fondo propios.
+   Va después de las reglas de .section input para ganar el desempate. */
+.section .chipInput {
+  flex: 1;
+  min-width: 140px;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.section .chipInput:hover,
+.section .chipInput:focus {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Botón "Editar": outline suave con tokens del sistema. */
+.editBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background-color .15s;
+}
+
+.editBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: var(--accent-lt);
+}
+
+/* Botón "Corregir con IA": píldora lavanda suave con icono estrella. */
+.aiBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 13px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background-color: var(--accent-lt);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+
+.aiBtn:hover {
+  background-color: var(--accent);
+  color: var(--surface);
+}
+
+/* En dark mode, surface es oscuro y no contrasta sobre accent al hover:
+   se usa text-1 (claro) para mantener legible el texto. */
+:global(body.dark-mode) .aiBtn:hover,
+:global(body.dark-mode) .chipRemove:hover {
+  color: var(--text-1);
+}
