@@ -1,0 +1,99 @@
+/* Sección "Documentación adicional" — usa tokens de styles/globals.css.
+   El grid se comparte entre la fila de encabezados y las filas de inputs
+   para que las columnas queden alineadas. La columna del botón × es de
+   ancho fijo, de modo que los inputs no cambian de ancho entre filas. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 38px;
+  gap: 10px;
+  align-items: center;
+}
+
+.headerRow {
+  margin-bottom: 2px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 13px;
+  font-family: var(--font);
+  font-size: 13.5px;
+  color: var(--text-1);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  appearance: none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+.input::placeholder {
+  color: var(--text-4);
+}
+
+.input:hover {
+  border-color: var(--border-2);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-lt);
+  background: var(--surface);
+}
+
+.removeBtn {
+  width: 38px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 15px;
+  color: var(--text-3);
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+
+.removeBtn:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-lt);
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 9px 16px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: transparent;
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+
+.addBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-lt);
+}

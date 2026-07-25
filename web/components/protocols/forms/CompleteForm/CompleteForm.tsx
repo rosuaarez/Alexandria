@@ -9,6 +9,7 @@ import { useUIStore } from '@/lib/stores/useUIStore'
 import { useFolderStore } from '@/lib/stores/useFolderStore'
 import type { FormProps } from '@/components/protocols/forms/types'
 import { asArray, asQuestions, asString } from '@/components/protocols/forms/utils'
+import docsStyles from './DocsSection.module.css'
 
 // Opciones fieles a los <select> del formulario completo del original.
 const METODO_OPTIONS = [
@@ -679,12 +680,33 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
             <div className="card-subtitle">Documentos y enlaces de referencia</div>
           </div>
         </div>
-        <div className="list-container">
+        <div className={docsStyles.list}>
+          {/* Fila de encabezados: labels una sola vez, mismo grid que las filas. */}
+          <div className={`${docsStyles.grid} ${docsStyles.headerRow}`}>
+            <span className={docsStyles.label}>Documento</span>
+            <span className={docsStyles.label}>Link</span>
+            <span />
+          </div>
           {docs.fields.map((f, i) => (
-            <div key={f.id} className="list-item">
-              <input placeholder="Ej. Research plan" {...register(`docs.${i}.nombre` as const)} />
-              <input placeholder="https://..." {...register(`docs.${i}.link` as const)} />
-              <button type="button" onClick={() => docs.remove(i)} aria-label="Quitar">
+            <div key={f.id} className={docsStyles.grid}>
+              <input
+                type="text"
+                className={docsStyles.input}
+                placeholder="Ej. Research plan"
+                {...register(`docs.${i}.nombre` as const)}
+              />
+              <input
+                type="text"
+                className={docsStyles.input}
+                placeholder="https://..."
+                {...register(`docs.${i}.link` as const)}
+              />
+              <button
+                type="button"
+                className={docsStyles.removeBtn}
+                onClick={() => docs.remove(i)}
+                aria-label="Quitar"
+              >
                 ✕
               </button>
             </div>
@@ -692,7 +714,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         </div>
         <button
           type="button"
-          className="add-btn"
+          className={docsStyles.addBtn}
           onClick={() => docs.append({ nombre: '', link: '' })}
         >
           ＋ Agregar documento
