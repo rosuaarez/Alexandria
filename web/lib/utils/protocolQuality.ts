@@ -47,6 +47,9 @@ function textItems(v: unknown): string[] {
   return arr(v).map((x) => {
     if (typeof x === 'string') return x
     if (x && typeof x === 'object' && 'value' in (x as Rec)) return str((x as Rec).value)
+    // KPIs con formato { tipo, descripcion }.
+    if (x && typeof x === 'object' && ('tipo' in (x as Rec) || 'descripcion' in (x as Rec)))
+      return `${str((x as Rec).tipo)} ${str((x as Rec).descripcion)}`.trim()
     return ''
   })
 }

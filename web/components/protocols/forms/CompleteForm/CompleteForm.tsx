@@ -150,6 +150,10 @@ interface DocItem {
 interface TextItem {
   value: string
 }
+interface KpiItem {
+  tipo: string
+  descripcion: string
+}
 
 interface CompleteValues {
   // 1. Datos del proyecto
@@ -165,7 +169,7 @@ interface CompleteValues {
   // 4. Hipótesis
   hipotesis: string
   // 5. KPIs
-  kpis: TextItem[]
+  kpis: KpiItem[]
   // 6. Fechas
   fechaInicio: string
   fechaResultados: string
@@ -219,7 +223,15 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       objetivoGeneral: asString(initialData.objetivoGeneral),
       objetivos: asArray<TextItem>(initialData.objetivos),
       hipotesis: asString(initialData.hipotesis),
-      kpis: asArray<TextItem>(initialData.kpis),
+      // Al menos una fila de KPI por defecto; migra datos antiguos
+      // ({ value }) al nuevo formato ({ tipo, descripcion }).
+      kpis: (() => {
+        const k = asArray<Record<string, unknown>>(initialData.kpis).map((item) => ({
+          tipo: asString(item.tipo),
+          descripcion: asString(item.descripcion) || asString(item.value),
+        }))
+        return k.length > 0 ? k : [{ tipo: '', descripcion: '' }]
+      })(),
       fechaInicio: asString(initialData.fechaInicio),
       fechaResultados: asString(initialData.fechaResultados),
       // Al menos una fila de documentación por defecto (con placeholders).
@@ -486,15 +498,89 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
         </div>
         <div className="list-container">
           {kpis.fields.map((f, i) => (
-            <div key={f.id} className="list-item">
-              <input placeholder="KPI..." {...register(`kpis.${i}.value` as const)} />
-              <button type="button" onClick={() => kpis.remove(i)} aria-label="Quitar">
+            <div
+              key={f.id}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr auto',
+                gap: '12px',
+                alignItems: 'center',
+                marginBottom: '8px',
+              }}
+            >
+              <div className="form-group" style={{ margin: 0 }}>
+                <label
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text-3)',
+                    fontWeight: 600,
+                    marginBottom: '4px',
+                  }}
+                >
+                  KPI
+                </label>
+                <select {...register(`kpis.${i}.tipo` as const)}>
+                  <option value="">Seleccionar KPI...</option>
+                  <option>Tasa de completación de tarea</option>
+                  <option>Tasa de error</option>
+                  <option>Tiempo en tarea</option>
+                  <option>Tasa de éxito</option>
+                  <option>NPS (Net Promoter Score)</option>
+                  <option>CSAT (Satisfacción del cliente)</option>
+                  <option>SUS (System Usability Scale)</option>
+                  <option>CES (Customer Effort Score)</option>
+                  <option>Tasa de abandono</option>
+                  <option>Tiempo de primer uso exitoso</option>
+                  <option>Tasa de retención</option>
+                  <option>Tasa de conversión</option>
+                  <option>Número de clics hasta completar tarea</option>
+                  <option>Tasa de uso de función</option>
+                  <option>Otro (especificar)</option>
+                </select>
+              </div>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text-3)',
+                    fontWeight: 600,
+                    marginBottom: '4px',
+                  }}
+                >
+                  ¿Qué se medirá?
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej. % usuarios que completan el flujo"
+                  {...register(`kpis.${i}.descripcion` as const)}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => kpis.remove(i)}
+                aria-label="Quitar"
+                style={{
+                  background: 'none',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  padding: '6px 8px',
+                  cursor: 'pointer',
+                  color: 'var(--text-3)',
+                  marginTop: '20px',
+                }}
+              >
                 ✕
               </button>
             </div>
           ))}
         </div>
-        <button type="button" className="add-btn" onClick={() => kpis.append({ value: '' })}>
+        <button
+          type="button"
+          className="add-btn"
+          onClick={() => kpis.append({ tipo: '', descripcion: '' })}
+        >
           ＋ Agregar KPI
         </button>
       </div>
