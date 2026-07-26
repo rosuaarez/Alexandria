@@ -44,10 +44,6 @@
   transition: background .15s, border-color .15s, color .15s, opacity .15s;
 }
 
-.step:disabled {
-  cursor: not-allowed;
-}
-
 .stepIcon {
   font-size: 14px;
   line-height: 1;
@@ -60,7 +56,7 @@
   color: var(--surface);
 }
 
-.stepPrimary:hover:not(:disabled) {
+.stepPrimary:hover {
   background: var(--accent-hv);
 }
 
@@ -69,7 +65,7 @@
   color: var(--surface);
 }
 
-.stepDark:hover:not(:disabled) {
+.stepDark:hover {
   opacity: .9;
 }
 
@@ -78,35 +74,19 @@
   color: var(--surface);
 }
 
-.stepApprove:hover:not(:disabled) {
+.stepApprove:hover {
   opacity: .9;
 }
 
-/* Deshabilitado neutro (gris apagado) para pasos de estado no disponibles. */
-.stepPrimary:disabled,
-.stepDark:disabled,
-.stepApprove:disabled {
-  background: var(--surface-2);
-  color: var(--text-4);
-  border-color: var(--border);
-}
-
-/* Lyssna: variante rosa; deshabilitado = rosa apagado. */
+/* Lyssna: variante rosa. */
 .stepLyssna {
   background: var(--danger-lt);
   color: var(--danger);
   border-color: var(--danger-lt);
 }
 
-.stepLyssna:hover:not(:disabled) {
+.stepLyssna:hover {
   opacity: .9;
-}
-
-.stepLyssna:disabled {
-  background: var(--danger-lt);
-  color: var(--text-4);
-  border-color: transparent;
-  opacity: .7;
 }
 
 /* Presentación: estilo texto/link primary. */
@@ -116,16 +96,12 @@
   border-color: transparent;
 }
 
-.stepLink:hover:not(:disabled) {
+.stepLink:hover {
   background: var(--accent-lt);
 }
 
-.stepLink:disabled {
-  color: var(--text-4);
-}
-
-:global(body.dark-mode) .stepPrimary:not(:disabled),
-:global(body.dark-mode) .stepDark:not(:disabled),
-:global(body.dark-mode) .stepApprove:not(:disabled) {
+:global(body.dark-mode) .stepPrimary,
+:global(body.dark-mode) .stepDark,
+:global(body.dark-mode) .stepApprove {
   color: var(--text-1);
 }

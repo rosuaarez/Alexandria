@@ -395,8 +395,6 @@ export default function ProtocolOutputPage() {
 
       {/* Pipeline de acciones (componente reutilizable) */}
       <ActionPipeline
-        status={status}
-        hasTestUrl={asString(data.testUrl) !== ''}
         onChangeStatus={changeStatus}
         onLyssna={handleLyssna}
         onPdf={() => window.print()}

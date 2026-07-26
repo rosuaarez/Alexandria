@@ -45,26 +45,7 @@ const variantClass: Record<PipeVariant, string> = {
   link: styles.stepLink,
 }
 
-// Disabled reales según el estado del protocolo:
-// - Enviar a revisión: solo desde borrador / cambios solicitados.
-// - Aprobar: solo cuando está en revisión.
-// - Listo para ejecutar: hasta que ya esté listo o completado.
-function isStatusStepDisabled(target: ProtocolStatus, status: ProtocolStatus): boolean {
-  switch (target) {
-    case 'in-review':
-      return status !== 'draft' && status !== 'changes_requested'
-    case 'approved':
-      return status !== 'in-review'
-    case 'ready':
-      return status === 'ready' || status === 'completed'
-    default:
-      return true
-  }
-}
-
 export interface ActionPipelineProps {
-  status: ProtocolStatus
-  hasTestUrl: boolean
   onChangeStatus: (status: ProtocolStatus) => void
   onLyssna: () => void
   onPdf: () => void
@@ -72,20 +53,13 @@ export interface ActionPipelineProps {
 }
 
 export function ActionPipeline({
-  status,
-  hasTestUrl,
   onChangeStatus,
   onLyssna,
   onPdf,
   onPresentation,
 }: ActionPipelineProps) {
-  const isStepDisabled = (step: PipeStep): boolean => {
-    if (step.kind === 'status') return isStatusStepDisabled(step.target, status)
-    // Lyssna requiere link de prueba; PDF y Presentación siempre disponibles.
-    if (step.action === 'lyssna') return !hasTestUrl
-    return false
-  }
-
+  // Todos los pasos están siempre activos: cada clic ejecuta su acción o
+  // cambia el estado del protocolo (sin flujo por pasos).
   const runStep = (step: PipeStep) => {
     if (step.kind === 'status') {
       onChangeStatus(step.target)
@@ -100,7 +74,6 @@ export function ActionPipeline({
     <button
       type="button"
       className={`${styles.step} ${variantClass[step.variant]}`}
-      disabled={isStepDisabled(step)}
       onClick={() => runStep(step)}
     >
       <span className={styles.stepIcon} aria-hidden>
