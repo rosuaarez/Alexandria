@@ -11,12 +11,56 @@ import styles from './output.module.css'
 
 type Rec = Record<string, unknown>
 
-const STATUS_OPTIONS: { value: ProtocolStatus; label: string }[] = [
-  { value: 'draft', label: 'Borrador' },
-  { value: 'in-review', label: 'En revisión' },
-  { value: 'approved', label: 'Aprobado' },
-  { value: 'ready', label: 'Listo para ejecutar' },
-  { value: 'completed', label: 'Completado' },
+const STATUS_OPTIONS: { value: ProtocolStatus; label: string; emoji: string }[] = [
+  { value: 'draft', label: 'Borrador', emoji: '📝' },
+  { value: 'in-review', label: 'En revisión', emoji: '👀' },
+  { value: 'approved', label: 'Aprobado', emoji: '✅' },
+  { value: 'ready', label: 'Listo para ejecutar', emoji: '🚀' },
+  { value: 'completed', label: 'Completado', emoji: '🎉' },
+]
+
+// Orden del flujo de estados; un paso solo se habilita si su destino es el
+// estado inmediatamente siguiente al actual.
+const STATUS_FLOW: ProtocolStatus[] = [
+  'draft',
+  'in-review',
+  'approved',
+  'ready',
+  'completed',
+]
+
+type PipeVariant = 'primary' | 'approve' | 'dark' | 'lyssna' | 'link'
+
+// Paso del pipeline: emoji/estilo van como data tipada (no sueltos en el JSX).
+// 'status' transiciona el protocolo; 'action' ejecuta una acción sin cambiarlo.
+type PipeStep =
+  | {
+      kind: 'status'
+      key: string
+      label: string
+      icon: string
+      variant: PipeVariant
+      target: ProtocolStatus
+    }
+  | {
+      kind: 'action'
+      key: string
+      label: string
+      icon: string
+      variant: PipeVariant
+      action: 'lyssna' | 'pdf' | 'presentation'
+    }
+
+const FLOW_STEPS: PipeStep[] = [
+  { kind: 'status', key: 'review', label: 'Enviar a revisión', icon: '✉️', variant: 'primary', target: 'in-review' },
+  { kind: 'status', key: 'approve', label: 'Aprobar', icon: '✅', variant: 'approve', target: 'approved' },
+  { kind: 'status', key: 'ready', label: 'Listo para ejecutar', icon: '🚀', variant: 'primary', target: 'ready' },
+  { kind: 'action', key: 'lyssna', label: 'Lyssna', icon: '🧊', variant: 'lyssna', action: 'lyssna' },
+]
+
+const EXPORT_STEPS: PipeStep[] = [
+  { kind: 'action', key: 'pdf', label: 'PDF', icon: '📄', variant: 'dark', action: 'pdf' },
+  { kind: 'action', key: 'presentation', label: 'Presentación', icon: '🎨', variant: 'link', action: 'presentation' },
 ]
 
 interface OutputField {
@@ -224,6 +268,50 @@ export default function ProtocolOutputPage() {
   const handlePresentation = () =>
     showToast('La presentación llega en un próximo sprint', 'info')
 
+  const variantClass: Record<PipeVariant, string> = {
+    primary: styles.stepPrimary,
+    approve: styles.stepApprove,
+    dark: styles.stepDark,
+    lyssna: styles.stepLyssna,
+    link: styles.stepLink,
+  }
+
+  // Habilitado solo si el destino es el estado inmediatamente siguiente.
+  const currentIdx = STATUS_FLOW.indexOf(status)
+  const isStepDisabled = (step: PipeStep): boolean => {
+    if (step.kind === 'status') {
+      const targetIdx = STATUS_FLOW.indexOf(step.target)
+      return currentIdx < 0 || targetIdx !== currentIdx + 1
+    }
+    // Lyssna requiere link de prueba; PDF y Presentación siempre disponibles.
+    if (step.action === 'lyssna') return asString(data.testUrl) === ''
+    return false
+  }
+
+  const runStep = (step: PipeStep) => {
+    if (step.kind === 'status') {
+      changeStatus(step.target)
+      return
+    }
+    if (step.action === 'lyssna') handleLyssna()
+    else if (step.action === 'pdf') window.print()
+    else handlePresentation()
+  }
+
+  const renderStep = (step: PipeStep) => (
+    <button
+      type="button"
+      className={`${styles.step} ${variantClass[step.variant]}`}
+      disabled={isStepDisabled(step)}
+      onClick={() => runStep(step)}
+    >
+      <span className={styles.stepIcon} aria-hidden>
+        {step.icon}
+      </span>
+      {step.label}
+    </button>
+  )
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -244,6 +332,9 @@ export default function ProtocolOutputPage() {
             onClick={() => setStatusMenuOpen((v) => !v)}
           >
             <span className={styles.statusDot} aria-hidden />
+            <span className={styles.statusEmoji} aria-hidden>
+              {currentStatus.emoji}
+            </span>
             <span>{currentStatus.label}</span>
             <span className={styles.statusChevron} aria-hidden>
               ▾
@@ -279,55 +370,21 @@ export default function ProtocolOutputPage() {
       {/* Pipeline de acciones */}
       <div className={styles.pipeline}>
         <div className={styles.pipeFlow}>
-          <button
-            type="button"
-            className={`${styles.pipeBtn}${status === 'in-review' ? ` ${styles.pipeBtnActive}` : ''}`}
-            onClick={() => changeStatus('in-review')}
-          >
-            Enviar a revisión
-          </button>
-          <span className={styles.pipeArrow} aria-hidden>
-            →
-          </span>
-          <button
-            type="button"
-            className={`${styles.pipeBtn}${status === 'approved' ? ` ${styles.pipeBtnActive}` : ''}`}
-            onClick={() => changeStatus('approved')}
-          >
-            Aprobar
-          </button>
-          <span className={styles.pipeArrow} aria-hidden>
-            →
-          </span>
-          <button
-            type="button"
-            className={`${styles.pipeBtn}${status === 'ready' ? ` ${styles.pipeBtnActive}` : ''}`}
-            onClick={() => changeStatus('ready')}
-          >
-            Listo para ejecutar
-          </button>
-          <span className={styles.pipeArrow} aria-hidden>
-            →
-          </span>
-          <button type="button" className={styles.pipeBtn} onClick={handleLyssna}>
-            Lyssna
-          </button>
+          {FLOW_STEPS.map((step, i) => (
+            <div key={step.key} className={styles.pipeStepWrap}>
+              {i > 0 && (
+                <span className={styles.pipeSep} aria-hidden>
+                  ›
+                </span>
+              )}
+              {renderStep(step)}
+            </div>
+          ))}
         </div>
         <div className={styles.pipeExports}>
-          <button
-            type="button"
-            className={styles.pipeBtn}
-            onClick={() => window.print()}
-          >
-            🖨 PDF
-          </button>
-          <button
-            type="button"
-            className={styles.pipeBtn}
-            onClick={handlePresentation}
-          >
-            Presentación
-          </button>
+          {EXPORT_STEPS.map((step) => (
+            <span key={step.key}>{renderStep(step)}</span>
+          ))}
         </div>
       </div>
 
