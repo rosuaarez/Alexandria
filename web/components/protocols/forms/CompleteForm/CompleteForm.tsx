@@ -10,6 +10,7 @@ import { useFolderStore } from '@/lib/stores/useFolderStore'
 import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import type { FormProps } from '@/components/protocols/forms/types'
 import { asArray, asQuestions, asString } from '@/components/protocols/forms/utils'
+import teamStyles from './TeamSection.module.css'
 import docsStyles from './DocsSection.module.css'
 import methodStyles from './MethodologySection.module.css'
 import questionsStyles from './QuestionsSection.module.css'
@@ -25,19 +26,22 @@ const METODO_OPTIONS = [
   'Eye Tracking',
   'Think Aloud',
 ]
-const ROL_INVESTIGACION_OPTIONS = [
-  'Investigador principal',
-  'Investigador de apoyo',
-  'Facilitador',
-  'Observador',
-  'Note-taker',
+const ROL_INVESTIGACION_OPTIONS: readonly string[] = [
+  'UX Research',
+  'UX Writer',
+  'UX Designer',
+  'Product Designer',
+  'Customer Success',
+  'Product Owner',
+  'Project Manager',
 ]
-const ROL_PDU_OPTIONS = [
-  'Líder de producto',
-  'Diseñador',
-  'Desarrollador',
+const ROL_PDU_OPTIONS: readonly string[] = [
   'Stakeholder',
-  'QA',
+  'Moderador',
+  'Observador',
+  'Documentador',
+  'Operador técnico',
+  'Reclutador',
 ]
 const ENTREGABLE_OPTIONS = [
   'Reporte de hallazgos',
@@ -399,11 +403,25 @@ export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
             <div className="card-subtitle">Equipo involucrado en el estudio</div>
           </div>
         </div>
-        <div className="list-container">
+        <div className={teamStyles.list}>
+          {/* Fila de encabezados: labels una sola vez, mismo grid que las filas. */}
+          <div className={`${teamStyles.grid} ${teamStyles.headerRow}`}>
+            <span className={teamStyles.label}>Nombre</span>
+            <span className={teamStyles.label}>Rol de investigación</span>
+            <span className={teamStyles.label}>Rol en PDU</span>
+            <span />
+          </div>
           {team.fields.map((f, i) => (
-            <div key={f.id} className="list-item">
-              <input placeholder="Ej. Ana García" {...register(`team.${i}.name` as const)} />
-              <select {...register(`team.${i}.rolInvestigacion` as const)}>
+            <div key={f.id} className={teamStyles.grid}>
+              <input
+                className={teamStyles.field}
+                placeholder="Ej. Ana García"
+                {...register(`team.${i}.name` as const)}
+              />
+              <select
+                className={`${teamStyles.field} ${teamStyles.select}`}
+                {...register(`team.${i}.rolInvestigacion` as const)}
+              >
                 <option value="">Seleccionar...</option>
                 {ROL_INVESTIGACION_OPTIONS.map((r) => (
                   <option key={r} value={r}>
@@ -411,7 +429,10 @@ export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
                   </option>
                 ))}
               </select>
-              <select {...register(`team.${i}.rolPdu` as const)}>
+              <select
+                className={`${teamStyles.field} ${teamStyles.select}`}
+                {...register(`team.${i}.rolPdu` as const)}
+              >
                 <option value="">Seleccionar...</option>
                 {ROL_PDU_OPTIONS.map((r) => (
                   <option key={r} value={r}>
@@ -419,7 +440,12 @@ export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
                   </option>
                 ))}
               </select>
-              <button type="button" onClick={() => team.remove(i)} aria-label="Quitar miembro">
+              <button
+                type="button"
+                className={teamStyles.removeBtn}
+                onClick={() => team.remove(i)}
+                aria-label="Quitar miembro"
+              >
                 ✕
               </button>
             </div>
@@ -427,7 +453,7 @@ export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
         </div>
         <button
           type="button"
-          className="add-btn"
+          className={teamStyles.addBtn}
           onClick={() => team.append({ name: '', rolInvestigacion: '', rolPdu: '' })}
         >
           ＋ Agregar miembro

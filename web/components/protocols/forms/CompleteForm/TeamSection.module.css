@@ -1,0 +1,113 @@
+/* Sección "Team y stakeholders" — usa tokens de styles/globals.css.
+   El grid se comparte entre la fila de encabezados y las filas de datos
+   para que las columnas queden alineadas. La columna del botón × es de
+   ancho fijo, de modo que los campos no cambian de ancho entre filas. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 38px;
+  gap: 10px;
+  align-items: center;
+}
+
+.headerRow {
+  margin-bottom: 2px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+/* Campos: fondo lavanda suave, borde suave, radius medio, más padding. */
+.field {
+  width: 100%;
+  padding: 10px 13px;
+  font-family: var(--font);
+  font-size: 13.5px;
+  color: var(--text-1);
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+
+.field::placeholder {
+  color: var(--text-4);
+}
+
+.field:hover {
+  border-color: var(--border-2);
+}
+
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-lt);
+  background-color: var(--surface);
+}
+
+/* Select: quita la flecha nativa y usa el chevron del design system, con
+   espacio a la derecha. background-color (no shorthand) para no borrarlo. */
+.select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237C6FA0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px 14px;
+}
+
+/* Botón × cuadrado, misma altura que los campos; hover danger. */
+.removeBtn {
+  width: 38px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 15px;
+  color: var(--text-3);
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+
+.removeBtn:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-lt);
+}
+
+/* Botón "Agregar miembro": borde punteado claro, colores del sistema. */
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 9px 16px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: transparent;
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+
+.addBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-lt);
+}
