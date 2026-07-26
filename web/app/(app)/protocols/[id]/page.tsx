@@ -9,6 +9,7 @@ import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { asArray, asString } from '@/components/protocols/forms/utils'
 import { ActionPipeline } from '@/components/protocols/ActionPipeline'
+import { printProtocolPdf } from '@/lib/pdf/protocolPdf'
 import styles from './output.module.css'
 
 type Rec = Record<string, unknown>
@@ -335,6 +336,11 @@ export default function ProtocolOutputPage() {
   const handlePresentation = () =>
     showToast('La presentación llega en un próximo sprint', 'info')
 
+  const handlePdf = () => {
+    const ok = printProtocolPdf(protocol)
+    if (!ok) showToast('Permite ventanas emergentes para exportar el PDF', 'info')
+  }
+
   return (
     <div className={styles.page}>
       {/* Banner de estado */}
@@ -397,7 +403,7 @@ export default function ProtocolOutputPage() {
       <ActionPipeline
         onChangeStatus={changeStatus}
         onLyssna={handleLyssna}
-        onPdf={() => window.print()}
+        onPdf={handlePdf}
         onPresentation={handlePresentation}
       />
 
