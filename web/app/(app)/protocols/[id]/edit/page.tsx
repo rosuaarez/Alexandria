@@ -188,7 +188,6 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   const createProtocol = useProtocolStore((s) => s.createProtocol)
   const updateProtocol = useProtocolStore((s) => s.updateProtocol)
   const showToast = useUIStore((s) => s.showToast)
-  const generateProtocol = useCopilotStore((s) => s.generateProtocol)
   const isGenerating = useCopilotStore((s) => s.isGenerating)
   const setCurrentProtocol = useCopilotStore((s) => s.setCurrentProtocol)
   const setCopilotOpen = useCopilotStore((s) => s.setOpen)
@@ -371,18 +370,13 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
   }, [])
 
   const handleGenerate = async () => {
-    // 1. Guardar primero
+    // Render directo de los datos guardados: se persiste el protocolo y se
+    // navega a la vista de Resultados. NO depende de Gemini (la vista lee
+    // protocol.data), así funciona con NEXT_PUBLIC_USE_REAL_GEMINI=false.
     const savedId = await persist()
     if (!savedId) return
-    const fresh = useProtocolStore.getState().getProtocolById(savedId)
-    if (!fresh) return
-    // 2. Generar con IA (el store maneja el estado de carga global)
-    const result = await generateProtocol(fresh)
-    if (result) {
-      showToast('Protocolo generado con IA ✨', 'success')
-      // 3. Ir a la vista de Output (accesible también desde el sidebar).
-      router.push(`/protocols/${savedId}`)
-    }
+    showToast('Protocolo listo ✨', 'success')
+    router.push(`/protocols/${savedId}`)
   }
 
   const handleStatusChange = async (value: ProtocolStatus) => {

@@ -23,55 +23,187 @@
 
 .title {
   color: var(--text-1);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   margin: 0;
 }
 
-.editBtn {
+/* Selector de estado (tokens; dark-safe). */
+.statusWrap {
+  position: relative;
   flex: 0 0 auto;
-  border: 1px solid var(--border-2);
-  background: var(--surface);
-  color: var(--text-1);
-  border-radius: 8px;
-  padding: 9px 18px;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
 }
 
-.editBtn:hover {
+.statusBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+
+.statusBtn:hover {
+  border-color: var(--border-2);
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.statusChevron {
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.statusMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.statusOpt {
+  text-align: left;
+  padding: 8px 10px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.statusOpt:hover {
   background: var(--surface-2);
 }
 
-.placeholder {
+.statusOptActive {
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Pipeline de acciones: flujo de estado + exportaciones. */
+.pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pipeFlow,
+.pipeExports {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pipeArrow {
+  color: var(--text-4);
+  font-size: 14px;
+}
+
+.pipeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.pipeBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-lt);
+}
+
+/* Paso activo del flujo (estado actual del protocolo). */
+.pipeBtnActive {
+  background: var(--accent-lt);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Secciones de datos guardados. */
+.sections {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  padding: 70px 20px;
-  border: 1px dashed var(--border-2);
-  border-radius: 12px;
+  gap: 16px;
+}
+
+.section {
   background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
 }
 
-.icon {
-  font-size: 38px;
-}
-
-.phTitle {
-  color: var(--text-1);
-  font-size: 18px;
+/* Header de sección con underline verde. */
+.sectionTitle {
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  font-size: 15px;
   font-weight: 700;
-  margin: 0;
+  color: var(--text-1);
+  border-bottom: 2px solid var(--success);
 }
 
-.phText {
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-3);
-  font-size: 14px;
-  max-width: 440px;
-  margin: 0;
+}
+
+.fieldValue {
+  font-size: 13.5px;
+  color: var(--text-1);
+  line-height: 1.5;
+  white-space: pre-line;
+  word-break: break-word;
 }
 
 .empty {
