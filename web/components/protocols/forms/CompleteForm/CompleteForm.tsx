@@ -7,13 +7,11 @@ import { QuestionList } from '@/components/protocols/QuestionList'
 import { FieldCommentIndicator } from '@/components/protocols/FieldCommentIndicator'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useFolderStore } from '@/lib/stores/useFolderStore'
-import { useCopilotStore } from '@/lib/stores/useCopilotStore'
 import type { FormProps } from '@/components/protocols/forms/types'
 import { asArray, asQuestions, asString } from '@/components/protocols/forms/utils'
 import teamStyles from './TeamSection.module.css'
 import docsStyles from './DocsSection.module.css'
 import methodStyles from './MethodologySection.module.css'
-import questionsStyles from './QuestionsSection.module.css'
 
 // Opciones fieles a los <select> del formulario completo del original.
 const METODO_OPTIONS = [
@@ -209,10 +207,9 @@ interface CompleteValues {
   herramientaPrueba: string
 }
 
-export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
+export function CompleteForm({ initialData, onChange }: FormProps) {
   const showToast = useUIStore((s) => s.showToast)
   const folders = useFolderStore((s) => s.folders)
-  const isGenerating = useCopilotStore((s) => s.isGenerating)
 
   // El template 'usabilidad' pre-selecciona método/herramientas y expande cuotas.
   const isUsabilidad = asString(initialData.template) === 'usabilidad'
@@ -1029,18 +1026,6 @@ export function CompleteForm({ initialData, onChange, onGenerate }: FormProps) {
             />
           </div>
         </div>
-        {onGenerate && (
-          <div className={questionsStyles.generateRow}>
-            <button
-              type="button"
-              className={`btn btn-primary ${questionsStyles.generateBtn}`}
-              onClick={onGenerate}
-              disabled={isGenerating}
-            >
-              {isGenerating ? 'Generando…' : '✦ Generar protocolo'}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )

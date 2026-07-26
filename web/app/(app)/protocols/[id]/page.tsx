@@ -8,6 +8,7 @@ import type { ProtocolStatus } from '@/lib/types'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { asArray, asString } from '@/components/protocols/forms/utils'
+import { ActionPipeline } from '@/components/protocols/ActionPipeline'
 import styles from './output.module.css'
 
 type Rec = Record<string, unknown>
@@ -32,50 +33,6 @@ const STATUS_OPTIONS: { value: ProtocolStatus; label: string; emoji: string }[] 
   { value: 'approved', label: 'Aprobado', emoji: '✅' },
   { value: 'ready', label: 'Listo para ejecutar', emoji: '🚀' },
   { value: 'completed', label: 'Completado', emoji: '🎉' },
-]
-
-// Orden del flujo de estados; un paso solo se habilita si su destino es el
-// estado inmediatamente siguiente al actual.
-const STATUS_FLOW: ProtocolStatus[] = [
-  'draft',
-  'in-review',
-  'approved',
-  'ready',
-  'completed',
-]
-
-type PipeVariant = 'primary' | 'approve' | 'dark' | 'lyssna' | 'link'
-
-// Paso del pipeline: emoji/estilo van como data tipada (no sueltos en el JSX).
-// 'status' transiciona el protocolo; 'action' ejecuta una acción sin cambiarlo.
-type PipeStep =
-  | {
-      kind: 'status'
-      key: string
-      label: string
-      icon: string
-      variant: PipeVariant
-      target: ProtocolStatus
-    }
-  | {
-      kind: 'action'
-      key: string
-      label: string
-      icon: string
-      variant: PipeVariant
-      action: 'lyssna' | 'pdf' | 'presentation'
-    }
-
-const FLOW_STEPS: PipeStep[] = [
-  { kind: 'status', key: 'review', label: 'Enviar a revisión', icon: '✉️', variant: 'primary', target: 'in-review' },
-  { kind: 'status', key: 'approve', label: 'Aprobar', icon: '✅', variant: 'approve', target: 'approved' },
-  { kind: 'status', key: 'ready', label: 'Listo para ejecutar', icon: '🚀', variant: 'primary', target: 'ready' },
-  { kind: 'action', key: 'lyssna', label: 'Lyssna', icon: '🧊', variant: 'lyssna', action: 'lyssna' },
-]
-
-const EXPORT_STEPS: PipeStep[] = [
-  { kind: 'action', key: 'pdf', label: 'PDF', icon: '📄', variant: 'dark', action: 'pdf' },
-  { kind: 'action', key: 'presentation', label: 'Presentación', icon: '🎨', variant: 'link', action: 'presentation' },
 ]
 
 // --- Campos (label MAYÚSCULAS + valor). Los vacíos se descartan. ---
@@ -378,50 +335,6 @@ export default function ProtocolOutputPage() {
   const handlePresentation = () =>
     showToast('La presentación llega en un próximo sprint', 'info')
 
-  const variantClass: Record<PipeVariant, string> = {
-    primary: styles.stepPrimary,
-    approve: styles.stepApprove,
-    dark: styles.stepDark,
-    lyssna: styles.stepLyssna,
-    link: styles.stepLink,
-  }
-
-  // Habilitado solo si el destino es el estado inmediatamente siguiente.
-  const currentIdx = STATUS_FLOW.indexOf(status)
-  const isStepDisabled = (step: PipeStep): boolean => {
-    if (step.kind === 'status') {
-      const targetIdx = STATUS_FLOW.indexOf(step.target)
-      return currentIdx < 0 || targetIdx !== currentIdx + 1
-    }
-    // Lyssna requiere link de prueba; PDF y Presentación siempre disponibles.
-    if (step.action === 'lyssna') return asString(data.testUrl) === ''
-    return false
-  }
-
-  const runStep = (step: PipeStep) => {
-    if (step.kind === 'status') {
-      changeStatus(step.target)
-      return
-    }
-    if (step.action === 'lyssna') handleLyssna()
-    else if (step.action === 'pdf') window.print()
-    else handlePresentation()
-  }
-
-  const renderStep = (step: PipeStep) => (
-    <button
-      type="button"
-      className={`${styles.step} ${variantClass[step.variant]}`}
-      disabled={isStepDisabled(step)}
-      onClick={() => runStep(step)}
-    >
-      <span className={styles.stepIcon} aria-hidden>
-        {step.icon}
-      </span>
-      {step.label}
-    </button>
-  )
-
   return (
     <div className={styles.page}>
       {/* Banner de estado */}
@@ -480,26 +393,15 @@ export default function ProtocolOutputPage() {
         <span className="editor-tab active">Resultados</span>
       </div>
 
-      {/* Pipeline de acciones */}
-      <div className={styles.pipeline}>
-        <div className={styles.pipeFlow}>
-          {FLOW_STEPS.map((step, i) => (
-            <div key={step.key} className={styles.pipeStepWrap}>
-              {i > 0 && (
-                <span className={styles.pipeSep} aria-hidden>
-                  ›
-                </span>
-              )}
-              {renderStep(step)}
-            </div>
-          ))}
-        </div>
-        <div className={styles.pipeExports}>
-          {EXPORT_STEPS.map((step) => (
-            <span key={step.key}>{renderStep(step)}</span>
-          ))}
-        </div>
-      </div>
+      {/* Pipeline de acciones (componente reutilizable) */}
+      <ActionPipeline
+        status={status}
+        hasTestUrl={asString(data.testUrl) !== ''}
+        onChangeStatus={changeStatus}
+        onLyssna={handleLyssna}
+        onPdf={() => window.print()}
+        onPresentation={handlePresentation}
+      />
 
       {/* Tarjetas agrupadas (solo las que tienen contenido) */}
       {!anyContent ? (

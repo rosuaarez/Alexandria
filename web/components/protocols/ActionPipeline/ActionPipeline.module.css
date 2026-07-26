@@ -1,0 +1,131 @@
+/* Pipeline de acciones reutilizable. Usa tokens de styles/globals.css. */
+
+.pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pipeFlow,
+.pipeExports {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pipeStepWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Separador entre pasos: chevron tenue. */
+.pipeSep {
+  color: var(--text-4);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Botón base del pipeline; el color lo aporta la variante. */
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, opacity .15s;
+}
+
+.step:disabled {
+  cursor: not-allowed;
+}
+
+.stepIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Variantes llenas: el texto usa surface (blanco en claro); en dark se
+   sobrescribe a text-1 para mantener contraste sobre el fondo de color. */
+.stepPrimary {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.stepPrimary:hover:not(:disabled) {
+  background: var(--accent-hv);
+}
+
+.stepDark {
+  background: var(--accent-hv);
+  color: var(--surface);
+}
+
+.stepDark:hover:not(:disabled) {
+  opacity: .9;
+}
+
+.stepApprove {
+  background: var(--success);
+  color: var(--surface);
+}
+
+.stepApprove:hover:not(:disabled) {
+  opacity: .9;
+}
+
+/* Deshabilitado neutro (gris apagado) para pasos de estado no disponibles. */
+.stepPrimary:disabled,
+.stepDark:disabled,
+.stepApprove:disabled {
+  background: var(--surface-2);
+  color: var(--text-4);
+  border-color: var(--border);
+}
+
+/* Lyssna: variante rosa; deshabilitado = rosa apagado. */
+.stepLyssna {
+  background: var(--danger-lt);
+  color: var(--danger);
+  border-color: var(--danger-lt);
+}
+
+.stepLyssna:hover:not(:disabled) {
+  opacity: .9;
+}
+
+.stepLyssna:disabled {
+  background: var(--danger-lt);
+  color: var(--text-4);
+  border-color: transparent;
+  opacity: .7;
+}
+
+/* Presentación: estilo texto/link primary. */
+.stepLink {
+  background: transparent;
+  color: var(--accent);
+  border-color: transparent;
+}
+
+.stepLink:hover:not(:disabled) {
+  background: var(--accent-lt);
+}
+
+.stepLink:disabled {
+  color: var(--text-4);
+}
+
+:global(body.dark-mode) .stepPrimary:not(:disabled),
+:global(body.dark-mode) .stepDark:not(:disabled),
+:global(body.dark-mode) .stepApprove:not(:disabled) {
+  color: var(--text-1);
+}
