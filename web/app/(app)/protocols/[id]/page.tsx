@@ -1,15 +1,30 @@
 'use client'
 
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import type { ProtocolStatus } from '@/lib/types'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
-import { asArray, asQuestions, asString } from '@/components/protocols/forms/utils'
+import { asArray, asString } from '@/components/protocols/forms/utils'
 import styles from './output.module.css'
 
 type Rec = Record<string, unknown>
+
+// Mensaje del banner de estado (arriba de la vista).
+const STATUS_BANNER: Record<ProtocolStatus, string> = {
+  draft: 'Borrador — completa y envía a revisión para continuar',
+  'in-review': 'En revisión — esperando la aprobación de los stakeholders',
+  approved: 'Aprobado — márcalo como listo para ejecutar cuando corresponda',
+  ready: 'Listo para ejecutar — puedes lanzar la prueba en Lyssna',
+  completed: 'Completado — la prueba ha finalizado',
+  onhold: 'En pausa — retomarás este protocolo más adelante',
+  cerrado: 'Cerrado',
+  finalizado: 'Finalizado',
+  changes_requested: 'Cambios solicitados — revisa los comentarios',
+  activo: 'Activo',
+}
 
 const STATUS_OPTIONS: { value: ProtocolStatus; label: string; emoji: string }[] = [
   { value: 'draft', label: 'Borrador', emoji: '📝' },
@@ -63,13 +78,19 @@ const EXPORT_STEPS: PipeStep[] = [
   { kind: 'action', key: 'presentation', label: 'Presentación', icon: '🎨', variant: 'link', action: 'presentation' },
 ]
 
-interface OutputField {
+// --- Campos (label MAYÚSCULAS + valor). Los vacíos se descartan. ---
+interface FieldItem {
   label: string
   value: string
+  full?: boolean
 }
-interface OutputSection {
-  title: string
-  fields: OutputField[]
+
+function pickFields(
+  entries: ReadonlyArray<readonly [string, string, boolean?]>
+): FieldItem[] {
+  return entries
+    .filter((e) => e[1].trim() !== '')
+    .map((e) => ({ label: e[0], value: e[1], full: e[2] ?? false }))
 }
 
 // Lee un array de items de texto que pueden ser strings u objetos
@@ -87,10 +108,6 @@ function readTextItems(v: unknown): string[] {
     .filter((s) => s.trim() !== '')
 }
 
-function joinLines(items: string[]): string {
-  return items.filter((s) => s.trim() !== '').join('\n')
-}
-
 function joinTokens(v: unknown): string {
   return asArray<unknown>(v)
     .map((s) => (typeof s === 'string' ? s : ''))
@@ -98,129 +115,134 @@ function joinTokens(v: unknown): string {
     .join(', ')
 }
 
-// Construye las secciones a partir de los datos guardados del formulario.
-// Los campos vacíos y las secciones sin campos se descartan.
-function buildSections(data: Rec): OutputSection[] {
-  const team = joinLines(
-    asArray<Rec>(data.team).map((m) => {
-      const name = asString(m.name) || asString(m.nombre)
-      const roles = [asString(m.rolInvestigacion), asString(m.rolPdu)]
+// --- Preguntas del test como unión discriminada por tipo. ---
+type RenderQuestion =
+  | { id: string; n: number; kind: 'open'; text: string }
+  | { id: string; n: number; kind: 'likert'; text: string }
+  | { id: string; n: number; kind: 'multiple'; text: string; options: string[] }
+  | { id: string; n: number; kind: 'other'; text: string; badge: string }
+
+function questionBadge(q: RenderQuestion): string {
+  return q.kind === 'other' ? q.badge : q.kind
+}
+
+// Normaliza las preguntas guardadas ({ id, text, type }) a RenderQuestion.
+// Las opciones de 'multiple' se leen si existen; hoy no se guardan (queda []).
+function parseQuestions(v: unknown): RenderQuestion[] {
+  const out: RenderQuestion[] = []
+  asArray<unknown>(v).forEach((raw, i) => {
+    const o = (raw ?? {}) as Rec
+    const text = asString(o.text)
+    if (text.trim() === '') return
+    const id = asString(o.id) || `q-${i}`
+    const type = asString(o.type)
+    const n = out.length + 1
+    if (type === 'likert' || type === 'scale5' || type === 'scale7') {
+      out.push({ id, n, kind: 'likert', text })
+    } else if (type === 'multiple') {
+      const options = asArray<unknown>(o.options)
+        .map((op) => (typeof op === 'string' ? op : asString(((op ?? {}) as Rec).value)))
         .filter((s) => s.trim() !== '')
-        .join(' · ')
-      return [name, roles].filter((s) => s.trim() !== '').join(' — ')
-    })
+      out.push({ id, n, kind: 'multiple', text, options })
+    } else if (type === '' || type === 'open') {
+      out.push({ id, n, kind: 'open', text })
+    } else {
+      out.push({ id, n, kind: 'other', text, badge: type })
+    }
+  })
+  return out
+}
+
+// --- Componentes de presentación ---
+
+function Card({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className={styles.card}>
+      <h2 className={styles.cardTitle}>{title}</h2>
+      {children}
+    </section>
   )
+}
 
-  const docs = joinLines(
-    asArray<Rec>(data.docs).map((d) => {
-      const nombre = asString(d.nombre)
-      const link = asString(d.link)
-      return [nombre, link].filter((s) => s.trim() !== '').join(' — ')
-    })
+function FieldGrid({ fields }: { fields: FieldItem[] }) {
+  return (
+    <div className={styles.grid2}>
+      {fields.map((f) => (
+        <div
+          key={f.label}
+          className={`${styles.field}${f.full ? ` ${styles.full}` : ''}`}
+        >
+          <span className={styles.fieldLabel}>{f.label}</span>
+          <span className={styles.fieldValue}>{f.value}</span>
+        </div>
+      ))}
+    </div>
   )
+}
 
-  const preguntas = joinLines(
-    asQuestions(data.questions).map((q, i) => {
-      const text = asString(q.text)
-      return text ? `${i + 1}. ${text}` : ''
-    })
+function ArrowList({ items }: { items: string[] }) {
+  return (
+    <ul className={styles.arrowList}>
+      {items.map((it, i) => (
+        <li key={`${i}-${it}`} className={styles.arrowItem}>
+          <span className={styles.arrow} aria-hidden>
+            →
+          </span>
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
   )
+}
 
-  const fechasAplicacion = [
-    asString(data.fechasAplicacionInicio),
-    asString(data.fechasAplicacionFin),
-  ]
-    .filter((s) => s.trim() !== '')
-    .join(' – ')
+function KpiTable({ rows }: { rows: { kpi: string; metrica: string }[] }) {
+  return (
+    <div className={styles.kpiTable}>
+      <div className={`${styles.kpiRow} ${styles.kpiHead}`}>
+        <span className={styles.kpiCell}>KPI</span>
+        <span className={styles.kpiCell}>Métrica</span>
+      </div>
+      {rows.map((r, i) => (
+        <div key={i} className={styles.kpiRow}>
+          <span className={styles.kpiCell}>{r.kpi || '—'}</span>
+          <span className={styles.kpiCell}>{r.metrica || '—'}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
 
-  const raw: OutputSection[] = [
-    {
-      title: 'Datos del proyecto',
-      fields: [
-        { label: 'Proyecto', value: asString(data.proyecto) },
-        { label: 'Cliente', value: asString(data.cliente) },
-        { label: 'Tema', value: asString(data.tema) },
-      ],
-    },
-    {
-      title: 'Team y stakeholders',
-      fields: [{ label: 'Equipo', value: team }],
-    },
-    {
-      title: 'Propósito',
-      fields: [
-        { label: 'Objetivo general', value: asString(data.objetivoGeneral) },
-        {
-          label: 'Objetivos específicos',
-          value: joinLines(readTextItems(data.objetivos)),
-        },
-      ],
-    },
-    {
-      title: 'Hipótesis',
-      fields: [{ label: 'Hipótesis', value: asString(data.hipotesis) }],
-    },
-    {
-      title: 'KPIs',
-      fields: [{ label: 'Indicadores', value: joinLines(readTextItems(data.kpis)) }],
-    },
-    {
-      title: 'Fechas',
-      fields: [
-        { label: 'Inicio', value: asString(data.fechaInicio) },
-        { label: 'Resultados', value: asString(data.fechaResultados) },
-      ],
-    },
-    {
-      title: 'Entregables',
-      fields: [{ label: 'Entregables', value: joinTokens(data.entregables) }],
-    },
-    {
-      title: 'Documentación adicional',
-      fields: [{ label: 'Documentos', value: docs }],
-    },
-    {
-      title: 'Metodología',
-      fields: [
-        { label: 'Método', value: asString(data.metodo) },
-        { label: 'Enfoque', value: asString(data.enfoque) },
-        { label: 'Duración por sesión', value: asString(data.duracion) },
-        { label: 'Muestra esperada', value: asString(data.muestra) },
-        { label: 'Razón de la muestra', value: asString(data.razonMuestra) },
-        { label: 'Herramientas', value: joinTokens(data.herramientas) },
-        { label: 'Fechas de aplicación', value: fechasAplicacion },
-      ],
-    },
-    {
-      title: 'Perfil del usuario',
-      fields: [
-        { label: 'Característica', value: asString(data.caracteristica) },
-        { label: 'Nivel digital', value: asString(data.nivelDigital) },
-        { label: 'Edad', value: asString(data.edad) },
-        { label: 'Género', value: asString(data.genero) },
-        { label: 'NSE', value: asString(data.nse) },
-        { label: 'Ocupación', value: asString(data.ocupacion) },
-        { label: 'País', value: asString(data.pais) },
-        { label: 'Contexto', value: asString(data.contexto) },
-        { label: 'Link Proto Persona', value: asString(data.linkProtoPersona) },
-        { label: 'Link User Persona', value: asString(data.linkUserPersona) },
-      ],
-    },
-    {
-      title: 'Preguntas de la prueba',
-      fields: [
-        { label: 'Introducción', value: asString(data.intro) },
-        { label: 'Cierre', value: asString(data.cierre) },
-        { label: 'Preguntas', value: preguntas },
-        { label: 'Link de la prueba', value: asString(data.testUrl) },
-        { label: 'Herramienta', value: asString(data.herramientaPrueba) },
-      ],
-    },
-  ]
-
-  return raw
-    .map((s) => ({ ...s, fields: s.fields.filter((f) => f.value.trim() !== '') }))
-    .filter((s) => s.fields.length > 0)
+function QuestionItem({ q }: { q: RenderQuestion }) {
+  return (
+    <div className={styles.qItem}>
+      <span className={styles.qNum}>{q.n}</span>
+      <div className={styles.qBody}>
+        <div className={styles.qHead}>
+          <span className={styles.qText}>{q.text}</span>
+          <span className={styles.qBadge}>{questionBadge(q)}</span>
+        </div>
+        {q.kind === 'likert' && (
+          <div className={styles.likert} aria-hidden>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <span key={n} className={styles.likertBtn}>
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
+        {q.kind === 'multiple' && q.options.length > 0 && (
+          <ul className={styles.options}>
+            {q.options.map((o, i) => (
+              <li key={`${i}-${o}`} className={styles.option}>
+                <span className={styles.checkbox} aria-hidden />
+                <span>{o}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function ProtocolOutputPage() {
@@ -247,11 +269,99 @@ export default function ProtocolOutputPage() {
   }
 
   const data = (protocol.data ?? {}) as Rec
-  const sections = buildSections(data)
   const version = protocol.version ?? 1
   const status = protocol.protoStatus
   const currentStatus =
     STATUS_OPTIONS.find((o) => o.value === status) ?? STATUS_OPTIONS[0]
+
+  // --- Datos derivados (leídos de lo ya guardado; se ocultan los vacíos). ---
+  const datosFields = pickFields([
+    ['Proyecto', asString(data.proyecto)],
+    ['Tema', asString(data.tema)],
+    ['Inicio', asString(data.fechaInicio)],
+    ['Presentación de resultados', asString(data.fechaResultados)],
+  ])
+
+  const fechasApp = [
+    asString(data.fechasAplicacionInicio),
+    asString(data.fechasAplicacionFin),
+  ]
+    .filter((s) => s.trim() !== '')
+    .join(' – ')
+
+  const metodFields = pickFields([
+    ['Método', asString(data.metodo)],
+    ['Enfoque', asString(data.enfoque)],
+    ['Herramientas', joinTokens(data.herramientas)],
+    ['Duración', asString(data.duracion)],
+    ['Muestra', asString(data.muestra)],
+    ['Fechas de aplicación', fechasApp],
+    ['¿Por qué?', asString(data.razonMuestra), true],
+  ])
+
+  const team = asArray<unknown>(data.team)
+    .map((m) => {
+      const o = (m ?? {}) as Rec
+      const name = asString(o.name) || asString(o.nombre)
+      return [name, asString(o.rolInvestigacion), asString(o.rolPdu)]
+        .filter((s) => s.trim() !== '')
+        .join(' — ')
+    })
+    .filter((s) => s.trim() !== '')
+
+  const objetivo = asString(data.objetivoGeneral)
+  const objetivoItems = objetivo
+    ? [objetivo, ...readTextItems(data.objetivos)]
+    : readTextItems(data.objetivos)
+  const kpis = asArray<unknown>(data.kpis)
+    .map((k) => {
+      const o = (k ?? {}) as Rec
+      return { kpi: asString(o.tipo), metrica: asString(o.descripcion) }
+    })
+    .filter((r) => r.kpi.trim() !== '' || r.metrica.trim() !== '')
+  const hasDefinicion = objetivoItems.length > 0 || kpis.length > 0
+
+  // ProtoPersona: "Tipificación" mapea al campo nse (no existe uno propio).
+  const protoFields = pickFields([
+    ['Tipificación', asString(data.nse)],
+    ['Edad', asString(data.edad)],
+    ['Nivel digital', asString(data.nivelDigital)],
+    ['Género', asString(data.genero)],
+    ['Ocupación', asString(data.ocupacion)],
+    ['Características', asString(data.caracteristica)],
+  ])
+
+  const devFields = pickFields([
+    ['Introducción', asString(data.intro), true],
+    ['Cierre', asString(data.cierre), true],
+    ['Link de la prueba', asString(data.testUrl)],
+    ['Herramienta', asString(data.herramientaPrueba)],
+  ])
+  const questions = parseQuestions(data.questions)
+  const hasDesarrollo = devFields.length > 0 || questions.length > 0
+
+  const entregables = asArray<unknown>(data.entregables)
+    .map((e) => (typeof e === 'string' ? e : ''))
+    .filter((s) => s.trim() !== '')
+
+  const docs = asArray<unknown>(data.docs)
+    .map((d) => {
+      const o = (d ?? {}) as Rec
+      return [asString(o.nombre), asString(o.link)]
+        .filter((s) => s.trim() !== '')
+        .join(' — ')
+    })
+    .filter((s) => s.trim() !== '')
+
+  const anyContent =
+    datosFields.length > 0 ||
+    metodFields.length > 0 ||
+    team.length > 0 ||
+    hasDefinicion ||
+    protoFields.length > 0 ||
+    hasDesarrollo ||
+    entregables.length > 0 ||
+    docs.length > 0
 
   const changeStatus = (value: ProtocolStatus) => {
     setStatusMenuOpen(false)
@@ -314,6 +424,9 @@ export default function ProtocolOutputPage() {
 
   return (
     <div className={styles.page}>
+      {/* Banner de estado */}
+      <div className={styles.banner}>{STATUS_BANNER[status]}</div>
+
       <header className={styles.header}>
         <div className={styles.titleRow}>
           <h1 className={styles.title}>
@@ -388,8 +501,8 @@ export default function ProtocolOutputPage() {
         </div>
       </div>
 
-      {/* Secciones con los datos guardados */}
-      {sections.length === 0 ? (
+      {/* Tarjetas agrupadas (solo las que tienen contenido) */}
+      {!anyContent ? (
         <div className={styles.empty}>
           <p>Este protocolo aún no tiene datos.</p>
           <Link href={`/protocols/${protocol.id}/edit`} className={styles.link}>
@@ -397,20 +510,65 @@ export default function ProtocolOutputPage() {
           </Link>
         </div>
       ) : (
-        <div className={styles.sections}>
-          {sections.map((s) => (
-            <section key={s.title} className={styles.section}>
-              <h2 className={styles.sectionTitle}>{s.title}</h2>
-              <div className={styles.fields}>
-                {s.fields.map((f) => (
-                  <div key={f.label} className={styles.field}>
-                    <span className={styles.fieldLabel}>{f.label}</span>
-                    <span className={styles.fieldValue}>{f.value}</span>
+        <div className={styles.cards}>
+          {datosFields.length > 0 && (
+            <Card title="Datos del proyecto">
+              <FieldGrid fields={datosFields} />
+            </Card>
+          )}
+
+          {metodFields.length > 0 && (
+            <Card title="Metodología">
+              <FieldGrid fields={metodFields} />
+            </Card>
+          )}
+
+          {team.length > 0 && (
+            <Card title="Equipo">
+              <ArrowList items={team} />
+            </Card>
+          )}
+
+          {hasDefinicion && (
+            <Card title="Definición">
+              {objetivoItems.length > 0 && <ArrowList items={objetivoItems} />}
+              {kpis.length > 0 && <KpiTable rows={kpis} />}
+            </Card>
+          )}
+
+          {protoFields.length > 0 && (
+            <Card title="ProtoPersona">
+              <FieldGrid fields={protoFields} />
+            </Card>
+          )}
+
+          {hasDesarrollo && (
+            <Card title="Desarrollo de prueba">
+              {devFields.length > 0 && <FieldGrid fields={devFields} />}
+              {questions.length > 0 && (
+                <>
+                  <p className={styles.subLabel}>Preguntas del test</p>
+                  <div className={styles.qList}>
+                    {questions.map((q) => (
+                      <QuestionItem key={q.id} q={q} />
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
-          ))}
+                </>
+              )}
+            </Card>
+          )}
+
+          {entregables.length > 0 && (
+            <Card title="Entregables">
+              <ArrowList items={entregables} />
+            </Card>
+          )}
+
+          {docs.length > 0 && (
+            <Card title="Documentación">
+              <ArrowList items={docs} />
+            </Card>
+          )}
         </div>
       )}
     </div>
