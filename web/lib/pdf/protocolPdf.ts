@@ -280,7 +280,9 @@ export function buildProtocolPdfHtml(protocol: Protocol, origin: string): string
 export function printProtocolPdf(protocol: Protocol): boolean {
   const origin = window.location.origin
   const html = buildProtocolPdfHtml(protocol, origin)
-  const win = window.open('', '_blank', 'noopener,noreferrer')
+  // No usar 'noopener': con esa opción window.open devuelve null y no se
+  // podría escribir el documento en la ventana nueva.
+  const win = window.open('', '_blank')
   if (!win) return false
   win.document.open()
   win.document.write(html)
