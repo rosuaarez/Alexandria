@@ -9,7 +9,9 @@ import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { asArray, asString } from '@/components/protocols/forms/utils'
 import { ActionPipeline } from '@/components/protocols/ActionPipeline'
+import { LyssnaModal } from '@/components/protocols/LyssnaModal'
 import { printProtocolPdf } from '@/lib/pdf/protocolPdf'
+import { buildLyssnaText } from '@/lib/lyssna/formatProtocol'
 import styles from './output.module.css'
 
 type Rec = Record<string, unknown>
@@ -210,6 +212,8 @@ export default function ProtocolOutputPage() {
   const updateProtocol = useProtocolStore((s) => s.updateProtocol)
   const showToast = useUIStore((s) => s.showToast)
   const [statusMenuOpen, setStatusMenuOpen] = useState(false)
+  const [lyssnaOpen, setLyssnaOpen] = useState(false)
+  const [lyssnaText, setLyssnaText] = useState('')
 
   const protocol = protocols.find((p) => p.id === params.id)
 
@@ -327,10 +331,26 @@ export default function ProtocolOutputPage() {
     void updateProtocol({ ...protocol, protoStatus: value })
   }
 
+  // Enfoque semi-automático: Lyssna no expone API pública de creación de
+  // estudios. Se formatea el protocolo, se copia al portapapeles y se abre
+  // Lyssna en una pestaña nueva; el modal muestra el texto como respaldo.
+  const copyLyssnaText = (text: string) => {
+    if (!navigator.clipboard) {
+      showToast('Copia el contenido desde el cuadro (portapapeles no disponible).', 'info')
+      return
+    }
+    navigator.clipboard.writeText(text).then(
+      () => showToast('Contenido copiado. Pégalo en tu nuevo estudio de Lyssna.', 'success'),
+      () => showToast('Copia el contenido desde el cuadro (permiso denegado).', 'info')
+    )
+  }
+
   const handleLyssna = () => {
-    const url = asString(data.testUrl)
-    if (url) window.open(url, '_blank', 'noopener,noreferrer')
-    else showToast('Aún no hay link de la prueba (Lyssna)', 'info')
+    const text = buildLyssnaText(protocol)
+    setLyssnaText(text)
+    setLyssnaOpen(true)
+    copyLyssnaText(text)
+    window.open('https://app.lyssna.com', '_blank', 'noopener,noreferrer')
   }
 
   const handlePresentation = () =>
@@ -477,6 +497,13 @@ export default function ProtocolOutputPage() {
           )}
         </div>
       )}
+
+      <LyssnaModal
+        isOpen={lyssnaOpen}
+        text={lyssnaText}
+        onClose={() => setLyssnaOpen(false)}
+        onCopy={() => copyLyssnaText(lyssnaText)}
+      />
     </div>
   )
 }

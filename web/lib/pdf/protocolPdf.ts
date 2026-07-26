@@ -1,31 +1,8 @@
-import type { Protocol, QuestionType } from '@/lib/types'
+import type { Protocol } from '@/lib/types'
 import { asArray, asString } from '@/components/protocols/forms/utils'
+import { questionTypeLabel } from '@/lib/protocols/questionTypeLabels'
 
 type Rec = Record<string, unknown>
-
-// Etiquetas legibles por tipo de pregunta (todas las del modelo actual).
-const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
-  open: 'Abierta',
-  likert: 'Escala Likert',
-  multiple: 'Opción múltiple',
-  yesno: 'Sí / No',
-  abtest: 'A/B Test',
-  prototype: 'Prototype test',
-  instruction: 'Instruction',
-  'first-click': 'First click',
-  'five-second': 'Five second test',
-  survey: 'Survey questions',
-  'design-survey': 'Design survey',
-  preference: 'Preference test',
-  navigation: 'Navigation test',
-  'card-sort': 'Card sort',
-  'tree-test': 'Tree test',
-  'live-website': 'Live website test',
-  closed: 'Cerrada',
-  scale5: 'Escala (1-5)',
-  scale7: 'Escala (1-7)',
-  nps: 'NPS',
-}
 
 interface PdfField {
   label: string
@@ -73,7 +50,7 @@ function parseQuestions(v: unknown): PdfQuestion[] {
     const text = asString(o.text)
     if (text.trim() === '') return
     const type = asString(o.type)
-    const typeLabel = QUESTION_TYPE_LABELS[type as QuestionType] ?? type ?? 'Pregunta'
+    const typeLabel = questionTypeLabel(type)
     const likert = type === 'likert' || type === 'scale5' || type === 'scale7'
     const options = asArray<unknown>(o.options)
       .map((op) => (typeof op === 'string' ? op : asString(((op ?? {}) as Rec).value)))
