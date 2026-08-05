@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { ProtocolType } from '@/lib/types'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useFolderStore } from '@/lib/stores/useFolderStore'
+import { useOrgOptionsStore } from '@/lib/stores/useOrgOptionsStore'
 
 interface TemplateOption {
   value: string
@@ -76,9 +77,60 @@ const TEMPLATE_BY_VALUE: Record<string, TemplateOption> = Object.fromEntries(
 // Opciones de versión 1..10 (fiel al <select> del original).
 const VERSION_OPTIONS = Array.from({ length: 10 }, (_, i) => String(i + 1))
 
-// Mocks vacíos por ahora (se poblarán con datos reales más adelante).
-const CLIENTE_OPTIONS: { value: string; label: string }[] = []
-const PROYECTO_OPTIONS: { value: string; label: string }[] = []
+// Valor centinela del <option> "+ Agregar…" en los selectores.
+const ADD_OPTION = '__ADD__'
+
+// Fila inline para escribir y confirmar una nueva opción de Cliente/Proyecto.
+function AddOptionRow({
+  value,
+  onChange,
+  onConfirm,
+  onCancel,
+}: {
+  value: string
+  onChange: (v: string) => void
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+      <input
+        type="text"
+        autoFocus
+        placeholder="Nuevo nombre…"
+        style={{ flex: 1 }}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            onConfirm()
+          } else if (e.key === 'Escape') {
+            e.preventDefault()
+            onCancel()
+          }
+        }}
+      />
+      <button
+        type="button"
+        className="btn btn-primary"
+        style={{ padding: '6px 12px', fontSize: 13 }}
+        onClick={onConfirm}
+      >
+        Agregar
+      </button>
+      <button
+        type="button"
+        className="btn btn-secondary"
+        style={{ padding: '6px 10px', fontSize: 13 }}
+        onClick={onCancel}
+        aria-label="Cancelar"
+      >
+        ✕
+      </button>
+    </div>
+  )
+}
 
 // Slug fiel al original: espacios→guion, minúsculas, solo [a-z0-9-], recorte.
 function slugify(value: string, max: number): string {
@@ -98,6 +150,9 @@ interface CreateProtocolModalProps {
 export function CreateProtocolModal({ isOpen, onClose }: CreateProtocolModalProps) {
   const router = useRouter()
   const folders = useFolderStore((s) => s.folders)
+  // Cliente y Proyecto comparten la misma lista de opciones (ampliable).
+  const options = useOrgOptionsStore((s) => s.options)
+  const addOption = useOrgOptionsStore((s) => s.addOption)
 
   const [step, setStep] = useState<1 | 2>(1)
   const [cliente, setCliente] = useState('')
@@ -106,6 +161,19 @@ export function CreateProtocolModal({ isOpen, onClose }: CreateProtocolModalProp
   const [folder, setFolder] = useState('')
   const [version, setVersion] = useState('1')
   const [template, setTemplate] = useState<string | null>(null)
+  // "+ Agregar" inline: en qué selector se está agregando y el nombre escrito.
+  const [addingFor, setAddingFor] = useState<'cliente' | 'proyecto' | null>(null)
+  const [newOption, setNewOption] = useState('')
+
+  const confirmAddOption = () => {
+    const n = newOption.trim()
+    if (!n || !addingFor) return
+    addOption(n)
+    if (addingFor === 'cliente') setCliente(n)
+    else setProyecto(n)
+    setAddingFor(null)
+    setNewOption('')
+  }
   // La fecha se captura tras el montaje para no llamar a new Date() en render.
   const [dateStr, setDateStr] = useState('')
   const trapRef = useFocusTrap<HTMLDivElement>(isOpen)
@@ -153,6 +221,11 @@ export function CreateProtocolModal({ isOpen, onClose }: CreateProtocolModalProp
     if (!tema.trim() || !template) return
     const type = TEMPLATE_BY_VALUE[template]?.type ?? 'express'
     const params = new URLSearchParams({ type, template, name: autoName })
+    // Hereda los datos capturados en el modal hacia el formulario de edición.
+    if (cliente.trim()) params.set('cliente', cliente.trim())
+    if (proyecto.trim()) params.set('proyecto', proyecto.trim())
+    if (tema.trim()) params.set('tema', tema.trim())
+    if (folder) params.set('folder', folder)
     resetAndClose()
     router.push(`/protocols/new/edit?${params.toString()}`)
   }
@@ -192,30 +265,64 @@ export function CreateProtocolModal({ isOpen, onClose }: CreateProtocolModalProp
                 <select
                   style={{ width: '100%' }}
                   value={cliente}
-                  onChange={(e) => setCliente(e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value === ADD_OPTION) {
+                      setAddingFor('cliente')
+                      setNewOption('')
+                    } else setCliente(e.target.value)
+                  }}
                 >
                   <option value="">Ninguno</option>
-                  {CLIENTE_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {options.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
                     </option>
                   ))}
+                  <option value={ADD_OPTION}>+ Agregar…</option>
                 </select>
+                {addingFor === 'cliente' && (
+                  <AddOptionRow
+                    value={newOption}
+                    onChange={setNewOption}
+                    onConfirm={confirmAddOption}
+                    onCancel={() => {
+                      setAddingFor(null)
+                      setNewOption('')
+                    }}
+                  />
+                )}
               </div>
               <div>
                 <label style={{ marginBottom: 6, display: 'block' }}>Proyecto</label>
                 <select
                   style={{ width: '100%' }}
                   value={proyecto}
-                  onChange={(e) => setProyecto(e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value === ADD_OPTION) {
+                      setAddingFor('proyecto')
+                      setNewOption('')
+                    } else setProyecto(e.target.value)
+                  }}
                 >
                   <option value="">Seleccionar...</option>
-                  {PROYECTO_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {options.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
                     </option>
                   ))}
+                  <option value={ADD_OPTION}>+ Agregar…</option>
                 </select>
+                {addingFor === 'proyecto' && (
+                  <AddOptionRow
+                    value={newOption}
+                    onChange={setNewOption}
+                    onConfirm={confirmAddOption}
+                    onCancel={() => {
+                      setAddingFor(null)
+                      setNewOption('')
+                    }}
+                  />
+                )}
               </div>
             </div>
 

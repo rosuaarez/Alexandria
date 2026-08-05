@@ -123,6 +123,15 @@ export default function ProtocolEditorPage() {
       // Se guarda el template en data.template para el pill del header y para
       // decidir qué formulario mostrar (independiente del tipo).
       if (templateKey) data.template = templateKey
+      // Datos heredados del modal de creación (Datos del proyecto).
+      const proyecto = searchParams.get('proyecto') ?? ''
+      const cliente = searchParams.get('cliente') ?? ''
+      const temaParam = searchParams.get('tema') ?? ''
+      const folderParam = searchParams.get('folder') ?? ''
+      if (proyecto) data.proyecto = proyecto
+      if (cliente) data.cliente = cliente
+      if (temaParam) data.tema = temaParam
+      if (folderParam) data.folderId = folderParam
       if (tpl) {
         // Datos iniciales del formulario completo definidos por el template
         // (team, docs, metodo, herramientas… se van al CompleteForm).
@@ -301,12 +310,18 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
     setSaving(true)
     try {
       if (isNew) {
+        // Carpeta heredada del modal de creación → asocia el protocolo a ella.
+        const folderId =
+          typeof dataRef.current.folderId === 'string'
+            ? dataRef.current.folderId
+            : ''
         const created = await createProtocol(
           {
             name: nameRef.current.trim() || 'Nuevo protocolo',
             type: initial.type,
             protoStatus: 'draft',
             ...(initial.platform ? { platform: initial.platform } : {}),
+            ...(folderId ? { folderId } : {}),
             data: dataRef.current,
           },
           currentUser.id

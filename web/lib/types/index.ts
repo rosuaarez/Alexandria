@@ -224,6 +224,7 @@ export interface ProtocolComment {
   protocolId: string;
   fieldKey: string; // qué campo del protocolo comentan
   fieldLabel: string; // label legible del campo
+  quote?: string; // fragmento del texto original sobre el que se comentó
   author: TeamMember;
   text: string;
   resolved: boolean;

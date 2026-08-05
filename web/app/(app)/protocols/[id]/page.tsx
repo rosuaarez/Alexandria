@@ -14,6 +14,7 @@ import { LyssnaModal } from '@/components/protocols/LyssnaModal'
 import { ShareLinkModal } from '@/components/protocols/ShareLinkModal'
 import { PresentationModal } from '@/components/protocols/PresentationModal'
 import { PresentationViewer } from '@/components/protocols/PresentationViewer'
+import { SelectionCommenter } from '@/components/protocols/SelectionCommenter'
 import { printProtocolPdf } from '@/lib/pdf/protocolPdf'
 import { buildLyssnaText } from '@/lib/lyssna/formatProtocol'
 import type { PresentationTemplate } from '@/lib/presentation/constants'
@@ -142,6 +143,8 @@ function FieldGrid({ fields }: { fields: FieldItem[] }) {
         <div
           key={f.label}
           className={`${styles.field}${f.full ? ` ${styles.full}` : ''}`}
+          data-field-key={f.label.toLowerCase()}
+          data-field-label={f.label}
         >
           <span className={styles.fieldLabel}>{f.label}</span>
           <span className={styles.fieldValue}>{f.value}</span>
@@ -319,6 +322,8 @@ export default function ProtocolOutputPage() {
     ['Nivel digital', asString(data.nivelDigital)],
     ['Género', asString(data.genero)],
     ['Ocupación', asString(data.ocupacion)],
+    ['País', asString(data.pais)],
+    ['Estado', asString(data.estado)],
     ['Características', asString(data.caracteristica)],
   ])
 
@@ -550,7 +555,8 @@ export default function ProtocolOutputPage() {
           </Link>
         </div>
       ) : (
-        <div className={styles.cards}>
+        <SelectionCommenter protocolId={protocol.id}>
+          <div className={styles.cards}>
           {datosFields.length > 0 && (
             <Card title="Datos del proyecto">
               <FieldGrid fields={datosFields} />
@@ -609,7 +615,8 @@ export default function ProtocolOutputPage() {
               <ArrowList items={docs} />
             </Card>
           )}
-        </div>
+          </div>
+        </SelectionCommenter>
       )}
 
       <LyssnaModal

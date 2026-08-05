@@ -67,6 +67,7 @@ interface TeamState {
     reply: Omit<CommentReply, 'id' | 'createdAt'>
   ) => Promise<void>
   resolveComment: (commentId: string) => Promise<void>
+  deleteComment: (commentId: string) => Promise<void>
 
   setInviteEmail: (email: string) => void
   openFieldComments: (fieldKey: string, fieldLabel: string) => void
@@ -167,6 +168,11 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         c.id === commentId ? { ...c, resolved: !c.resolved } : c
       ),
     }))
+  },
+
+  deleteComment: async (commentId) => {
+    // TODO: reemplazar con llamada a Supabase
+    set((s) => ({ comments: s.comments.filter((c) => c.id !== commentId) }))
   },
 
   setInviteEmail: (inviteEmail) => set({ inviteEmail }),

@@ -75,6 +75,20 @@ const PAIS_OPTIONS = [
   'España',
   'Estados Unidos',
 ]
+
+// Estados/provincias por país. El campo "Estado" solo aparece para los países
+// que tienen lista aquí (hoy México); es directo agregar más.
+const ESTADOS_BY_PAIS: Record<string, string[]> = {
+  México: [
+    'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche',
+    'Chiapas', 'Chihuahua', 'Ciudad de México', 'Coahuila', 'Colima',
+    'Durango', 'Estado de México', 'Guanajuato', 'Guerrero', 'Hidalgo',
+    'Jalisco', 'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca',
+    'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa',
+    'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz', 'Yucatán',
+    'Zacatecas',
+  ],
+}
 // Filas de cuota por campo del perfil (fieles al original).
 const EDAD_CUOTA_ROWS = ['18–30 años', '31–45 años', '46–60 años', '61+ años']
 const GENERO_CUOTA_ROWS = ['Masculino', 'Femenino', 'No binario']
@@ -144,6 +158,19 @@ function suggestSampleFor(metodo: string): { range: string; lower: number } {
   return { range: '8-12', lower: 8 }
 }
 
+// Justificación del tamaño de muestra (texto que genera "✦ Corregir con IA").
+function buildRazonMuestra(metodo: string, muestra: string): string {
+  const n = muestra && Number(muestra) > 0 ? muestra : '8'
+  const m = metodo.trim() ? metodo.trim().toLowerCase() : 'investigación de UX'
+  return (
+    `La muestra de ${n} participantes se ha determinado siguiendo las mejores ` +
+    `prácticas en investigación de UX para ${m}: en estudios cualitativos, un ` +
+    `grupo de este tamaño permite detectar la mayoría de los problemas de ` +
+    `usabilidad recurrentes y validar los patrones clave de comportamiento sin ` +
+    `sobredimensionar el esfuerzo de reclutamiento y análisis.`
+  )
+}
+
 interface TeamMember {
   name: string
   rolInvestigacion: string
@@ -197,6 +224,7 @@ interface CompleteValues {
   nse: string
   ocupacion: string
   pais: string
+  estado: string
   contexto: string
   linkProtoPersona: string
   linkUserPersona: string
@@ -259,6 +287,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
       nse: asString(initialData.nse),
       ocupacion: asString(initialData.ocupacion),
       pais: asString(initialData.pais),
+      estado: asString(initialData.estado),
       contexto: asString(initialData.contexto),
       linkProtoPersona: asString(initialData.linkProtoPersona),
       linkUserPersona: asString(initialData.linkUserPersona),
@@ -281,6 +310,18 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
     return h.length > 0 ? h : isUsabilidad ? ['Lyssna', 'Figma'] : []
   })
   const [herramientaInput, setHerramientaInput] = useState('')
+  const [suggesting, setSuggesting] = useState(false)
+
+  // "Estado" depende del país (selector controlado): aparece solo si el país
+  // tiene lista de estados. Al cambiar a un país sin lista, se limpia el valor.
+  const paisSeleccionado = watch('pais')
+  const estadosDelPais = ESTADOS_BY_PAIS[paisSeleccionado] ?? []
+  useEffect(() => {
+    if (!ESTADOS_BY_PAIS[paisSeleccionado] && getValues('estado')) {
+      setValue('estado', '')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paisSeleccionado])
   const [entregables, setEntregables] = useState<string[]>(
     asArray<string>(initialData.entregables)
   )
@@ -338,15 +379,30 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
     onChange({ ...getValues(), questions, herramientas, entregables: next })
   }
 
-  const handleSuggestSample = () => {
-    const metodo = getValues('metodo')
-    const { range, lower } = suggestSampleFor(metodo)
-    setValue('muestra', String(lower))
-    emit({ muestra: String(lower) })
-    showToast(
-      `Muestra sugerida: ${range} participantes basado en ${metodo || 'el método'}`,
-      'success'
-    )
+  // "✦ Corregir con IA": genera la JUSTIFICACIÓN (razonMuestra). Si la muestra
+  // esperada está vacía, primero sugiere un número según el método. Con estado
+  // de carga y feedback de error para no quedar en silencio.
+  const handleSuggestSample = async () => {
+    if (suggesting) return
+    setSuggesting(true)
+    try {
+      const metodo = getValues('metodo')
+      let muestra = getValues('muestra')
+      if (!muestra || Number(muestra) <= 0) {
+        muestra = String(suggestSampleFor(metodo).lower)
+        setValue('muestra', muestra)
+      }
+      // Breve espera para que el estado de carga sea visible.
+      await new Promise((r) => setTimeout(r, 450))
+      const razon = buildRazonMuestra(metodo, muestra)
+      setValue('razonMuestra', razon)
+      emit({ muestra, razonMuestra: razon })
+      showToast('Justificación generada ✓', 'success')
+    } catch {
+      showToast('No se pudo generar la justificación', 'error')
+    } finally {
+      setSuggesting(false)
+    }
   }
 
   return (
@@ -864,8 +920,14 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
               }}
             >
               <label style={{ marginBottom: 0 }}>Razón del tamaño de la muestra</label>
-              <button type="button" className={methodStyles.aiBtn} onClick={handleSuggestSample}>
-                ✦ Corregir con IA
+              <button
+                type="button"
+                className={methodStyles.aiBtn}
+                onClick={handleSuggestSample}
+                disabled={suggesting}
+                style={suggesting ? { opacity: 0.65, cursor: 'wait' } : undefined}
+              >
+                {suggesting ? '✦ Generando…' : '✦ Corregir con IA'}
               </button>
             </div>
             <textarea
@@ -963,6 +1025,19 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
               ))}
             </select>
           </div>
+          {estadosDelPais.length > 0 && (
+            <div className="form-group">
+              <label>Estado</label>
+              <select {...register('estado')}>
+                <option value="">Seleccionar...</option>
+                {estadosDelPais.map((e) => (
+                  <option key={e} value={e}>
+                    {e}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="form-group full">
             <label>Contexto</label>
             <textarea
