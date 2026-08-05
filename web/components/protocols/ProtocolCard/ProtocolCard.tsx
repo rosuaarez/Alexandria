@@ -101,7 +101,9 @@ export function ProtocolCard({ protocol, onRequestDelete }: ProtocolCardProps) {
   const [linkValue, setLinkValue] = useState(protocol.findingsLink ?? '')
 
   const icon = protocol.icon || DEFAULT_ICON[protocol.type] || '📄'
-  const openEditor = () => router.push(`/protocols/${protocol.id}/edit`)
+  // Abre primero la vista resumen/detalle; desde ahí la tab "Editar protocolo"
+  // lleva al formulario completo.
+  const openDetail = () => router.push(`/protocols/${protocol.id}`)
 
   const templateKey =
     protocol.template ||
@@ -125,11 +127,11 @@ export function ProtocolCard({ protocol, onRequestDelete }: ProtocolCardProps) {
     <div
       className={styles.card}
       style={{ borderLeft: `3px solid ${STATUS_BORDER[protocol.protoStatus] ?? '#9CA3AF'}` }}
-      onClick={openEditor}
+      onClick={openDetail}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') openEditor()
+        if (e.key === 'Enter') openDetail()
       }}
     >
       <div className={styles.top}>
@@ -153,9 +155,9 @@ export function ProtocolCard({ protocol, onRequestDelete }: ProtocolCardProps) {
         <button
           type="button"
           className={styles.actionBtn}
-          onClick={openEditor}
-          title="Editar"
-          aria-label="Editar"
+          onClick={openDetail}
+          title="Abrir"
+          aria-label="Abrir"
         >
           <EditIcon />
         </button>

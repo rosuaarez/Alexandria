@@ -275,10 +275,10 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
   const docs = useFieldArray({ control, name: 'docs' })
 
   // Herramientas y entregables como chips removibles (estado local en el payload).
-  // El template 'usabilidad' pre-carga Maze y Figma si no hay herramientas.
+  // El template 'usabilidad' pre-carga Lyssna y Figma si no hay herramientas.
   const [herramientas, setHerramientas] = useState<string[]>(() => {
     const h = asArray<string>(initialData.herramientas)
-    return h.length > 0 ? h : isUsabilidad ? ['Maze', 'Figma'] : []
+    return h.length > 0 ? h : isUsabilidad ? ['Lyssna', 'Figma'] : []
   })
   const [herramientaInput, setHerramientaInput] = useState('')
   const [entregables, setEntregables] = useState<string[]>(
@@ -286,10 +286,10 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
   )
 
   // Sin preguntas de ejemplo: si el protocolo ya trae preguntas guardadas se
-  // muestran esas; si no, se arranca con UNA sola pregunta vacía (tipo "Abierta").
+  // muestran esas; si no, se arranca con UNA sola sección "Survey questions".
   const [questions, setQuestions] = useState<Question[]>(() => {
     const saved = asQuestions(initialData.questions)
-    return saved.length > 0 ? saved : [{ id: 'q-1', text: '', type: 'open' }]
+    return saved.length > 0 ? saved : [{ id: 'q-1', text: '', type: 'survey' }]
   })
 
   // Emite el estado combinado (RHF + listas locales) al padre.
@@ -987,7 +987,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
           <div className="card-icon">❓</div>
           <div>
             <div className="card-title">Preguntas de la prueba</div>
-            <div className="card-subtitle">Maze — tipos de preguntas UX</div>
+            <div className="card-subtitle">Técnicas UX — tipos de pregunta</div>
           </div>
         </div>
         <div className="form-grid">
@@ -1021,7 +1021,7 @@ export function CompleteForm({ initialData, onChange }: FormProps) {
             <label>Herramienta</label>
             <input
               type="text"
-              placeholder="Ej. Maze, Lookback, UserZoom..."
+              placeholder="Ej. Lyssna, Lookback, UserZoom..."
               {...register('herramientaPrueba')}
             />
           </div>

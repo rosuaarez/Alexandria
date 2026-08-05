@@ -16,6 +16,12 @@
   width: 100%;
 }
 
+/* Contenedor de una pregunta: fila principal + su bloque de configuración. */
+.qItem {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Cada pregunta en UNA sola fila: número | input | select tipo | × */
 .item {
   display: grid;
@@ -70,9 +76,16 @@
   color: var(--text-4);
 }
 
-/* Select real con flecha chevron (misma del design system). */
-.typeSelect {
+/* Dropdown personalizado (título + descripción + badges). */
+.select {
+  position: relative;
   width: 100%;
+}
+
+/* Trigger con flecha chevron (misma del design system). */
+.selectTrigger {
+  width: 100%;
+  text-align: left;
   border: 1.5px solid var(--border);
   background-color: var(--surface);
   color: var(--text-2);
@@ -90,13 +103,114 @@
   transition: border-color .15s, box-shadow .15s;
 }
 
-.typeSelect:hover {
+.selectTrigger:hover {
   border-color: var(--border-2);
 }
 
-.typeSelect:focus {
+.selectTrigger[aria-expanded='true'] {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-lt);
+}
+
+.selectValue {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Panel desplegable: se ancla al borde derecho del trigger y es más ancho
+   para dar espacio a las descripciones. */
+/* Se renderiza en un portal (document.body) con position:fixed, así que la
+   posición (top/left/width/max-height) llega por estilos inline y aquí solo
+   quedan los estilos visuales. */
+.menu {
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+}
+
+.group + .group {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.groupLabel {
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-4);
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background .12s;
+}
+
+.option:hover {
+  background: var(--surface-2);
+}
+
+.optionActive {
+  background: var(--accent-lt);
+}
+
+.optionTitleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.optionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.optionDesc {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--text-3);
+}
+
+/* Badges pequeños. */
+.badge,
+.badgeAlt {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge {
+  background: var(--accent-lt);
+  color: var(--accent);
+}
+
+.badgeAlt {
+  background: var(--surface-2);
+  color: var(--text-3);
+  border: 1px solid var(--border);
 }
 
 .delete {

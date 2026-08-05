@@ -579,6 +579,9 @@ function EditorView({ id, isNew, initial, protocol }: EditorViewProps) {
           style={{
             display: 'flex',
             justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
             padding: '32px 0',
             borderTop: '1px solid var(--border)',
             marginTop: 8,

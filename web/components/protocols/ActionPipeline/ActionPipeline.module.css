@@ -78,6 +78,38 @@
   opacity: .9;
 }
 
+/* Paso de estado completado: relleno de acento con check. */
+.stepDone {
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+.stepDone:hover {
+  opacity: .92;
+}
+
+/* Paso de estado actual: mantiene su variante y añade un anillo de foco. */
+.stepActive {
+  box-shadow: 0 0 0 3px var(--accent-lt);
+}
+
+/* Paso de estado pendiente: atenuado. */
+.stepPending {
+  background: var(--surface-2);
+  color: var(--text-3);
+  border-color: var(--border);
+}
+
+.stepPending:hover {
+  border-color: var(--border-2);
+  color: var(--text-2);
+}
+
+:global(body.dark-mode) .stepDone {
+  color: var(--text-1);
+}
+
 /* Lyssna: variante rosa. */
 .stepLyssna {
   background: var(--danger-lt);

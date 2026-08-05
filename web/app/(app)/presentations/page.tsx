@@ -1,24 +1,80 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useMemo, useState } from 'react'
+import type { Protocol } from '@/lib/types'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
-import { StatusPill } from '@/components/ui/StatusPill'
+import {
+  usePresentationStore,
+  type SavedPresentation,
+} from '@/lib/stores/usePresentationStore'
+import { useUIStore } from '@/lib/stores/useUIStore'
 import { EmptyState } from '@/components/ui'
-import { timeAgo } from '@/lib/utils/date'
+import { DeleteModal } from '@/components/ui/DeleteModal'
+import { PresentationViewer } from '@/components/protocols/PresentationViewer'
+import { downloadPresentationPptx } from '@/lib/presentation/download'
+import { colorShort, templateBackground } from '@/lib/presentation/constants'
+import styles from './presentations.module.css'
+
+function formatDate(iso: string): string {
+  const d = iso ? new Date(iso) : null
+  if (!d || Number.isNaN(d.getTime())) return ''
+  return d.toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
 
 export default function PresentationsPage() {
-  const router = useRouter()
   const protocols = useProtocolStore((s) => s.protocols)
+  const presentations = usePresentationStore((s) => s.presentations)
+  const deletePresentation = usePresentationStore((s) => s.deletePresentation)
+  const showToast = useUIStore((s) => s.showToast)
 
-  // Solo protocolos de tipo presentación (fiel a la sección "Presentaciones" del original).
-  const presentations = useMemo(
+  const [viewing, setViewing] = useState<SavedPresentation | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<SavedPresentation | null>(null)
+
+  const sorted = useMemo(
     () =>
-      protocols
-        .filter((p) => p.type === 'presentation')
-        .sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '')),
-    [protocols]
+      [...presentations].sort((a, b) =>
+        (b.createdAt ?? '').localeCompare(a.createdAt ?? '')
+      ),
+    [presentations]
   )
+
+  // Protocolo de origen (para regenerar/descargar). Si ya no existe, se usa un
+  // stub mínimo — "Ver" igual funciona porque las slides van guardadas.
+  const protocolFor = (pres: SavedPresentation): Protocol => {
+    const found = protocols.find((p) => p.id === pres.protocolId)
+    if (found) return found
+    return { id: pres.protocolId, name: pres.name, data: {} } as unknown as Protocol
+  }
+
+  const handleDownload = async (pres: SavedPresentation) => {
+    showToast('Generando .pptx…', 'info')
+    const ok = await downloadPresentationPptx(
+      protocolFor(pres),
+      pres.template,
+      pres.color
+    )
+    showToast(
+      ok ? 'Presentación descargada ✓' : 'No se pudo generar la presentación',
+      ok ? 'success' : 'error'
+    )
+  }
+
+  const handleGoogleSlides = async (pres: SavedPresentation) => {
+    showToast(
+      'Se descargará el .pptx — súbelo a Google Drive y ábrelo con Google Slides.',
+      'info'
+    )
+    const ok = await downloadPresentationPptx(
+      protocolFor(pres),
+      pres.template,
+      pres.color
+    )
+    if (ok) window.open('https://slides.google.com', '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <div className="page-transition" id="view-presentations">
@@ -29,34 +85,86 @@ export default function PresentationsPage() {
         Genera slides de resultados de investigación a partir de tus protocolos.
       </p>
 
-      {presentations.length === 0 ? (
+      {sorted.length === 0 ? (
         <EmptyState
           emoji="🎯"
           title="Aún no hay presentaciones"
-          description="Crea un protocolo de tipo Presentación para generar slides de resultados."
+          description="Genera una desde cualquier protocolo con el botón “Presentación”."
         />
       ) : (
-        <div className="proto-list">
-          {presentations.map((p) => (
-            <div
-              key={p.id}
-              className="proto-item"
-              onClick={() => router.push(`/protocols/${p.id}/edit`)}
-            >
-              <div className={`proto-item-icon ${p.type}`}>{p.icon || '🎯'}</div>
-              <div className="proto-item-body">
-                <div className="proto-item-name">{p.name}</div>
-                <div className="proto-item-meta">
-                  Presentación
-                  {' · '}
-                  {timeAgo(p.updatedAt)}
-                  <StatusPill status={p.protoStatus} size="sm" />
+        <div className={styles.grid}>
+          {sorted.map((pres) => (
+            <div key={pres.id} className={styles.card}>
+              <div
+                className={styles.thumb}
+                style={{ background: templateBackground(pres.template, pres.color) }}
+              >
+                <span className={styles.thumbIcon} aria-hidden>
+                  🎯
+                </span>
+              </div>
+              <div className={styles.body}>
+                <div className={styles.name} title={pres.name}>
+                  {pres.name}
+                </div>
+                <div className={styles.meta}>
+                  <span>
+                    {colorShort(pres.color)} ·{' '}
+                    {pres.template === 'gradient' ? 'Gradient' : 'Minimal'}
+                  </span>
+                  <span className={styles.metaDot}>{pres.slideCount} slides</span>
+                  <span className={styles.metaDot}>{formatDate(pres.createdAt)}</span>
+                </div>
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={styles.viewBtn}
+                    onClick={() => setViewing(pres)}
+                  >
+                    ▶ Ver
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.deleteBtn}
+                    onClick={() => setDeleteTarget(pres)}
+                    title="Eliminar presentación"
+                    aria-label="Eliminar presentación"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {viewing && (
+        <PresentationViewer
+          isOpen
+          protocol={protocolFor(viewing)}
+          template={viewing.template}
+          color={viewing.color}
+          slides={viewing.slides}
+          title={viewing.name}
+          onClose={() => setViewing(null)}
+          onDownloadPptx={() => handleDownload(viewing)}
+          onGoogleSlides={() => handleGoogleSlides(viewing)}
+        />
+      )}
+
+      <DeleteModal
+        isOpen={deleteTarget !== null}
+        title="Eliminar presentación"
+        protocolName={deleteTarget?.name ?? ''}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={async () => {
+          if (deleteTarget) {
+            deletePresentation(deleteTarget.id)
+            showToast('Presentación eliminada', 'success')
+          }
+        }}
+      />
     </div>
   )
 }

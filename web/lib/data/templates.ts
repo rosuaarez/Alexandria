@@ -15,9 +15,9 @@ export const PROTOCOL_TEMPLATES: Record<string, ProtocolTemplate> = {
     // Sin pre-llenado mock: los campos arrancan vacíos con sus placeholders
     // (p. ej. "Ej. Ana García"). Solo las preguntas vienen del template.
     questions: [
-      { id: '1', text: '¿Pudiste completar la tarea sin dificultad?', type: 'scale5' },
+      { id: '1', text: '¿Pudiste completar la tarea sin dificultad?', type: 'open' },
       { id: '2', text: '¿Qué fue lo más confuso del proceso?', type: 'open' },
-      { id: '3', text: '¿Qué tan probable es que uses este producto?', type: 'nps' },
+      { id: '3', text: '¿Qué tan probable es que uses este producto?', type: 'open' },
     ],
   },
   entrevistas: {
@@ -34,7 +34,7 @@ export const PROTOCOL_TEMPLATES: Record<string, ProtocolTemplate> = {
     objetivo:
       'Comparar dos versiones de [elemento] para determinar cuál performa mejor.',
     questions: [
-      { id: '1', text: '¿Cuál versión prefieres?', type: 'closed' },
+      { id: '1', text: '¿Cuál versión prefieres?', type: 'open' },
       { id: '2', text: '¿Por qué elegiste esa versión?', type: 'open' },
     ],
   },
@@ -50,7 +50,7 @@ export const PROTOCOL_TEMPLATES: Record<string, ProtocolTemplate> = {
     name: 'Tree Testing',
     objetivo: 'Evaluar la arquitectura de información y navegabilidad.',
     questions: [
-      { id: '1', text: '¿Encontraste fácilmente lo que buscabas?', type: 'scale5' },
+      { id: '1', text: '¿Encontraste fácilmente lo que buscabas?', type: 'open' },
       { id: '2', text: '¿Qué término usarías para buscar [contenido]?', type: 'open' },
     ],
   },
@@ -59,9 +59,9 @@ export const PROTOCOL_TEMPLATES: Record<string, ProtocolTemplate> = {
     objetivo:
       'Medir el nivel de satisfacción de los usuarios con [producto/servicio].',
     questions: [
-      { id: '1', text: '¿Qué tan satisfecho estás con [producto]?', type: 'scale5' },
+      { id: '1', text: '¿Qué tan satisfecho estás con [producto]?', type: 'open' },
       { id: '2', text: '¿Qué mejorarías?', type: 'open' },
-      { id: '3', text: '¿Lo recomendarías a otros?', type: 'nps' },
+      { id: '3', text: '¿Lo recomendarías a otros?', type: 'open' },
     ],
   },
 }

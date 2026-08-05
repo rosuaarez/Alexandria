@@ -90,28 +90,77 @@ export type QuestionType =
   | 'multiple'
   | 'yesno'
   | 'abtest'
-  // Grupo "Tipos de sección Lyssna"
+  // Grupo "Técnicas UX"
+  | 'five-second'
   | 'prototype'
+  | 'context-screen'
+  | 'tree-test'
+  | 'card-sort'
+  // Valores heredados (plantillas/datos previos); no se ofrecen en el dropdown.
   | 'instruction'
   | 'first-click'
-  | 'five-second'
   | 'survey'
   | 'design-survey'
   | 'preference'
   | 'navigation'
-  | 'card-sort'
-  | 'tree-test'
   | 'live-website'
-  // Valores heredados (plantillas/datos previos); no se ofrecen en el dropdown.
   | 'closed'
   | 'scale5'
   | 'scale7'
   | 'nps';
 
+// Variante para el bloque de configuración de A/B Test.
+export interface ABVariant {
+  id: string;
+  desc: string;
+  link: string;
+  imageUrl?: string;
+}
+
+// Configuración dinámica por tipo de pregunta (todos los campos opcionales:
+// cada subcomponente de TypeConfigFields usa solo los que le corresponden).
+// Se serializa junto a la pregunta, por lo que persiste sin lógica extra.
+export interface QuestionConfig {
+  // Likert
+  scale?: string;
+  startLabel?: string;
+  endLabel?: string;
+  // Opción múltiple
+  options?: string[];
+  // A/B Test
+  criterio?: string;
+  variants?: ABVariant[];
+  // 5 Seconds Test
+  duration?: string;
+  stimulusType?: string;
+  measure?: string;
+  instruction?: string;
+  // Prototype Test
+  tool?: string;
+  fidelity?: string;
+  task?: string;
+  metric?: string;
+  prototypeUrl?: string;
+  // Context Screen
+  screen?: string;
+  usageContext?: string;
+  scenario?: string;
+  aspects?: string[];
+  // Tree Test
+  depth?: string;
+  navTask?: string;
+  expectedAnswer?: string;
+  nodes?: string[];
+  // Card Sort
+  sortType?: string;
+  cards?: string[];
+}
+
 export interface Question {
   id: string;
   text: string;
   type: QuestionType;
+  config?: QuestionConfig;
 }
 
 export interface LibraryResource {

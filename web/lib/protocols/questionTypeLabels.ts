@@ -8,6 +8,7 @@ export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
   yesno: 'Sí / No',
   abtest: 'A/B Test',
   prototype: 'Prototype test',
+  'context-screen': 'Context Screen',
   instruction: 'Instruction',
   'first-click': 'First click',
   'five-second': 'Five second test',

@@ -1702,23 +1702,29 @@ body.dark-mode .gp-footer{background:var(--surface);border-top-color:var(--borde
 
 /* ── EDITOR TABS ─────────────────────────────────────────────────────────── */
 .editor-tabs{
-  display:flex;gap:0;border-top:1px solid var(--border);
-  margin:12px -20px 0;
-  padding:0 20px;
+  display:inline-flex;gap:4px;
+  margin:14px 0 4px;
+  padding:4px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:10px;
   overflow-x:auto;
 }
 .editor-tab{
   display:inline-flex;align-items:center;gap:6px;
-  padding:11px 18px;border:none;background:none;
-  font-family:var(--font);font-size:13px;font-weight:500;
+  padding:8px 16px;border:none;background:none;text-decoration:none;
+  font-family:var(--font);font-size:13px;font-weight:600;
   color:var(--text-3);cursor:pointer;
-  border-bottom:2.5px solid transparent;
-  margin-bottom:-1px;
-  transition:color .15s,border-color .15s;
+  border-radius:7px;
+  transition:background .15s,color .15s,box-shadow .15s;
   white-space:nowrap;
 }
-.editor-tab:hover{color:var(--text-1)}
-.editor-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.editor-tab:hover{color:var(--text-1);background:var(--surface)}
+.editor-tab.active{
+  color:var(--accent);
+  background:var(--surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
+}
 
 /* ── TAB PANELS ──────────────────────────────────────────────────────────── */
 .editor-tab-panel{animation:fadeIn .18s ease}

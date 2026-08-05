@@ -8,6 +8,8 @@ interface DeleteModalProps {
   protocolName: string
   onConfirm: () => Promise<void>
   onClose: () => void
+  // Encabezado del diálogo (por defecto "Eliminar protocolo").
+  title?: string
 }
 
 export function DeleteModal({
@@ -15,6 +17,7 @@ export function DeleteModal({
   protocolName,
   onConfirm,
   onClose,
+  title = 'Eliminar protocolo',
 }: DeleteModalProps) {
   const [loading, setLoading] = useState(false)
   const trapRef = useFocusTrap<HTMLDivElement>(isOpen)
@@ -52,11 +55,11 @@ export function DeleteModal({
         className="confirm-box"
         role="dialog"
         aria-modal="true"
-        aria-label="Eliminar protocolo"
+        aria-label={title}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="confirm-icon">🗑️</div>
-        <div className="confirm-title">Eliminar protocolo</div>
+        <div className="confirm-title">{title}</div>
         <div className="confirm-body">
           ¿Estás seguro de que quieres eliminar &ldquo;{protocolName}&rdquo;?
           <br />

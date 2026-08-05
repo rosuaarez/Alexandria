@@ -45,24 +45,49 @@ const variantClass: Record<PipeVariant, string> = {
   link: styles.stepLink,
 }
 
+// Progreso del flujo de estado (para marcar pasos completados/actual).
+const STATUS_RANK: Partial<Record<ProtocolStatus, number>> = {
+  draft: 0,
+  'in-review': 1,
+  approved: 2,
+  ready: 3,
+  completed: 4,
+}
+
+function rankOf(status: ProtocolStatus): number {
+  return STATUS_RANK[status] ?? 0
+}
+
 export interface ActionPipelineProps {
+  status: ProtocolStatus
   onChangeStatus: (status: ProtocolStatus) => void
+  onSendToReview: () => void
   onLyssna: () => void
   onPdf: () => void
   onPresentation: () => void
 }
 
 export function ActionPipeline({
+  status,
   onChangeStatus,
+  onSendToReview,
   onLyssna,
   onPdf,
   onPresentation,
 }: ActionPipelineProps) {
-  // Todos los pasos están siempre activos: cada clic ejecuta su acción o
-  // cambia el estado del protocolo (sin flujo por pasos).
+  const currentRank = rankOf(status)
+
+  // Índice del primer paso de estado aún no completado = paso "actual".
+  const statusTargets = FLOW_STEPS.filter(
+    (s): s is Extract<PipeStep, { kind: 'status' }> => s.kind === 'status'
+  )
+  const activeTarget = statusTargets.find((s) => rankOf(s.target) > currentRank)
+    ?.target
+
   const runStep = (step: PipeStep) => {
     if (step.kind === 'status') {
-      onChangeStatus(step.target)
+      if (step.key === 'review') onSendToReview()
+      else onChangeStatus(step.target)
       return
     }
     if (step.action === 'lyssna') onLyssna()
@@ -70,18 +95,35 @@ export function ActionPipeline({
     else onPresentation()
   }
 
-  const renderStep = (step: PipeStep) => (
-    <button
-      type="button"
-      className={`${styles.step} ${variantClass[step.variant]}`}
-      onClick={() => runStep(step)}
-    >
-      <span className={styles.stepIcon} aria-hidden>
-        {step.icon}
-      </span>
-      {step.label}
-    </button>
-  )
+  const renderStep = (step: PipeStep) => {
+    // Estado visual solo para los pasos de estado del flujo.
+    let stateClass = variantClass[step.variant]
+    let done = false
+    let isActive = false
+    if (step.kind === 'status') {
+      done = rankOf(step.target) <= currentRank
+      isActive = step.target === activeTarget
+      stateClass = done
+        ? styles.stepDone
+        : isActive
+          ? `${variantClass[step.variant]} ${styles.stepActive}`
+          : styles.stepPending
+    }
+
+    return (
+      <button
+        type="button"
+        className={`${styles.step} ${stateClass}`}
+        onClick={() => runStep(step)}
+        aria-current={isActive ? 'step' : undefined}
+      >
+        <span className={styles.stepIcon} aria-hidden>
+          {done ? '✓' : step.icon}
+        </span>
+        {step.label}
+      </button>
+    )
+  }
 
   return (
     <div className={styles.pipeline}>

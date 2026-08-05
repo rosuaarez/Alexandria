@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState, type ReactNode } from 'react'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
+import { usePresentationStore } from '@/lib/stores/usePresentationStore'
 
 // Un item está activo cuando la ruta coincide exacto (dashboard) o por prefijo
 // para el resto, de modo que /protocols/[id]/edit resalte "Mis Protocolos".
@@ -116,7 +117,8 @@ export function Sidebar() {
   const closeMobileSidebar = useUIStore((s) => s.closeMobileSidebar)
   const protocols = useProtocolStore((s) => s.protocols)
   const protocolCount = protocols.length
-  const presentationCount = protocols.filter((p) => p.type === 'presentation').length
+  // El badge refleja las presentaciones GUARDADAS (misma fuente que la lista).
+  const presentationCount = usePresentationStore((s) => s.presentations.length)
   // Notificación de protocolos nuevos (descartable) al fondo del sidebar.
   const [notifOpen, setNotifOpen] = useState(true)
 

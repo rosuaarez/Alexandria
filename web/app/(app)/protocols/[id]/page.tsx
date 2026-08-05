@@ -6,12 +6,19 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import type { ProtocolStatus } from '@/lib/types'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
+import { usePresentationStore } from '@/lib/stores/usePresentationStore'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { asArray, asString } from '@/components/protocols/forms/utils'
 import { ActionPipeline } from '@/components/protocols/ActionPipeline'
 import { LyssnaModal } from '@/components/protocols/LyssnaModal'
+import { ShareLinkModal } from '@/components/protocols/ShareLinkModal'
+import { PresentationModal } from '@/components/protocols/PresentationModal'
+import { PresentationViewer } from '@/components/protocols/PresentationViewer'
 import { printProtocolPdf } from '@/lib/pdf/protocolPdf'
 import { buildLyssnaText } from '@/lib/lyssna/formatProtocol'
+import type { PresentationTemplate } from '@/lib/presentation/constants'
+import { downloadPresentationPptx } from '@/lib/presentation/download'
+import { buildSlides } from '@/lib/presentation/presentationData'
 import styles from './output.module.css'
 
 type Rec = Record<string, unknown>
@@ -68,9 +75,13 @@ function readTextItems(v: unknown): string[] {
     .filter((s) => s.trim() !== '')
 }
 
-function joinTokens(v: unknown): string {
+// Renombre de herramientas heredadas: el proyecto pasó de "Maze" a "Lyssna".
+// Se aplica solo al mostrar, sin reescribir los datos guardados.
+const TOOL_RENAME: Record<string, string> = { Maze: 'Lyssna' }
+
+function joinTools(v: unknown): string {
   return asArray<unknown>(v)
-    .map((s) => (typeof s === 'string' ? s : ''))
+    .map((s) => (typeof s === 'string' ? TOOL_RENAME[s] ?? s : ''))
     .filter((s) => s.trim() !== '')
     .join(', ')
 }
@@ -210,10 +221,19 @@ export default function ProtocolOutputPage() {
   const protocols = useProtocolStore((s) => s.protocols)
   const loading = useProtocolStore((s) => s.loading)
   const updateProtocol = useProtocolStore((s) => s.updateProtocol)
+  const addPresentation = usePresentationStore((s) => s.addPresentation)
   const showToast = useUIStore((s) => s.showToast)
   const [statusMenuOpen, setStatusMenuOpen] = useState(false)
   const [lyssnaOpen, setLyssnaOpen] = useState(false)
   const [lyssnaText, setLyssnaText] = useState('')
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareLink, setShareLink] = useState('')
+  const [presentationOpen, setPresentationOpen] = useState(false)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerCfg, setViewerCfg] = useState<{
+    template: PresentationTemplate
+    color: string
+  }>({ template: 'minimal', color: 'Morado (predeterminado)' })
 
   const protocol = protocols.find((p) => p.id === params.id)
 
@@ -236,6 +256,15 @@ export default function ProtocolOutputPage() {
   const currentStatus =
     STATUS_OPTIONS.find((o) => o.value === status) ?? STATUS_OPTIONS[0]
 
+  // Ajustes de presentación guardados (plantilla + color) para reabrir con ellos.
+  const savedPresentationRaw = (data.presentation ?? {}) as Rec
+  const savedPresentation = {
+    template: (asString(savedPresentationRaw.template) === 'gradient'
+      ? 'gradient'
+      : 'minimal') as PresentationTemplate,
+    color: asString(savedPresentationRaw.color) || undefined,
+  }
+
   // --- Datos derivados (leídos de lo ya guardado; se ocultan los vacíos). ---
   const datosFields = pickFields([
     ['Proyecto', asString(data.proyecto)],
@@ -254,7 +283,7 @@ export default function ProtocolOutputPage() {
   const metodFields = pickFields([
     ['Método', asString(data.metodo)],
     ['Enfoque', asString(data.enfoque)],
-    ['Herramientas', joinTokens(data.herramientas)],
+    ['Herramientas', joinTools(data.herramientas)],
     ['Duración', asString(data.duracion)],
     ['Muestra', asString(data.muestra)],
     ['Fechas de aplicación', fechasApp],
@@ -353,8 +382,91 @@ export default function ProtocolOutputPage() {
     window.open('https://app.lyssna.com', '_blank', 'noopener,noreferrer')
   }
 
-  const handlePresentation = () =>
-    showToast('La presentación llega en un próximo sprint', 'info')
+  // Enviar a revisión: genera la liga compartible, la muestra y marca el
+  // protocolo como "en revisión".
+  const copyShareLink = (link: string) => {
+    if (!navigator.clipboard) {
+      showToast('Copia la liga desde el cuadro (portapapeles no disponible).', 'info')
+      return
+    }
+    navigator.clipboard.writeText(link).then(
+      () => showToast('Liga copiada al portapapeles ✓', 'success'),
+      () => showToast('Copia la liga desde el cuadro (permiso denegado).', 'info')
+    )
+  }
+
+  const handleSendToReview = () => {
+    const link = `${window.location.origin}/protocols/${protocol.id}`
+    setShareLink(link)
+    setShareOpen(true)
+    copyShareLink(link)
+    if (status !== 'in-review') {
+      void updateProtocol({ ...protocol, protoStatus: 'in-review' })
+    }
+  }
+
+  const handlePresentation = () => setPresentationOpen(true)
+
+  // "Generar presentación" abre el visualizador in-app con la plantilla elegida.
+  const handleGeneratePresentation = (
+    template: PresentationTemplate,
+    color: string
+  ) => {
+    setViewerCfg({ template, color })
+    setPresentationOpen(false)
+    setViewerOpen(true)
+  }
+
+  const handleDownloadPptx = async () => {
+    showToast('Generando .pptx…', 'info')
+    const ok = await downloadPresentationPptx(
+      protocol,
+      viewerCfg.template,
+      viewerCfg.color
+    )
+    showToast(
+      ok ? 'Presentación descargada ✓' : 'No se pudo generar la presentación',
+      ok ? 'success' : 'error'
+    )
+  }
+
+  // Google Slides: sin API/OAuth. Se descarga el .pptx y se abre Google Slides
+  // para que el usuario lo suba a Drive y lo abra ahí.
+  const handleGoogleSlides = async () => {
+    showToast(
+      'Se descargará el .pptx — súbelo a Google Drive y ábrelo con Google Slides.',
+      'info'
+    )
+    const ok = await downloadPresentationPptx(
+      protocol,
+      viewerCfg.template,
+      viewerCfg.color
+    )
+    if (ok) window.open('https://slides.google.com', '_blank', 'noopener,noreferrer')
+  }
+
+  // Guardar: crea un registro de la presentación (asociado al protocolo) con su
+  // contenido de slides, y recuerda plantilla+color para reabrir el modal así.
+  const handleSavePresentation = () => {
+    const slides = buildSlides(protocol)
+    addPresentation({
+      protocolId: protocol.id,
+      name: protocol.name,
+      template: viewerCfg.template,
+      color: viewerCfg.color,
+      slideCount: slides.length,
+      slides,
+    })
+    const prevData = (protocol.data ?? {}) as Rec
+    void updateProtocol({
+      ...protocol,
+      data: {
+        ...prevData,
+        presentation: { template: viewerCfg.template, color: viewerCfg.color },
+      },
+    })
+    showToast('Presentación guardada ✓', 'success')
+  }
 
   const handlePdf = () => {
     const ok = printProtocolPdf(protocol)
@@ -421,7 +533,9 @@ export default function ProtocolOutputPage() {
 
       {/* Pipeline de acciones (componente reutilizable) */}
       <ActionPipeline
+        status={status}
         onChangeStatus={changeStatus}
+        onSendToReview={handleSendToReview}
         onLyssna={handleLyssna}
         onPdf={handlePdf}
         onPresentation={handlePresentation}
@@ -503,6 +617,32 @@ export default function ProtocolOutputPage() {
         text={lyssnaText}
         onClose={() => setLyssnaOpen(false)}
         onCopy={() => copyLyssnaText(lyssnaText)}
+      />
+
+      <ShareLinkModal
+        isOpen={shareOpen}
+        link={shareLink}
+        onClose={() => setShareOpen(false)}
+        onCopy={() => copyShareLink(shareLink)}
+      />
+
+      <PresentationModal
+        isOpen={presentationOpen}
+        onClose={() => setPresentationOpen(false)}
+        onGenerate={handleGeneratePresentation}
+        initialTemplate={savedPresentation.template}
+        initialColor={savedPresentation.color}
+      />
+
+      <PresentationViewer
+        isOpen={viewerOpen}
+        protocol={protocol}
+        template={viewerCfg.template}
+        color={viewerCfg.color}
+        onClose={() => setViewerOpen(false)}
+        onSave={handleSavePresentation}
+        onDownloadPptx={handleDownloadPptx}
+        onGoogleSlides={handleGoogleSlides}
       />
     </div>
   )
