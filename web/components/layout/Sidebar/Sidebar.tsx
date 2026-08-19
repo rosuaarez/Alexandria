@@ -6,6 +6,7 @@ import { useState, type ReactNode } from 'react'
 import { useUIStore } from '@/lib/stores/useUIStore'
 import { useProtocolStore } from '@/lib/stores/useProtocolStore'
 import { usePresentationStore } from '@/lib/stores/usePresentationStore'
+import { SHOW_CAPSULAS } from '@/lib/config/flags'
 
 // Un item está activo cuando la ruta coincide exacto (dashboard) o por prefijo
 // para el resto, de modo que /protocols/[id]/edit resalte "Mis Protocolos".
@@ -20,6 +21,8 @@ interface NavItem {
   icon: ReactNode
   // Clave del contador a mostrar como badge.
   badge?: 'protocols' | 'presentations'
+  // Si es true, el item se omite del render (visibilidad, no se elimina).
+  hidden?: boolean
 }
 
 interface NavSection {
@@ -99,6 +102,8 @@ const NAV_SECTIONS: NavSection[] = [
       {
         label: 'Cápsulas',
         href: '/capsulas',
+        // Oculto temporalmente vía SHOW_CAPSULAS (código y ruta intactos).
+        hidden: !SHOW_CAPSULAS,
         icon: (
           <svg {...ICON_PROPS}>
             <path d="M9 18h6" />
@@ -145,7 +150,7 @@ export function Sidebar() {
         <div key={section.label ?? `section-${i}`}>
           {i > 0 && <div className="sidebar-divider" aria-hidden="true" />}
           {section.label && <div className="sidebar-label">{section.label}</div>}
-          {section.items.map((item) => {
+          {section.items.filter((item) => !item.hidden).map((item) => {
             const active = isActiveRoute(pathname, item.href)
             const badge = item.badge ? badgeValue(item.badge) : null
             return (

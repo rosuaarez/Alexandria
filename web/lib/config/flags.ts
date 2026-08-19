@@ -12,3 +12,10 @@ export const FLAGS = {
 } as const
 
 export type FeatureFlag = keyof typeof FLAGS
+
+// Flag temporal para ocultar/bloquear "💡 Cápsulas de Conocimiento" sin borrar
+// el código ni la ruta. Controla a la vez:
+//   - el item del sidebar (components/layout/Sidebar/Sidebar.tsx)
+//   - el acceso por URL directa (app/(app)/capsulas/layout.tsx -> notFound())
+// Poner en `true` para volver a mostrar y habilitar la sección.
+export const SHOW_CAPSULAS = false
