@@ -25,3 +25,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# backups sueltos en la raíz (no confundir con web/public, que sí se versiona)
+/public/
